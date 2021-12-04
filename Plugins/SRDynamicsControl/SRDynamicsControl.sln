@@ -11,8 +11,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SRDynamicsControl-vst3", "p
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SRDynamicsControl-aax", "projects\SRDynamicsControl-aax.vcxproj", "{DC4B5920-933D-4C82-B842-F34431D55A93}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Classes", "..\..\Classes\Classes.vcxproj", "{96E79BB9-6B7D-46A4-A295-F59824142B1E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -71,18 +69,6 @@ Global
 		{DC4B5920-933D-4C82-B842-F34431D55A93}.Tracer|Win32.Build.0 = Tracer|Win32
 		{DC4B5920-933D-4C82-B842-F34431D55A93}.Tracer|x64.ActiveCfg = Tracer|x64
 		{DC4B5920-933D-4C82-B842-F34431D55A93}.Tracer|x64.Build.0 = Tracer|x64
-		{96E79BB9-6B7D-46A4-A295-F59824142B1E}.Debug|Win32.ActiveCfg = Debug|Win32
-		{96E79BB9-6B7D-46A4-A295-F59824142B1E}.Debug|Win32.Build.0 = Debug|Win32
-		{96E79BB9-6B7D-46A4-A295-F59824142B1E}.Debug|x64.ActiveCfg = Debug|x64
-		{96E79BB9-6B7D-46A4-A295-F59824142B1E}.Debug|x64.Build.0 = Debug|x64
-		{96E79BB9-6B7D-46A4-A295-F59824142B1E}.Release|Win32.ActiveCfg = Release|Win32
-		{96E79BB9-6B7D-46A4-A295-F59824142B1E}.Release|Win32.Build.0 = Release|Win32
-		{96E79BB9-6B7D-46A4-A295-F59824142B1E}.Release|x64.ActiveCfg = Release|x64
-		{96E79BB9-6B7D-46A4-A295-F59824142B1E}.Release|x64.Build.0 = Release|x64
-		{96E79BB9-6B7D-46A4-A295-F59824142B1E}.Tracer|Win32.ActiveCfg = Debug|Win32
-		{96E79BB9-6B7D-46A4-A295-F59824142B1E}.Tracer|Win32.Build.0 = Debug|Win32
-		{96E79BB9-6B7D-46A4-A295-F59824142B1E}.Tracer|x64.ActiveCfg = Debug|x64
-		{96E79BB9-6B7D-46A4-A295-F59824142B1E}.Tracer|x64.Build.0 = Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

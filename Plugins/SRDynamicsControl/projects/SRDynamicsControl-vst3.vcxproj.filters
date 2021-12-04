@@ -354,8 +354,11 @@
     <ClInclude Include="..\..\..\iPlug2\IPlug\IPlugPluginBase.h">
       <Filter>IPlug</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\iPlug2\IGraphics\ISender.h">
-      <Filter>IGraphics</Filter>
+    <ClInclude Include="..\..\..\Classes\Graphics\SRControls.h">
+      <Filter>Classes\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Classes\Graphics\SRCustomKnob.h">
+      <Filter>Classes\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -415,6 +418,12 @@
     </Filter>
     <Filter Include="IPlug\VST3\VST3_SDK\plugininterfaces\base">
       <UniqueIdentifier>{5f06b03e-5093-46c0-9513-efb4e494c857}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Classes">
+      <UniqueIdentifier>{f4a2571f-2b37-4d3f-9cf6-8137932a9151}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Classes\Graphics">
+      <UniqueIdentifier>{ce8d3644-c3cb-44f0-be9e-48d1cd1ea59b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

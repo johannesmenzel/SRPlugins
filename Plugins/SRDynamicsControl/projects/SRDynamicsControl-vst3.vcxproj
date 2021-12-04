@@ -254,6 +254,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="../config.h" />
+    <ClInclude Include="..\..\..\Classes\Graphics\SRControls.h" />
+    <ClInclude Include="..\..\..\Classes\Graphics\SRCustomKnob.h" />
     <ClInclude Include="..\..\..\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\classfactoryhelpers.h" />
     <ClInclude Include="..\..\..\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fbuffer.h" />
     <ClInclude Include="..\..\..\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fcleanup.h" />
