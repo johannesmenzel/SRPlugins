@@ -1,6 +1,7 @@
 #pragma once
-//#include "IPlug/IPlug_include_in_plug_hdr.h"
+#include "IPlug_include_in_plug_src.h"
 #include "IControl.h"
+#include "IGraphics.h"
 #include "IPlugPluginBase.h"
 #include "../Utils/SRHelpers.h"
 #include "config.h"
@@ -9,9 +10,9 @@
 #include "IPlugStructs.h"
 #include "Controls/IVMeterControl.h"
 
-
 //#include <string>
-
+using namespace iplug;
+using namespace igraphics;
 namespace SR {
   namespace Graphics {
     namespace Layout {
@@ -538,14 +539,14 @@ namespace SR {
           if (mStyle.drawFrame)
             handleBounds.Pad(-0.5f * mStyle.frameThickness);
 
-          if (mStyle.drawShadows)
-            handleBounds.Alter(
+          /*if (mStyle.drawShadows)
+            handleBounds.Alter( // obviously deprecated
               std::max(-GetShadowOffsetX(handleBounds.MW(), 10.f), 0.f),
               std::max(-GetShadowOffsetY(handleBounds.MH(), 10.f), 0.f),
               std::min(-GetShadowOffsetX(handleBounds.MW(), 10.f), 0.f),
               std::min(-GetShadowOffsetY(handleBounds.MH(), 10.f), 0.f)
             );
-
+            */
           return handleBounds;
         }
 
@@ -1005,7 +1006,7 @@ namespace SR {
 
       void SRVectorKnob::Draw(IGraphics& g)
       {
-        DrawBackGround(g, mRECT);
+        // DrawBackGround(g, mRECT); // obviously deprecated
         DrawLabel(g);
         DrawWidget(g);
         DrawValue(g, mValueMouseOver);
