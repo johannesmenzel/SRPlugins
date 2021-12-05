@@ -663,7 +663,7 @@ namespace SR {
                                                                         // See NOTE 4
 
                         // gain reduction
-      double grRaw = mThreshLin / currentOvershootLin;
+      double grRaw = mGrLin = mThreshLin / currentOvershootLin;
 
       // unload current buffer index
       // ( mCursor - delay ) & mBufferMask gets sample from [delay] samples ago
