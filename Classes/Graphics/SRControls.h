@@ -1,5 +1,5 @@
 #pragma once
-#include "IPlug_include_in_plug_src.h"
+//#include "IPlug_include_in_plug_src.h"
 #include "IControl.h"
 #include "IGraphics.h"
 #include "IPlugPluginBase.h"
@@ -8,14 +8,13 @@
 // For meter, see IVMeterControl.h
 #include "IPlugQueue.h"
 #include "IPlugStructs.h"
-#include "Controls/IVMeterControl.h"
+//#include "Controls/IVMeterControl.h"
 
 //#include <string>
 using namespace iplug;
 using namespace igraphics;
 namespace SR {
   namespace Graphics {
-    namespace Layout {
 
       // SRPLUGIN CONSTANTS
 
@@ -479,7 +478,7 @@ namespace SR {
       };
 
 
-    }
+    
 
     namespace Base {
 
@@ -1179,7 +1178,7 @@ namespace SR {
         const IParam* pParam = GetParam();
 
         if (pParam)
-          pParam->GetDisplayForHostWithLabel(mValueStr);
+          pParam->GetDisplayWithLabel(mValueStr);
       }
 
       void SRVectorKnob::OnInit()
@@ -1188,10 +1187,10 @@ namespace SR {
 
         if (pParam)
         {
-          pParam->GetDisplayForHostWithLabel(mValueStr);
+          pParam->GetDisplayWithLabel(mValueStr);
 
           if (!mLabelStr.GetLength())
-            mLabelStr.Set(pParam->GetNameForHost());
+            mLabelStr.Set(pParam->GetName());
         }
       }
 
@@ -1258,7 +1257,7 @@ namespace SR {
         const IParam* pParam = GetParam();
 
         if (pParam)
-          pParam->GetDisplayForHost(mValueStr);
+          pParam->GetDisplay(mValueStr);
       }
 
       void SRVectorSwitch::OnResize() {
@@ -1277,10 +1276,10 @@ namespace SR {
 
         if (pParam)
         {
-          pParam->GetDisplayForHostWithLabel(mValueStr);
+          pParam->GetDisplayWithLabel(mValueStr);
 
           if (!mLabelStr.GetLength())
-            mLabelStr.Set(pParam->GetNameForHost());
+            mLabelStr.Set(pParam->GetName());
         }
       }
 
@@ -1773,13 +1772,13 @@ namespace SR {
         }
 
         void Draw(IGraphics& g) override {
-          if (g.HasPathSupport()) {
+          //if (g.HasPathSupport()) { //obviously deprecated
             g.PathRect(mRECT);
             g.PathFill(mPattern);
-          }
-          else {
-            g.FillRect(mPattern.GetStop(0).mColor, mRECT);
-          }
+          //}
+          //else {
+          //  g.FillRect(mPattern.GetStop(0).mColor, mRECT);
+          //}
 
           if (mDrawFrame) {
             g.DrawRect(COLOR_LIGHT_GRAY, mRECT);
@@ -1861,7 +1860,7 @@ namespace SR {
 
           if (itemChosen > -1 && itemChosen < numPresets) {
             pPluginBase->RestorePreset(itemChosen);
-            pPluginBase->InformHostOfProgramChange();
+            pPluginBase->InformHostOfPresetChange();
             pPluginBase->DirtyParametersFromUI();
           }
           else {
@@ -1872,7 +1871,7 @@ namespace SR {
             //}
             WDL_String filename, path;
             GetUI()->PromptForFile(filename, path, EFileAction::Save, "txt");
-            pPluginBase->DumpPresetSrcCode(filename.Get(), mNamedParams);
+            // pPluginBase->DumpPresetSrcCode(filename.Get(), mNamedParams); //obviously deprecated
           }
         }
         void TextFromTextEntry(const char* txt) {
@@ -1881,7 +1880,7 @@ namespace SR {
           safeName.Set(txt, MAX_PRESET_NAME_LEN);
 
           pPluginBase->ModifyCurrentPreset(safeName.Get());
-          pPluginBase->InformHostOfProgramChange();
+          pPluginBase->InformHostOfPresetChange();
           pPluginBase->DirtyParametersFromUI();
           SetDirty(false);
         }
