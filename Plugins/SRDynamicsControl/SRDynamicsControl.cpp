@@ -9,11 +9,12 @@ SRDynamicsControl::SRDynamicsControl(const InstanceInfo& info)
 	, fOutGain(100)
 	, fCompLevel()
 	, fCompOpto()
+	, fCompVca()
 	, fDeesser()
 	, fCompFet()
 	, fCompLim()
 {
-	GetParam(kGain)->InitDouble("Gain", 0., -12., 12.0, 0.01, "dB");
+	GetParam(kOutGain)->InitDouble("Output", 0., -12., 12., 0.01, "dB");
 	GetParam(kThresh)->InitDouble("Thresh", 0., 0., 100., 0.01, "%");
 	GetParam(kCrest)->InitDouble("Crest", 50., 0., 100., 0.01, "%");
 	GetParam(kRatio)->InitDouble("Ratio", 50., 0., 100., 0.01, "%");
@@ -33,19 +34,20 @@ SRDynamicsControl::SRDynamicsControl(const InstanceInfo& info)
 		pGraphics->LoadFont("Roboto-Regular", ROBOTO_FN);
 		const IRECT b = pGraphics->GetBounds();
 		//pGraphics->AttachControl(new ITextControl(b.GetMidVPadded(50), "SRDynamicsControl", IText(50)));
-		//pGraphics->AttachControl(new IVKnobControl(b.GetCentredInside(100).GetVShifted(-100), kGain));
+		//pGraphics->AttachControl(new IVKnobControl(b.GetCentredInside(100).GetVShifted(-100), kOutput));
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(b.GetGridCell(0, 0, 2, 4), kAttack, "Attack", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cAttack);
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(b.GetGridCell(0, 1, 2, 4), kRelease, "Release", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cRelease);
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(b.GetGridCell(0, 2, 2, 4), kCrest, "Crest", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCrest);
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(b.GetGridCell(1, 0, 2, 4), kThresh, "Tresh", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cThresh);
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(b.GetGridCell(1, 1, 2, 4), kRatio, "Ratio", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cRatio);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(b.GetGridCell(1, 2, 2, 4), kGain, "Out Gain", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGain);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(b.GetGridCell(1, 2, 2, 4), kOutGain, "Output", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cOutGain);
 		pGraphics->AttachControl(new IVMeterControl<2>(b.GetGridCell(0, 14, 1, 16), "In", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L", "R" }, 0, -60.f, 0.f), cMeterIn);
 		pGraphics->AttachControl(new IVMeterControl<2>(b.GetGridCell(0, 15, 1, 16), "Out", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L", "R" }, 0, -60.f, 0.f), cMeterOut);
-		pGraphics->AttachControl(new IVMeterControl<1>(b.GetGridCell(0, 24, 1, 32), "", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -20.f, 0.f), cMeterGrLevel);
-		pGraphics->AttachControl(new IVMeterControl<1>(b.GetGridCell(0, 25, 1, 32), "", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -10.f, 0.f), cMeterGrOpto);
-		pGraphics->AttachControl(new IVMeterControl<1>(b.GetGridCell(0, 26, 1, 32), "", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -5.f, 0.f), cMeterGrFet);
-		pGraphics->AttachControl(new IVMeterControl<1>(b.GetGridCell(0, 27, 1, 32), "", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -2.f, 0.f), cMeterGrLim);
+		pGraphics->AttachControl(new IVMeterControl<1>(b.GetGridCell(0, 30, 1, 40), "L", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -18.f, 0.f), cMeterGrLevel);
+		pGraphics->AttachControl(new IVMeterControl<1>(b.GetGridCell(0, 31, 1, 40), "O", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -18.f, 0.f), cMeterGrOpto);
+		pGraphics->AttachControl(new IVMeterControl<1>(b.GetGridCell(0, 32, 1, 40), "V", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -18.f, 0.f), cMeterGrVca);
+		pGraphics->AttachControl(new IVMeterControl<1>(b.GetGridCell(0, 33, 1, 40), "F", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -18.f, 0.f), cMeterGrFet);
+		pGraphics->AttachControl(new IVMeterControl<1>(b.GetGridCell(0, 34, 1, 40), "L", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -18.f, 0.f), cMeterGrLim);
 	};
 #endif
 }
@@ -57,6 +59,7 @@ void SRDynamicsControl::OnIdle()
 	mMeterSenderOut.TransmitData(*this);
 	mMeterSenderGrLevel.TransmitData(*this);
 	mMeterSenderGrOpto.TransmitData(*this);
+	mMeterSenderGrVca.TransmitData(*this);
 	mMeterSenderGrFet.TransmitData(*this);
 	mMeterSenderGrLim.TransmitData(*this);
 }
@@ -70,29 +73,44 @@ void SRDynamicsControl::SetCompressorValues()
 	const double release = GetParam(kRelease)->Value() * .01;
 
 	fCompLevel.ResetCompressor(
-		thresh * 48. * (2. - crest), // thresh
-		1. / (1. + ratio * 1.), // ratio
-		20. + attack * 80., // attack
-		500. + release * 4500., // release
+		thresh * 48. * (2. - crest), // thresh -48 .. -24 .. 0
+		1. / (1. + ratio * 1.), // ratio 1 .. 1.5 .. 2
+		20. + attack * 80., // attack 20 .. 60 .. 100
+		500. + release * 4500., // release 500 .. 2500 .. 4500
 		.0, // sidechain HP
 		10., // knee dB
 		false, // feedback
 		true, // automake
 		-18., // reference
 		samplerate);
+	fCompLevel.SetWindow(100.);
 
 	fCompOpto.ResetCompressor(
-		thresh * 36. * (1.5 - crest * .5), // thresh
-		1. / (1. + ratio * 4.), // ratio
-		5. + attack * 20., // attack
-		200. + release * 1800., // release
+		thresh * 27. * (1.5 - crest * .5), // thresh -27 .. -13.5 .. 0
+		1. / (1. + ratio * 4.), // ratio 1 .. 3 .. 5
+		3. + attack * 12., // attack 5 .. 15 .. 25
+		200. + release * 1800., // release 200 .. 1100 .. 2000
+		.0, // sidechain HP
+		8., // knee dB
+		true, // feedback
+		true, // automake
+		-18., // reference
+		samplerate);
+	fCompOpto.SetMaxGrDb(10.,true);
+	fCompOpto.SetWindow(4.);
+
+	fCompVca.ResetCompressor(
+		thresh * 24., // thresh
+		1. / (1. + ratio * 5.), // ratio
+		3. + attack * 12., // attack
+		50. + release * 450., // release
 		.0, // sidechain HP
 		6., // knee dB
 		false, // feedback
 		true, // automake
 		-18., // reference
-		samplerate);
-
+		samplerate);	
+	
 	fCompFet.ResetCompressor(
 		thresh * 24. * (.5 + crest * .5), // thresh
 		1. / (1. + ratio * 19.), // ratio
@@ -100,22 +118,26 @@ void SRDynamicsControl::SetCompressorValues()
 		40. + release * 360., // release
 		.0, // sidechain HP
 		4., // knee dB
-		false, // feedback
+		true, // feedback
 		true, // automake
 		-18., // reference
 		samplerate);
 
-	fCompLim.ResetCompressor(
-		thresh * 12. * crest, // thresh
-		1. / (1. + ratio * 99.), // ratio
-		.02 + attack * .08, // attack
-		20. + release * 180., // release
-		.0, // sidechain HP
-		2., // knee dB
-		false, // feedback
-		true, // automake
-		-18., // reference
-		samplerate);
+	fCompLim.SetThresh(thresh * 6. * crest);
+	fCompLim.SetRatio(1. / (1. + ratio * 99.));
+	fCompLim.SetAttack(.02 + attack * .08);
+	fCompLim.SetRelease(5. + release * 10.);
+	//fCompLim.ResetCompressor(
+	//	thresh * 12. * crest, // thresh
+	//	1. / (1. + ratio * 99.), // ratio
+	//	.02 + attack * .08, // attack
+	//	20. + release * 180., // release
+	//	.0, // sidechain HP
+	//	2., // knee dB
+	//	false, // feedback
+	//	true, // automake
+	//	-18., // reference
+	//	samplerate);
 	
 }
 
@@ -130,6 +152,7 @@ void SRDynamicsControl::ProcessBlock(sample** inputs, sample** outputs, int nFra
 
 		fCompLevel.Process(outputs[0][s], outputs[1][s]);
 		fCompOpto.Process(outputs[0][s], outputs[1][s]);
+		fCompVca.Process(outputs[0][s], outputs[1][s]);
 		fCompFet.Process(outputs[0][s], outputs[1][s]);
 		fCompLim.Process(outputs[0][s], outputs[1][s]);
 
@@ -139,6 +162,7 @@ void SRDynamicsControl::ProcessBlock(sample** inputs, sample** outputs, int nFra
 
 		mBufferMeterGrLevel.ProcessBuffer(fCompLevel.GetGrLin(), 0, s);
 		mBufferMeterGrOpto.ProcessBuffer(fCompOpto.GetGrLin(), 0, s);
+		mBufferMeterGrVca.ProcessBuffer(fCompVca.GetGrLin(), 0, s);
 		mBufferMeterGrFet.ProcessBuffer(fCompFet.GetGrLin(), 0, s);
 		mBufferMeterGrLim.ProcessBuffer(fCompLim.GetGrLin(), 0, s);
 
@@ -148,6 +172,7 @@ void SRDynamicsControl::ProcessBlock(sample** inputs, sample** outputs, int nFra
 	mMeterSenderOut.ProcessBlock(outputs, nFrames, cMeterOut);
 	mMeterSenderGrLevel.ProcessBlock(mBufferMeterGrLevel.GetBuffer(), nFrames, cMeterGrLevel);
 	mMeterSenderGrOpto.ProcessBlock(mBufferMeterGrOpto.GetBuffer(), nFrames, cMeterGrOpto);
+	mMeterSenderGrVca.ProcessBlock(mBufferMeterGrVca.GetBuffer(), nFrames, cMeterGrVca);
 	mMeterSenderGrFet.ProcessBlock(mBufferMeterGrFet.GetBuffer(), nFrames, cMeterGrFet);
 	mMeterSenderGrLim.ProcessBlock(mBufferMeterGrLim.GetBuffer(), nFrames, cMeterGrLim);
 }
@@ -160,7 +185,7 @@ void SRDynamicsControl::OnParamChange(int paramIdx)
 {
 	switch (paramIdx)
 	{
-	case kGain: fOutGain.SetGain(DBToAmp(GetParam(paramIdx)->Value())); break;
+	case kOutGain: fOutGain.SetGain(DBToAmp(GetParam(paramIdx)->Value())); break;
 	case kThresh:
 	case kRatio:
 	case kAttack:
