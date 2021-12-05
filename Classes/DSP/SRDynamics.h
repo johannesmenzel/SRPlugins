@@ -314,6 +314,19 @@ namespace SR {
         SRDynamicsBase::Reset();
       }
 
+      virtual void ResetCompressor(double threshDb, double ratio, double attackMs, double releaseMs, double sidechainFc, double kneeDb, bool isFeedbackCompressor, bool autoMakeup, double referenceDb, double samplerate) {
+        SRDynamicsDetector::SetSampleRate(samplerate);
+        SRDynamicsBase::SetThresh(threshDb);
+        SRDynamicsBase::SetRatio(ratio);
+        SRDynamicsBase::SetIsAutoMakeup(autoMakeup);
+        SRDynamicsBase::SetReference(referenceDb);
+        SRDynamicsDetector::SetAttack(attackMs);
+        SRDynamicsDetector::SetRelease(releaseMs);
+        InitSidechainFilter(sidechainFc);
+        SRDynamicsBase::SetKnee(kneeDb);
+        SetTopologyFeedback(isFeedbackCompressor);
+      }
+
       virtual void SetMaxGrDb(double maxGrDb, bool sigmoid = true) {
         if (!sigmoid)
           mMaxGr = maxGrDb;
