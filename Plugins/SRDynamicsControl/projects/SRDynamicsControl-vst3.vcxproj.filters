@@ -360,6 +360,15 @@
     <ClInclude Include="..\..\..\Classes\Graphics\SRCustomKnob.h">
       <Filter>Classes\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Classes\DSP\SRGain.h">
+      <Filter>Classes\DSP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Classes\Graphics\SRCustomLayout.h">
+      <Filter>Classes\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Classes\DSP\SRDynamics.h">
+      <Filter>Classes\DSP</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">
@@ -424,6 +433,9 @@
     </Filter>
     <Filter Include="Classes\Graphics">
       <UniqueIdentifier>{ce8d3644-c3cb-44f0-be9e-48d1cd1ea59b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Classes\DSP">
+      <UniqueIdentifier>{be51f028-c536-4b9f-b8ae-51f03b5db492}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
