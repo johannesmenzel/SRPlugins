@@ -34,20 +34,22 @@ SRDynamicsControl::SRDynamicsControl(const InstanceInfo& info)
 		pGraphics->AttachPanelBackground(SR::Graphics::Layout::SR_DEFAULT_COLOR_CUSTOM_PANEL_BG);
 		pGraphics->LoadFont("Roboto-Regular", ROBOTO_FN);
 		const IRECT b = pGraphics->GetBounds();
-		//pGraphics->AttachControl(new ITextControl(b.GetMidVPadded(50), "SRDynamicsControl", SR::Graphics::Layout::SR_DEFAULT_TEXT));
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(b.GetGridCell(0, 0, 2, 4), kAttack, "Attack", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cAttack);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(b.GetGridCell(0, 1, 2, 4), kRelease, "Release", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cRelease);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(b.GetGridCell(0, 2, 2, 4), kCrest, "Crest", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCrest);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(b.GetGridCell(1, 0, 2, 4), kThresh, "Tresh", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cThresh);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(b.GetGridCell(1, 1, 2, 4), kRatio, "Ratio", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cRatio);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(b.GetGridCell(1, 2, 2, 4), kOutGain, "Output", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cOutGain);
-		pGraphics->AttachControl(new IVMeterControl<2>(b.GetGridCell(0, 14, 1, 16), "In", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L", "R" }, 0, -60.f, 0.f), cMeterIn);
-		pGraphics->AttachControl(new IVMeterControl<2>(b.GetGridCell(0, 15, 1, 16), "Out", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L", "R" }, 0, -60.f, 0.f), cMeterOut);
-		pGraphics->AttachControl(new IVMeterControl<1>(b.GetGridCell(0, 30, 1, 40), "L", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -18.f, 0.f), cMeterGrLevel);
-		pGraphics->AttachControl(new IVMeterControl<1>(b.GetGridCell(0, 31, 1, 40), "O", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -18.f, 0.f), cMeterGrOpto);
-		pGraphics->AttachControl(new IVMeterControl<1>(b.GetGridCell(0, 32, 1, 40), "V", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -18.f, 0.f), cMeterGrVca);
-		pGraphics->AttachControl(new IVMeterControl<1>(b.GetGridCell(0, 33, 1, 40), "F", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -18.f, 0.f), cMeterGrFet);
-		pGraphics->AttachControl(new IVMeterControl<1>(b.GetGridCell(0, 34, 1, 40), "L", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -18.f, 0.f), cMeterGrLim);
+		const IRECT c = b.GetFromBottom(200.f);
+		const IRECT t = b.GetFromTop(50.f);
+		pGraphics->AttachControl(new ITextControl(t, "SRDynamicsControl " PLUG_VERSION_STR "-alpha", SR::Graphics::Layout::SR_DEFAULT_TEXT));
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(c.GetGridCell(0, 0, 2, 4), kAttack, "Attack", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cAttack);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(c.GetGridCell(0, 1, 2, 4), kRelease, "Release", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cRelease);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(c.GetGridCell(0, 2, 2, 4), kCrest, "Crest", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCrest);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(c.GetGridCell(1, 0, 2, 4), kThresh, "Tresh", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cThresh);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(c.GetGridCell(1, 1, 2, 4), kRatio, "Ratio", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cRatio);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(c.GetGridCell(1, 2, 2, 4), kOutGain, "Output", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cOutGain);
+		pGraphics->AttachControl(new IVMeterControl<2>(c.GetGridCell(0, 14, 1, 16), "In", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L", "R" }, 0, -60.f, 0.f), cMeterIn);
+		pGraphics->AttachControl(new IVMeterControl<2>(c.GetGridCell(0, 15, 1, 16), "Out", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L", "R" }, 0, -60.f, 0.f), cMeterOut);
+		pGraphics->AttachControl(new IVMeterControl<1>(c.GetGridCell(0, 30, 1, 40), "L", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -18.f, 0.f), cMeterGrLevel);
+		pGraphics->AttachControl(new IVMeterControl<1>(c.GetGridCell(0, 31, 1, 40), "O", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -18.f, 0.f), cMeterGrOpto);
+		pGraphics->AttachControl(new IVMeterControl<1>(c.GetGridCell(0, 32, 1, 40), "V", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -18.f, 0.f), cMeterGrVca);
+		pGraphics->AttachControl(new IVMeterControl<1>(c.GetGridCell(0, 33, 1, 40), "F", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -18.f, 0.f), cMeterGrFet);
+		pGraphics->AttachControl(new IVMeterControl<1>(c.GetGridCell(0, 34, 1, 40), "L", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -18.f, 0.f), cMeterGrLim);
 	};
 #endif
 }
