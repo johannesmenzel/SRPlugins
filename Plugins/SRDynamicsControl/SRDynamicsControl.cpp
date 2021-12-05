@@ -10,7 +10,8 @@ SRDynamicsControl::SRDynamicsControl(const InstanceInfo& info)
 	, fCompLevel()
 	, fCompOpto()
 	, fCompVca()
-	, fDeesser()
+	//, fDeesser()
+	//, fDeplosive()
 	, fCompFet()
 	, fCompLim()
 {
@@ -33,8 +34,7 @@ SRDynamicsControl::SRDynamicsControl(const InstanceInfo& info)
 		pGraphics->AttachPanelBackground(SR::Graphics::Layout::SR_DEFAULT_COLOR_CUSTOM_PANEL_BG);
 		pGraphics->LoadFont("Roboto-Regular", ROBOTO_FN);
 		const IRECT b = pGraphics->GetBounds();
-		//pGraphics->AttachControl(new ITextControl(b.GetMidVPadded(50), "SRDynamicsControl", IText(50)));
-		//pGraphics->AttachControl(new IVKnobControl(b.GetCentredInside(100).GetVShifted(-100), kOutput));
+		//pGraphics->AttachControl(new ITextControl(b.GetMidVPadded(50), "SRDynamicsControl", SR::Graphics::Layout::SR_DEFAULT_TEXT));
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(b.GetGridCell(0, 0, 2, 4), kAttack, "Attack", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cAttack);
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(b.GetGridCell(0, 1, 2, 4), kRelease, "Release", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cRelease);
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(b.GetGridCell(0, 2, 2, 4), kCrest, "Crest", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCrest);
@@ -124,8 +124,8 @@ void SRDynamicsControl::SetCompressorValues()
 		samplerate);
 
 	fCompLim.SetThresh(thresh * 6. * crest);
-	fCompLim.SetRatio(1. / (1. + ratio * 99.));
-	fCompLim.SetAttack(.02 + attack * .08);
+	// no ratio
+	fCompLim.SetAttack(.02 + attack * 1.);
 	fCompLim.SetRelease(5. + release * 10.);
 	//fCompLim.ResetCompressor(
 	//	thresh * 12. * crest, // thresh

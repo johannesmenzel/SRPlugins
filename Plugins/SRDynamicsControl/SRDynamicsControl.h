@@ -58,8 +58,9 @@ private:
 	SR::DSP::SRCompressor fCompVca;
 	SR::DSP::SRCompressor fCompFet;
 	SR::DSP::SRLimiter fCompLim;
-	SR::DSP::SRDeesser fDeesser;
-	//SR::DSP::SRBuffer<sample, 4, 1024> mBufferGr;
+	//SR::DSP::SRDeesser fDeesser;
+	//SR::DSP::SRDeesser fDeplosive;
+
 	IPeakSender<2> mMeterSenderIn;
 	IPeakSender<2> mMeterSenderOut;
 	IPeakSender<1> mMeterSenderGrLevel;
