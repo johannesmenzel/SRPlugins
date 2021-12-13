@@ -1,3 +1,9 @@
 [submodule "iPlug2"]
 	path = iPlug2
 	url = https://github.com/iPlug2/iPlug2.git
+[submodule "Dependencies/DSPFilters"]
+	path = Dependencies/DSPFilters
+	url = https://github.com/vinniefalco/DSPFilters.git
+[submodule "Dependencies/iir1"]
+	path = Dependencies/iir1
+	url = https://github.com/berndporr/iir1.git
