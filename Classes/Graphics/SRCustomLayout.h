@@ -1,5 +1,4 @@
 #pragma once
-#include "IControl.h"
 using namespace iplug;
 using namespace igraphics;
 // SRPLUGIN CONSTANTS
