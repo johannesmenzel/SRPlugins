@@ -50,6 +50,11 @@ SRDynamicsControl::SRDynamicsControl(const InstanceInfo& info)
 		pGraphics->AttachControl(new IVMeterControl<1>(c.GetGridCell(0, 32, 1, 40), "V", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -18.f, 0.f), cMeterGrVca);
 		pGraphics->AttachControl(new IVMeterControl<1>(c.GetGridCell(0, 33, 1, 40), "F", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -18.f, 0.f), cMeterGrFet);
 		pGraphics->AttachControl(new IVMeterControl<1>(c.GetGridCell(0, 34, 1, 40), "L", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, -18.f, 0.f), cMeterGrLim);
+		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrLevel))->SetBaseValue(1.);
+		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrOpto))->SetBaseValue(1.);
+		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrVca))->SetBaseValue(1.);
+		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrFet))->SetBaseValue(1.);
+		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrLim))->SetBaseValue(1.);
 	};
 #endif
 }
