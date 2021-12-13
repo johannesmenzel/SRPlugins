@@ -1,4 +1,4 @@
-<REAPER_PROJECT 0.1 "6.42/win64" 1638739881
+<REAPER_PROJECT 0.1 "6.42/win64" 1638749573
   RIPPLE 0
   GROUPOVERRIDE 0 0 0
   AUTOXFADE 1
@@ -14,7 +14,7 @@
   TIMEMODE 1 5 -1 30 0 0 -1
   VIDEO_CONFIG 0 0 256
   PANMODE 3
-  CURSOR 64
+  CURSOR 0
   ZOOM 4.61122669093423 0 0
   VZOOMEX 6 0
   USE_REC_CFG 0
@@ -159,7 +159,7 @@
       FADEIN 1 0.01 0 1 0 0 0
       FADEOUT 1 0.01 0 1 0 0 0
       MUTE 0 0
-      SEL 1
+      SEL 0
       IGUID {5A6867D7-0E8D-4C16-B3F2-96EB996F07A8}
       IID 21
       NAME "The Shritts - 80s Funk-001.mp3"
@@ -186,7 +186,7 @@
     BUSCOMP 0 0 0 0 0
     SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
     FREEMODE 0
-    SEL 1
+    SEL 0
     REC 0 0 1 0 0 0 0
     VU 2
     TRACKHEIGHT 0 0 0 0 0 0
@@ -206,7 +206,7 @@
       FADEIN 1 0.01 0 1 0 0 0
       FADEOUT 1 0.01 0 1 0 0 0
       MUTE 0 0
-      SEL 1
+      SEL 0
       IGUID {45EFCDFF-5C99-46FB-85BF-5E36CD2A7CAA}
       IID 22
       NAME "Anja und Hannes - Elefant_remix.mp3"
@@ -229,7 +229,7 @@
     MUTESOLO 0 0 0
     IPHASE 0
     PLAYOFFS 0 1
-    ISBUS 2 -1
+    ISBUS 0 0
     BUSCOMP 0 0 0 0 0
     SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
     FREEMODE 0
@@ -264,6 +264,53 @@
       GUID {6356CA19-0C3E-47B3-AB13-4B52B1685235}
       <SOURCE WAVE
         FILE "E:\Musikprojekte\REAPER\Anja\Elefant_remix\Audio\Vocals.wav"
+      >
+    >
+  >
+  <TRACK {395FE6CF-5799-4E37-B9C7-90FE45DE79D5}
+    NAME "Hannes - IndyInValhalla Demo"
+    PEAKCOL 16576
+    BEAT -1
+    AUTOMODE 0
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 2 -1
+    BUSCOMP 0 0 0 0 0
+    SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
+    FREEMODE 0
+    SEL 1
+    REC 0 0 1 0 0 0 0
+    VU 2
+    TRACKHEIGHT 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NCHAN 2
+    FX 1
+    TRACKID {395FE6CF-5799-4E37-B9C7-90FE45DE79D5}
+    PERF 0
+    MIDIOUT -1
+    MAINSEND 1 0
+    <ITEM
+      POSITION 0
+      SNAPOFFS 0
+      LENGTH 188.49056689342405
+      LOOP 1
+      ALLTAKES 0
+      FADEIN 1 0.01 0 1 0 0 0
+      FADEOUT 1 0.01 0 1 0 0 0
+      MUTE 0 0
+      SEL 1
+      IGUID {8AFA0E8A-F669-44B0-A9B5-53D5F3B8F8F6}
+      IID 24
+      NAME "Hannes - IndyInValhalla Demo.mp3"
+      VOLPAN 1 0 1 -1
+      SOFFS 0
+      PLAYRATE 1 1 0 -1 0 0.0025
+      CHANMODE 0
+      GUID {DAC16D3D-3ADE-4E09-8847-18A0E827D15C}
+      <SOURCE MP3
+        FILE "E:\Musik\Hannes\Hannes - IndyInValhalla Demo.mp3" 1
       >
     >
   >

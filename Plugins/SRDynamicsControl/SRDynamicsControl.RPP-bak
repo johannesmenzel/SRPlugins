@@ -1,4 +1,4 @@
-<REAPER_PROJECT 0.1 "6.42/win64" 1638738283
+<REAPER_PROJECT 0.1 "6.42/win64" 1638739881
   RIPPLE 0
   GROUPOVERRIDE 0 0 0
   AUTOXFADE 1
@@ -99,7 +99,7 @@
     BUSCOMP 1 0 0 0 0
     SHOWINMIX 1 0.6667 0.5 1 0.5 0 0 0
     FREEMODE 0
-    SEL 1
+    SEL 0
     REC 1 5088 1 0 0 0 0
     VU 2
     TRACKHEIGHT 0 0 0 0 0 0
@@ -126,13 +126,13 @@
       WAK 0 0
     >
   >
-  <TRACK {12EB2AD9-51BF-4456-8047-1E9E8E46F574}
-    NAME "Elefant_freeze_K Sax Section"
+  <TRACK {EF17D501-905F-43D4-829F-61E523785400}
+    NAME "80s Funk"
     PEAKCOL 16576
     BEAT -1
     AUTOMODE 0
     VOLPAN 1 0 -1 -1 1
-    MUTESOLO 0 0 0
+    MUTESOLO 0 2 0
     IPHASE 0
     PLAYOFFS 0 1
     ISBUS 0 0
@@ -142,39 +142,39 @@
     SEL 0
     REC 0 0 1 0 0 0 0
     VU 2
-    TRACKHEIGHT 0 1 0 0 0 0
+    TRACKHEIGHT 0 0 0 0 0 0
     INQ 0 0 0 0.5 100 0 0 100
     NCHAN 2
     FX 1
-    TRACKID {12EB2AD9-51BF-4456-8047-1E9E8E46F574}
+    TRACKID {EF17D501-905F-43D4-829F-61E523785400}
     PERF 0
     MIDIOUT -1
     MAINSEND 1 0
     <ITEM
-      POSITION 41
+      POSITION 0
       SNAPOFFS 0
-      LENGTH 309.074375
+      LENGTH 178
       LOOP 1
       ALLTAKES 0
       FADEIN 1 0.01 0 1 0 0 0
       FADEOUT 1 0.01 0 1 0 0 0
       MUTE 0 0
-      SEL 0
-      IGUID {000861C7-A7C8-454D-9ADD-558DB0A2E40D}
-      IID 2
-      NAME "Elefant_freeze_K Sax Section.wav"
+      SEL 1
+      IGUID {5A6867D7-0E8D-4C16-B3F2-96EB996F07A8}
+      IID 21
+      NAME "The Shritts - 80s Funk-001.mp3"
       VOLPAN 1 0 1 -1
       SOFFS 0
       PLAYRATE 1 1 0 -1 0 0.0025
       CHANMODE 0
-      GUID {C4F04F68-9512-4CBA-B9E9-ADECAC2BF3B6}
-      <SOURCE WAVE
-        FILE "E:\Musikprojekte\REAPER\Anja\Elefant_remix\Audio\Elefant_freeze_K Sax Section.wav"
+      GUID {D0415C69-765F-4ABC-8C47-FA9032A86B52}
+      <SOURCE MP3
+        FILE "E:\Musik\Hannes\The Shritts - 80s Funk-001.mp3" 1
       >
     >
   >
-  <TRACK {462AAAF3-6123-4176-BC85-7CD3D1777C45}
-    NAME "Elefant_freeze_K String Section"
+  <TRACK {27DE19BB-8DB5-41BA-8AEE-CB4875A3B5B3}
+    NAME Elefant
     PEAKCOL 16576
     BEAT -1
     AUTOMODE 0
@@ -186,648 +186,37 @@
     BUSCOMP 0 0 0 0 0
     SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
     FREEMODE 0
-    SEL 0
+    SEL 1
     REC 0 0 1 0 0 0 0
     VU 2
-    TRACKHEIGHT 0 1 0 0 0 0
+    TRACKHEIGHT 0 0 0 0 0 0
     INQ 0 0 0 0.5 100 0 0 100
     NCHAN 2
     FX 1
-    TRACKID {462AAAF3-6123-4176-BC85-7CD3D1777C45}
+    TRACKID {27DE19BB-8DB5-41BA-8AEE-CB4875A3B5B3}
     PERF 0
     MIDIOUT -1
     MAINSEND 1 0
     <ITEM
-      POSITION 41
+      POSITION 0
       SNAPOFFS 0
-      LENGTH 309.074375
+      LENGTH 305.10832199546485
       LOOP 1
       ALLTAKES 0
       FADEIN 1 0.01 0 1 0 0 0
       FADEOUT 1 0.01 0 1 0 0 0
       MUTE 0 0
-      SEL 0
-      IGUID {E37A86F5-F446-4BFD-B263-6E336E6F2805}
-      IID 3
-      NAME "Elefant_freeze_K String Section.wav"
+      SEL 1
+      IGUID {45EFCDFF-5C99-46FB-85BF-5E36CD2A7CAA}
+      IID 22
+      NAME "Anja und Hannes - Elefant_remix.mp3"
       VOLPAN 1 0 1 -1
       SOFFS 0
       PLAYRATE 1 1 0 -1 0 0.0025
       CHANMODE 0
-      GUID {8BB9F9D4-2016-4FED-BAFE-B8C9DA64B6DD}
-      <SOURCE WAVE
-        FILE "E:\Musikprojekte\REAPER\Anja\Elefant_remix\Audio\Elefant_freeze_K String Section.wav"
-      >
-    >
-  >
-  <TRACK {BE6DED85-8C39-4E4C-B23F-C8D0B7DD96E6}
-    NAME Elefant_freeze_Kick
-    PEAKCOL 16576
-    BEAT -1
-    AUTOMODE 0
-    VOLPAN 1 0 -1 -1 1
-    MUTESOLO 0 0 0
-    IPHASE 0
-    PLAYOFFS 0 1
-    ISBUS 0 0
-    BUSCOMP 0 0 0 0 0
-    SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
-    FREEMODE 0
-    SEL 0
-    REC 0 0 1 0 0 0 0
-    VU 2
-    TRACKHEIGHT 0 1 0 0 0 0
-    INQ 0 0 0 0.5 100 0 0 100
-    NCHAN 2
-    FX 1
-    TRACKID {BE6DED85-8C39-4E4C-B23F-C8D0B7DD96E6}
-    PERF 0
-    MIDIOUT -1
-    MAINSEND 1 0
-    <ITEM
-      POSITION 41
-      SNAPOFFS 0
-      LENGTH 309.074375
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0.01 0 1 0 0 0
-      FADEOUT 1 0.01 0 1 0 0 0
-      MUTE 0 0
-      SEL 0
-      IGUID {30453E13-3636-4CE0-9FFC-F318BBCE67A1}
-      IID 4
-      NAME Elefant_freeze_Kick.wav
-      VOLPAN 1 0 1 -1
-      SOFFS 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {D0A0AD9B-3B13-4357-B225-6F73DEA3E601}
-      <SOURCE WAVE
-        FILE "E:\Musikprojekte\REAPER\Anja\Elefant_remix\Audio\Elefant_freeze_Kick.wav"
-      >
-    >
-  >
-  <TRACK {20B78AC6-F24C-4C81-AD8C-3F128AD8CDB3}
-    NAME "Elefant_freeze_Kt. Organ"
-    PEAKCOL 16576
-    BEAT -1
-    AUTOMODE 0
-    VOLPAN 1 0 -1 -1 1
-    MUTESOLO 0 0 0
-    IPHASE 0
-    PLAYOFFS 0 1
-    ISBUS 0 0
-    BUSCOMP 0 0 0 0 0
-    SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
-    FREEMODE 0
-    SEL 0
-    REC 0 0 1 0 0 0 0
-    VU 2
-    TRACKHEIGHT 0 1 0 0 0 0
-    INQ 0 0 0 0.5 100 0 0 100
-    NCHAN 2
-    FX 1
-    TRACKID {20B78AC6-F24C-4C81-AD8C-3F128AD8CDB3}
-    PERF 0
-    MIDIOUT -1
-    MAINSEND 1 0
-    <ITEM
-      POSITION 41
-      SNAPOFFS 0
-      LENGTH 309.074375
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0.01 0 1 0 0 0
-      FADEOUT 1 0.01 0 1 0 0 0
-      MUTE 0 0
-      SEL 0
-      IGUID {82E5A13B-3CD5-4DC2-92F0-E0688469BD10}
-      IID 5
-      NAME "Elefant_freeze_Kt. Organ.wav"
-      VOLPAN 1 0 1 -1
-      SOFFS 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {BCBA0755-D4D5-4312-957D-0C70FC856411}
-      <SOURCE WAVE
-        FILE "E:\Musikprojekte\REAPER\Anja\Elefant_remix\Audio\Elefant_freeze_Kt. Organ.wav"
-      >
-    >
-  >
-  <TRACK {A3CCC414-9F68-4BB4-A882-A12FDC80A095}
-    NAME "Elefant_freeze_Kt. Piano"
-    PEAKCOL 16576
-    BEAT -1
-    AUTOMODE 0
-    VOLPAN 1 0 -1 -1 1
-    MUTESOLO 0 0 0
-    IPHASE 0
-    PLAYOFFS 0 1
-    ISBUS 0 0
-    BUSCOMP 0 0 0 0 0
-    SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
-    FREEMODE 0
-    SEL 0
-    REC 0 0 1 0 0 0 0
-    VU 2
-    TRACKHEIGHT 0 1 0 0 0 0
-    INQ 0 0 0 0.5 100 0 0 100
-    NCHAN 2
-    FX 1
-    TRACKID {A3CCC414-9F68-4BB4-A882-A12FDC80A095}
-    PERF 0
-    MIDIOUT -1
-    MAINSEND 1 0
-    <ITEM
-      POSITION 41
-      SNAPOFFS 0
-      LENGTH 309.074375
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0.01 0 1 0 0 0
-      FADEOUT 1 0.01 0 1 0 0 0
-      MUTE 0 0
-      SEL 0
-      IGUID {FA92F0EC-F2A3-4A38-A23A-4D4776990625}
-      IID 6
-      NAME "Elefant_freeze_Kt. Piano.wav"
-      VOLPAN 1 0 1 -1
-      SOFFS 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {ED890556-1744-4E47-A3EB-B6412B6254C2}
-      <SOURCE WAVE
-        FILE "E:\Musikprojekte\REAPER\Anja\Elefant_remix\Audio\Elefant_freeze_Kt. Piano.wav"
-      >
-    >
-  >
-  <TRACK {8CE4740D-0653-4332-8AC1-EA8CBA06D822}
-    NAME Elefant_freeze_OH
-    PEAKCOL 16576
-    BEAT -1
-    AUTOMODE 0
-    VOLPAN 1 0 -1 -1 1
-    MUTESOLO 0 0 0
-    IPHASE 0
-    PLAYOFFS 0 1
-    ISBUS 0 0
-    BUSCOMP 0 0 0 0 0
-    SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
-    FREEMODE 0
-    SEL 0
-    REC 0 0 1 0 0 0 0
-    VU 2
-    TRACKHEIGHT 0 1 0 0 0 0
-    INQ 0 0 0 0.5 100 0 0 100
-    NCHAN 2
-    FX 1
-    TRACKID {8CE4740D-0653-4332-8AC1-EA8CBA06D822}
-    PERF 0
-    MIDIOUT -1
-    MAINSEND 1 0
-    <ITEM
-      POSITION 41
-      SNAPOFFS 0
-      LENGTH 309.074375
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0.01 0 1 0 0 0
-      FADEOUT 1 0.01 0 1 0 0 0
-      MUTE 0 0
-      SEL 0
-      IGUID {70AA256E-BCEE-4BF1-914A-D23C4F74848D}
-      IID 7
-      NAME Elefant_freeze_OH.wav
-      VOLPAN 1 0 1 -1
-      SOFFS 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {9CC8E875-471B-49A2-946A-67CEBB83BAF0}
-      <SOURCE WAVE
-        FILE "E:\Musikprojekte\REAPER\Anja\Elefant_remix\Audio\Elefant_freeze_OH.wav"
-      >
-    >
-  >
-  <TRACK {3D242AA0-11AE-4E00-AB1A-6E5E5B2E9317}
-    NAME Elefant_freeze_Snare
-    PEAKCOL 16576
-    BEAT -1
-    AUTOMODE 0
-    VOLPAN 1 0 -1 -1 1
-    MUTESOLO 0 0 0
-    IPHASE 0
-    PLAYOFFS 0 1
-    ISBUS 0 0
-    BUSCOMP 0 0 0 0 0
-    SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
-    FREEMODE 0
-    SEL 0
-    REC 0 0 1 0 0 0 0
-    VU 2
-    TRACKHEIGHT 0 1 0 0 0 0
-    INQ 0 0 0 0.5 100 0 0 100
-    NCHAN 2
-    FX 1
-    TRACKID {3D242AA0-11AE-4E00-AB1A-6E5E5B2E9317}
-    PERF 0
-    MIDIOUT -1
-    MAINSEND 1 0
-    <ITEM
-      POSITION 41
-      SNAPOFFS 0
-      LENGTH 309.074375
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0.01 0 1 0 0 0
-      FADEOUT 1 0.01 0 1 0 0 0
-      MUTE 0 0
-      SEL 0
-      IGUID {252337DA-591E-47B0-8246-5C3BB069709E}
-      IID 8
-      NAME Elefant_freeze_Snare.wav
-      VOLPAN 1 0 1 -1
-      SOFFS 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {C04637C2-85EC-4215-BE73-F0CB8368B20C}
-      <SOURCE WAVE
-        FILE "E:\Musikprojekte\REAPER\Anja\Elefant_remix\Audio\Elefant_freeze_Snare.wav"
-      >
-    >
-  >
-  <TRACK {0290175E-32C7-4986-B896-928398F948CD}
-    NAME Elefant_freeze_Tamb
-    PEAKCOL 16576
-    BEAT -1
-    AUTOMODE 0
-    VOLPAN 1 0 -1 -1 1
-    MUTESOLO 0 0 0
-    IPHASE 0
-    PLAYOFFS 0 1
-    ISBUS 0 0
-    BUSCOMP 0 0 0 0 0
-    SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
-    FREEMODE 0
-    SEL 0
-    REC 0 0 1 0 0 0 0
-    VU 2
-    TRACKHEIGHT 0 1 0 0 0 0
-    INQ 0 0 0 0.5 100 0 0 100
-    NCHAN 2
-    FX 1
-    TRACKID {0290175E-32C7-4986-B896-928398F948CD}
-    PERF 0
-    MIDIOUT -1
-    MAINSEND 1 0
-    <ITEM
-      POSITION 41
-      SNAPOFFS 0
-      LENGTH 309.074375
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0.01 0 1 0 0 0
-      FADEOUT 1 0.01 0 1 0 0 0
-      MUTE 0 0
-      SEL 0
-      IGUID {2CE61DD0-5ADD-44FC-8860-EB75A39D43FF}
-      IID 9
-      NAME Elefant_freeze_Tamb.wav
-      VOLPAN 1 0 1 -1
-      SOFFS 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {1B9577D4-3D1D-4068-ADB5-3DF5888C9ED2}
-      <SOURCE WAVE
-        FILE "E:\Musikprojekte\REAPER\Anja\Elefant_remix\Audio\Elefant_freeze_Tamb.wav"
-      >
-    >
-  >
-  <TRACK {0539D2F6-A7EC-4E1F-A65C-B260A7DCF744}
-    NAME Elefant_freeze_Toms
-    PEAKCOL 16576
-    BEAT -1
-    AUTOMODE 0
-    VOLPAN 1 0 -1 -1 1
-    MUTESOLO 0 0 0
-    IPHASE 0
-    PLAYOFFS 0 1
-    ISBUS 0 0
-    BUSCOMP 0 0 0 0 0
-    SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
-    FREEMODE 0
-    SEL 0
-    REC 0 0 1 0 0 0 0
-    VU 2
-    TRACKHEIGHT 0 1 0 0 0 0
-    INQ 0 0 0 0.5 100 0 0 100
-    NCHAN 2
-    FX 1
-    TRACKID {0539D2F6-A7EC-4E1F-A65C-B260A7DCF744}
-    PERF 0
-    MIDIOUT -1
-    MAINSEND 1 0
-    <ITEM
-      POSITION 41
-      SNAPOFFS 0
-      LENGTH 309.074375
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0.01 0 1 0 0 0
-      FADEOUT 1 0.01 0 1 0 0 0
-      MUTE 0 0
-      SEL 0
-      IGUID {ED51F580-DD34-4B24-BDF8-7137804B2356}
-      IID 10
-      NAME Elefant_freeze_Toms.wav
-      VOLPAN 1 0 1 -1
-      SOFFS 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {FAE33A59-246D-44ED-A431-4D8278E3EA0E}
-      <SOURCE WAVE
-        FILE "E:\Musikprojekte\REAPER\Anja\Elefant_remix\Audio\Elefant_freeze_Toms.wav"
-      >
-    >
-  >
-  <TRACK {495155C1-4B7E-4430-A8A4-03C1BED887DD}
-    NAME Elefant_freeze_Verb
-    PEAKCOL 16576
-    BEAT -1
-    AUTOMODE 0
-    VOLPAN 1 0 -1 -1 1
-    MUTESOLO 0 0 0
-    IPHASE 0
-    PLAYOFFS 0 1
-    ISBUS 0 0
-    BUSCOMP 0 0 0 0 0
-    SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
-    FREEMODE 0
-    SEL 0
-    REC 0 0 1 0 0 0 0
-    VU 2
-    TRACKHEIGHT 0 1 0 0 0 0
-    INQ 0 0 0 0.5 100 0 0 100
-    NCHAN 2
-    FX 1
-    TRACKID {495155C1-4B7E-4430-A8A4-03C1BED887DD}
-    PERF 0
-    MIDIOUT -1
-    MAINSEND 1 0
-    <ITEM
-      POSITION 41
-      SNAPOFFS 0
-      LENGTH 309.074375
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0.01 0 1 0 0 0
-      FADEOUT 1 0.01 0 1 0 0 0
-      MUTE 0 0
-      SEL 0
-      IGUID {1B27A867-B75D-43DD-B71D-F5C55CE49B09}
-      IID 11
-      NAME Elefant_freeze_Verb.wav
-      VOLPAN 1 0 1 -1
-      SOFFS 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {7E822610-B2FA-4C99-9CF2-9FF7A34FACDE}
-      <SOURCE WAVE
-        FILE "E:\Musikprojekte\REAPER\Anja\Elefant_remix\Audio\Elefant_freeze_Verb.wav"
-      >
-    >
-  >
-  <TRACK {B4C5FECF-ABDE-4D04-AC47-C0705C0FD55A}
-    NAME "Elefant_freeze_War Tuba"
-    PEAKCOL 16576
-    BEAT -1
-    AUTOMODE 0
-    VOLPAN 1 0 -1 -1 1
-    MUTESOLO 0 0 0
-    IPHASE 0
-    PLAYOFFS 0 1
-    ISBUS 0 0
-    BUSCOMP 0 0 0 0 0
-    SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
-    FREEMODE 0
-    SEL 0
-    REC 0 0 1 0 0 0 0
-    VU 2
-    TRACKHEIGHT 0 1 0 0 0 0
-    INQ 0 0 0 0.5 100 0 0 100
-    NCHAN 2
-    FX 1
-    TRACKID {B4C5FECF-ABDE-4D04-AC47-C0705C0FD55A}
-    PERF 0
-    MIDIOUT -1
-    MAINSEND 1 0
-    <ITEM
-      POSITION 41
-      SNAPOFFS 0
-      LENGTH 309.074375
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0.01 0 1 0 0 0
-      FADEOUT 1 0.01 0 1 0 0 0
-      MUTE 0 0
-      SEL 0
-      IGUID {0BA844A1-8966-4D2F-8A51-14FE4C5B3F49}
-      IID 12
-      NAME "Elefant_freeze_War Tuba.wav"
-      VOLPAN 1 0 1 -1
-      SOFFS 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {B3110217-52B8-4F9A-B08A-6070464FC136}
-      <SOURCE WAVE
-        FILE "E:\Musikprojekte\REAPER\Anja\Elefant_remix\Audio\Elefant_freeze_War Tuba.wav"
-      >
-    >
-  >
-  <TRACK {AEC6ADFC-7A50-4EC0-8D98-801C67B0E723}
-    NAME "Geige GM"
-    PEAKCOL 16576
-    BEAT -1
-    AUTOMODE 0
-    VOLPAN 1 0 -1 -1 1
-    MUTESOLO 0 0 0
-    IPHASE 0
-    PLAYOFFS 0 1
-    ISBUS 0 0
-    BUSCOMP 0 0 0 0 0
-    SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
-    FREEMODE 0
-    SEL 0
-    REC 0 0 1 0 0 0 0
-    VU 2
-    TRACKHEIGHT 0 1 0 0 0 0
-    INQ 0 0 0 0.5 100 0 0 100
-    NCHAN 2
-    FX 1
-    TRACKID {AEC6ADFC-7A50-4EC0-8D98-801C67B0E723}
-    PERF 0
-    MIDIOUT -1
-    MAINSEND 1 0
-    <ITEM
-      POSITION 41
-      SNAPOFFS 0
-      LENGTH 302.40916666666669
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0.01 0 1 0 0 0
-      FADEOUT 1 0.01 0 1 0 0 0
-      MUTE 0 0
-      SEL 0
-      IGUID {BFEB8486-764B-4E27-AB00-ED0D3D625B7C}
-      IID 13
-      NAME "Geige GM.wav"
-      VOLPAN 1 0 1 -1
-      SOFFS 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {8D1E7B29-8DF0-4EAC-AE6C-7F72F5AB87FC}
-      <SOURCE WAVE
-        FILE "E:\Musikprojekte\REAPER\Anja\Elefant_remix\Audio\Geige GM.wav"
-      >
-    >
-  >
-  <TRACK {C164EA59-9362-421E-B142-5AD99DB623EA}
-    NAME "Geige KM"
-    PEAKCOL 16576
-    BEAT -1
-    AUTOMODE 0
-    VOLPAN 1 0 -1 -1 1
-    MUTESOLO 0 0 0
-    IPHASE 0
-    PLAYOFFS 0 1
-    ISBUS 0 0
-    BUSCOMP 0 0 0 0 0
-    SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
-    FREEMODE 0
-    SEL 0
-    REC 0 0 1 0 0 0 0
-    VU 2
-    TRACKHEIGHT 0 1 0 0 0 0
-    INQ 0 0 0 0.5 100 0 0 100
-    NCHAN 2
-    FX 1
-    TRACKID {C164EA59-9362-421E-B142-5AD99DB623EA}
-    PERF 0
-    MIDIOUT -1
-    MAINSEND 1 0
-    <ITEM
-      POSITION 41
-      SNAPOFFS 0
-      LENGTH 302.40916666666669
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0.01 0 1 0 0 0
-      FADEOUT 1 0.01 0 1 0 0 0
-      MUTE 0 0
-      SEL 0
-      IGUID {70EE763A-85E2-45A7-B5DB-5DB8E208C335}
-      IID 14
-      NAME "Geige KM.wav"
-      VOLPAN 1 0 1 -1
-      SOFFS 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {D58EBE11-621B-468D-A6DA-BFC6FE50B95B}
-      <SOURCE WAVE
-        FILE "E:\Musikprojekte\REAPER\Anja\Elefant_remix\Audio\Geige KM.wav"
-      >
-    >
-  >
-  <TRACK {44AEB1FC-434B-44D0-BA42-C2A8337C08EC}
-    NAME "Gitarre GM"
-    PEAKCOL 16576
-    BEAT -1
-    AUTOMODE 0
-    VOLPAN 1 0 -1 -1 1
-    MUTESOLO 0 0 0
-    IPHASE 0
-    PLAYOFFS 0 1
-    ISBUS 0 0
-    BUSCOMP 0 0 0 0 0
-    SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
-    FREEMODE 0
-    SEL 0
-    REC 0 0 1 0 0 0 0
-    VU 2
-    TRACKHEIGHT 0 1 0 0 0 0
-    INQ 0 0 0 0.5 100 0 0 100
-    NCHAN 2
-    FX 1
-    TRACKID {44AEB1FC-434B-44D0-BA42-C2A8337C08EC}
-    PERF 0
-    MIDIOUT -1
-    MAINSEND 1 0
-    <ITEM
-      POSITION 41
-      SNAPOFFS 0
-      LENGTH 307.45427083333334
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0.01 0 1 0 0 0
-      FADEOUT 1 0.01 0 1 0 0 0
-      MUTE 0 0
-      SEL 0
-      IGUID {45619882-CACF-414E-8558-C53508E6BF11}
-      IID 15
-      NAME "Gitarre GM.wav"
-      VOLPAN 1 0 1 -1
-      SOFFS 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {822B3377-B526-4C97-ACB7-9B73262C103B}
-      <SOURCE WAVE
-        FILE "E:\Musikprojekte\REAPER\Anja\Elefant_remix\Audio\Gitarre GM.wav"
-      >
-    >
-  >
-  <TRACK {132122E5-41F2-4698-9DFC-16BB6B1F52C6}
-    NAME "Gitarre KM"
-    PEAKCOL 16576
-    BEAT -1
-    AUTOMODE 0
-    VOLPAN 1 0 -1 -1 1
-    MUTESOLO 0 0 0
-    IPHASE 0
-    PLAYOFFS 0 1
-    ISBUS 0 0
-    BUSCOMP 0 0 0 0 0
-    SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
-    FREEMODE 0
-    SEL 0
-    REC 0 0 1 0 0 0 0
-    VU 2
-    TRACKHEIGHT 0 1 0 0 0 0
-    INQ 0 0 0 0.5 100 0 0 100
-    NCHAN 2
-    FX 1
-    TRACKID {132122E5-41F2-4698-9DFC-16BB6B1F52C6}
-    PERF 0
-    MIDIOUT -1
-    MAINSEND 1 0
-    <ITEM
-      POSITION 41
-      SNAPOFFS 0
-      LENGTH 307.45427083333334
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0.01 0 1 0 0 0
-      FADEOUT 1 0.01 0 1 0 0 0
-      MUTE 0 0
-      SEL 0
-      IGUID {3D24683F-AE33-46F5-8847-0419E4C76FCD}
-      IID 16
-      NAME "Gitarre KM.wav"
-      VOLPAN 1 0 1 -1
-      SOFFS 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {4AE994FB-B98D-4383-AD62-ABAA0B145000}
-      <SOURCE WAVE
-        FILE "E:\Musikprojekte\REAPER\Anja\Elefant_remix\Audio\Gitarre KM.wav"
+      GUID {FFB52FF3-9FE5-4769-9D75-217226781596}
+      <SOURCE MP3
+        FILE "E:\Musik\Hannes\Anja und Hannes - Elefant_remix.mp3" 1
       >
     >
   >
@@ -837,10 +226,10 @@
     BEAT -1
     AUTOMODE 0
     VOLPAN 1 0 -1 -1 1
-    MUTESOLO 0 2 0
+    MUTESOLO 0 0 0
     IPHASE 0
     PLAYOFFS 0 1
-    ISBUS 0 0
+    ISBUS 2 -1
     BUSCOMP 0 0 0 0 0
     SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
     FREEMODE 0
@@ -875,100 +264,6 @@
       GUID {6356CA19-0C3E-47B3-AB13-4B52B1685235}
       <SOURCE WAVE
         FILE "E:\Musikprojekte\REAPER\Anja\Elefant_remix\Audio\Vocals.wav"
-      >
-    >
-  >
-  <TRACK {AA57655C-EDBB-469C-A036-5DC98D8557E2}
-    NAME "06-Bass DI-glued"
-    PEAKCOL 16576
-    BEAT -1
-    AUTOMODE 0
-    VOLPAN 1 0 -1 -1 1
-    MUTESOLO 0 0 0
-    IPHASE 0
-    PLAYOFFS 0 1
-    ISBUS 0 0
-    BUSCOMP 0 0 0 0 0
-    SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
-    FREEMODE 0
-    SEL 0
-    REC 0 0 1 0 0 0 0
-    VU 2
-    TRACKHEIGHT 0 1 0 0 0 0
-    INQ 0 0 0 0.5 100 0 0 100
-    NCHAN 2
-    FX 1
-    TRACKID {AA57655C-EDBB-469C-A036-5DC98D8557E2}
-    PERF 0
-    MIDIOUT -1
-    MAINSEND 1 0
-    <ITEM
-      POSITION 41
-      SNAPOFFS 0
-      LENGTH 307.45427083333334
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0.01 0 1 0 0 0
-      FADEOUT 1 0.01 0 1 0 0 0
-      MUTE 0 0
-      SEL 0
-      IGUID {2BB23071-C6C3-410F-BD56-28BE4F39C563}
-      IID 19
-      NAME "06-Bass DI-glued.wav"
-      VOLPAN 1 0 1 -1
-      SOFFS 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {0ADF2085-E4A1-4E50-B9B9-CD685B42BD2E}
-      <SOURCE WAVE
-        FILE "E:\Musikprojekte\REAPER\Anja\Elefant_remix\Audio\06-Bass DI-glued.wav"
-      >
-    >
-  >
-  <TRACK {DBA64FBD-7CA1-4BF2-B576-DD917B3EB3E7}
-    NAME Elefant_freeze_Hihat
-    PEAKCOL 16576
-    BEAT -1
-    AUTOMODE 0
-    VOLPAN 1 0 -1 -1 1
-    MUTESOLO 0 0 0
-    IPHASE 0
-    PLAYOFFS 0 1
-    ISBUS 2 -1
-    BUSCOMP 0 0 0 0 0
-    SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
-    FREEMODE 0
-    SEL 0
-    REC 0 0 1 0 0 0 0
-    VU 2
-    TRACKHEIGHT 0 1 0 0 0 0
-    INQ 0 0 0 0.5 100 0 0 100
-    NCHAN 2
-    FX 1
-    TRACKID {DBA64FBD-7CA1-4BF2-B576-DD917B3EB3E7}
-    PERF 0
-    MIDIOUT -1
-    MAINSEND 1 0
-    <ITEM
-      POSITION 41
-      SNAPOFFS 0
-      LENGTH 309.074375
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0.01 0 1 0 0 0
-      FADEOUT 1 0.01 0 1 0 0 0
-      MUTE 0 0
-      SEL 0
-      IGUID {8C992839-E008-4B6D-8A05-C237D1630153}
-      IID 20
-      NAME Elefant_freeze_Hihat.wav
-      VOLPAN 1 0 1 -1
-      SOFFS 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {22E05956-CEB5-4534-A808-E33E5B3ED893}
-      <SOURCE WAVE
-        FILE "E:\Musikprojekte\REAPER\Anja\Elefant_remix\Audio\Elefant_freeze_Hihat.wav"
       >
     >
   >
