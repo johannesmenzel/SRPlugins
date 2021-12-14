@@ -10,23 +10,27 @@ const int kNumPresets = 1;
 
 enum EParams
 {
-	kOutGain = 0,
+	kInGain = 0,
+	kOutGain,
 	kThresh,
 	kCrest,
 	kRatio,
 	kAttack,
 	kRelease,
+	kMix,
 	kNumParams
 };
 
 enum ECtrlTags
 {
-	cOutGain = 0,
+	cInGain = 0,
+	cOutGain,
 	cThresh,
 	cCrest,
 	cRatio,
 	cAttack,
 	cRelease,
+	cMix,
 	cMeterIn,
 	cMeterOut,
 	cMeterGrLevel,
@@ -52,6 +56,7 @@ public:
 	void OnIdle() override;
 	void OnParamChange(int paramIdx) override;
 private:
+	SR::DSP::SRGain fInGain;
 	SR::DSP::SRGain fOutGain;
 	SR::DSP::SRCompressorRMS fCompLevel;
 	SR::DSP::SRCompressorRMS fCompOpto;
@@ -61,8 +66,8 @@ private:
 	//SR::DSP::SRDeesser fDeesser;
 	//SR::DSP::SRDeesser fDeplosive;
 
-	IPeakSender<2> mMeterSenderIn;
-	IPeakSender<2> mMeterSenderOut;
+	IPeakSender<2, 1024> mMeterSenderIn;
+	IPeakSender<2, 1024> mMeterSenderOut;
 	IPeakSender<1> mMeterSenderGrLevel;
 	IPeakSender<1> mMeterSenderGrOpto;
 	IPeakSender<1> mMeterSenderGrVca;
