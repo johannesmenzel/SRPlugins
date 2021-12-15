@@ -369,6 +369,9 @@
     <ClInclude Include="..\..\..\Classes\DSP\SRDynamics.h">
       <Filter>Classes\DSP</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Classes\DSP\SRFilters.h">
+      <Filter>Classes\DSP</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">

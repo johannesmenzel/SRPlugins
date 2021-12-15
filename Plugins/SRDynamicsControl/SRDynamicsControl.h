@@ -17,6 +17,7 @@ enum EParams
 	kRatio,
 	kAttack,
 	kRelease,
+	kSCFreq,
 	kMix,
 	kNumParams
 };
@@ -30,6 +31,7 @@ enum ECtrlTags
 	cRatio,
 	cAttack,
 	cRelease,
+	cSCFreq,
 	cMix,
 	cMeterIn,
 	cMeterOut,
