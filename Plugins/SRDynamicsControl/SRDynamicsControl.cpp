@@ -23,7 +23,7 @@ SRDynamicsControl::SRDynamicsControl(const InstanceInfo& info)
 	GetParam(kRatio)->InitDouble("Ratio", 50., 0., 100., 0.01, "%");
 	GetParam(kAttack)->InitDouble("Attack", 50., 0., 100., 0.01, "%");
 	GetParam(kRelease)->InitDouble("Release", 50., 0., 100., 0.01, "%");
-	GetParam(kSCFreq)->InitDouble("SC Freq", 0., 0., 2000., 1., "Hz");
+	GetParam(kSCFreq)->InitDouble("SC Freq", 0., 0., 2000., 1., "Hz", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 2000., 200., .5)));
 	GetParam(kMix)->InitDouble("Mix", 100., 0., 100., 0.01, "%");
 	OnReset();
 
