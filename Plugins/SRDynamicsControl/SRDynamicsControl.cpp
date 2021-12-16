@@ -15,6 +15,7 @@ SRDynamicsControl::SRDynamicsControl(const InstanceInfo& info)
 	//, fDeplosive()
 	, fCompFet()
 	, fCompLim()
+	, fMeterEnvelope()
 {
 	GetParam(kInGain)->InitDouble("Input", 0., -12., 12., 0.01, "dB");
 	GetParam(kOutGain)->InitDouble("Output", 0., -12., 12., 0.01, "dB");
@@ -148,10 +149,20 @@ void SRDynamicsControl::ProcessBlock(sample** inputs, sample** outputs, int nFra
 		mBufferMeterGrFet.ProcessBuffer(fCompFet.GetGrLin(), 0, s);
 		mBufferMeterGrLim.ProcessBuffer(fCompLim.GetGrLin(), 0, s);
 
+		
+		fMeterEnvelope[0].process(abs(inputs[0][s]), meterIn1);
+		fMeterEnvelope[1].process(abs(inputs[1][s]), meterIn2);
+		fMeterEnvelope[2].process(abs(outputs[0][s]), meterOut1);
+		fMeterEnvelope[3].process(abs(outputs[1][s]), meterOut2);
+		mBufferInput.ProcessBuffer(meterIn1, 0, s);
+		mBufferInput.ProcessBuffer(meterIn2, 1, s);
+		mBufferOutput.ProcessBuffer(meterOut1, 0, s);
+		mBufferOutput.ProcessBuffer(meterOut2, 1, s);
+
 	}
 
-	mMeterSenderIn.ProcessBlock(inputs, nFrames, cMeterIn);
-	mMeterSenderOut.ProcessBlock(outputs, nFrames, cMeterOut);
+	mMeterSenderIn.ProcessBlock(mBufferInput.GetBuffer(), nFrames, cMeterIn);
+	mMeterSenderOut.ProcessBlock(mBufferOutput.GetBuffer(), nFrames, cMeterOut);
 	mMeterSenderGrLevel.ProcessBlock(mBufferMeterGrLevel.GetBuffer(), nFrames, cMeterGrLevel);
 	mMeterSenderGrOpto.ProcessBlock(mBufferMeterGrOpto.GetBuffer(), nFrames, cMeterGrOpto);
 	mMeterSenderGrVca.ProcessBlock(mBufferMeterGrVca.GetBuffer(), nFrames, cMeterGrVca);
@@ -168,6 +179,7 @@ void SRDynamicsControl::OnReset() {
 	const double release = GetParam(kRelease)->Value() * .01;
 	const double scnorm = GetParam(kSCFreq)->Value() / samplerate;
 
+	fCompLevel.Reset();
 	fCompLevel.ResetCompressor(
 		thresh * 48. * (2. - crest), // thresh -48 .. -24 .. 0
 		1. / (1. + ratio * 1.), // ratio 1 .. 1.5 .. 2
@@ -180,7 +192,8 @@ void SRDynamicsControl::OnReset() {
 		-18., // reference
 		samplerate);
 	fCompLevel.SetWindow(100.);
-
+	
+	fCompOpto.Reset();
 	fCompOpto.ResetCompressor(
 		thresh * 27. * (1.5 - crest * .5), // thresh -27 .. -13.5 .. 0
 		1. / (1. + ratio * 4.), // ratio 1 .. 3 .. 5
@@ -195,6 +208,7 @@ void SRDynamicsControl::OnReset() {
 	fCompOpto.SetMaxGrDb(10., true);
 	fCompOpto.SetWindow(4.);
 
+	fCompVca.Reset();
 	fCompVca.ResetCompressor(
 		thresh * 24., // thresh
 		1. / (1. + ratio * 5.), // ratio
@@ -207,6 +221,7 @@ void SRDynamicsControl::OnReset() {
 		-18., // reference
 		samplerate);
 
+	fCompFet.Reset();
 	fCompFet.ResetCompressor(
 		thresh * 24. * (.5 + crest * .5), // thresh
 		1. / (1. + ratio * 19.), // ratio
@@ -224,6 +239,19 @@ void SRDynamicsControl::OnReset() {
 	fCompLim.SetThresh(thresh * 6. * crest);
 	fCompLim.SetAttack(.02 + attack * 1.);
 	fCompLim.SetRelease(5. + release * 10.);
+
+	fMeterEnvelope[0].SetAttack(4.);
+	fMeterEnvelope[1].SetAttack(4.);
+	fMeterEnvelope[2].SetAttack(4.);
+	fMeterEnvelope[3].SetAttack(4.);
+	fMeterEnvelope[0].SetRelease(1500.);
+	fMeterEnvelope[1].SetRelease(1500.);
+	fMeterEnvelope[2].SetRelease(1500.);
+	fMeterEnvelope[3].SetRelease(1500.);
+	fMeterEnvelope[0].SetSampleRate(samplerate);
+	fMeterEnvelope[1].SetSampleRate(samplerate);
+	fMeterEnvelope[2].SetSampleRate(samplerate);
+	fMeterEnvelope[3].SetSampleRate(samplerate);
 }
 
 void SRDynamicsControl::OnParamChange(int paramIdx)

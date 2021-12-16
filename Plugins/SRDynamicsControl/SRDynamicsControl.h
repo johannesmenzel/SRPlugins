@@ -58,6 +58,7 @@ public:
 	void OnIdle() override;
 	void OnParamChange(int paramIdx) override;
 private:
+	double meterIn1, meterIn2, meterOut1, meterOut2;
 	SR::DSP::SRGain fInGain;
 	SR::DSP::SRGain fOutGain;
 	SR::DSP::SRCompressorRMS fCompLevel;
@@ -68,6 +69,8 @@ private:
 	//SR::DSP::SRDeesser fDeesser;
 	//SR::DSP::SRDeesser fDeplosive;
 
+	SR::DSP::SRDynamicsDetector fMeterEnvelope[4];
+
 	IPeakSender<2, 1024> mMeterSenderIn;
 	IPeakSender<2, 1024> mMeterSenderOut;
 	IPeakSender<1> mMeterSenderGrLevel;
@@ -75,6 +78,8 @@ private:
 	IPeakSender<1> mMeterSenderGrVca;
 	IPeakSender<1> mMeterSenderGrFet;
 	IPeakSender<1> mMeterSenderGrLim;
+	SR::DSP::SRBuffer<sample, 2, 1024> mBufferInput;
+	SR::DSP::SRBuffer<sample, 2, 1024> mBufferOutput;
 	SR::DSP::SRBuffer<sample, 1, 1024> mBufferMeterGrLevel;
 	SR::DSP::SRBuffer<sample, 1, 1024> mBufferMeterGrOpto;
 	SR::DSP::SRBuffer<sample, 1, 1024> mBufferMeterGrVca;
