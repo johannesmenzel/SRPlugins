@@ -244,10 +244,10 @@ void SRDynamicsControl::OnReset() {
 	fMeterEnvelope[1].SetAttack(4.);
 	fMeterEnvelope[2].SetAttack(4.);
 	fMeterEnvelope[3].SetAttack(4.);
-	fMeterEnvelope[0].SetRelease(1500.);
-	fMeterEnvelope[1].SetRelease(1500.);
-	fMeterEnvelope[2].SetRelease(1500.);
-	fMeterEnvelope[3].SetRelease(1500.);
+	fMeterEnvelope[0].SetRelease(750.);
+	fMeterEnvelope[1].SetRelease(750.);
+	fMeterEnvelope[2].SetRelease(750.);
+	fMeterEnvelope[3].SetRelease(750.);
 	fMeterEnvelope[0].SetSampleRate(samplerate);
 	fMeterEnvelope[1].SetSampleRate(samplerate);
 	fMeterEnvelope[2].SetSampleRate(samplerate);
