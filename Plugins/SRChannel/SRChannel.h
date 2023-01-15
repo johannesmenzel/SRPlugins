@@ -226,5 +226,15 @@ public:
   void OnIdle() override;
   void OnParamChange(int paramIdx) override;
 
+private:
+	SR::DSP::SRFilterIIR<sample, 2> fEqHp;
+	SR::DSP::SRFilterIIR<sample, 2> fEqLp;
+	SR::DSP::SRFilterIIR<sample, 2> fEqLfBoost;
+	SR::DSP::SRFilterIIR<sample, 2> fEqLfCut;
+	SR::DSP::SRFilterIIR<sample, 2> fEqHfBoost;
+	SR::DSP::SRFilterIIR<sample, 2> fEqHfCut;
+	SR::DSP::SRFilterIIR<sample, 2> fEqLmf;
+	SR::DSP::SRFilterIIR<sample, 2> fEqHmf;
+
 #endif
 };

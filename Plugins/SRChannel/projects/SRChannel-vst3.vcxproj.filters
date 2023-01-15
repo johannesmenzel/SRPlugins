@@ -375,6 +375,9 @@
     <ClInclude Include="..\..\..\Classes\Graphics\SRCustomLayout.h">
       <Filter>SRClasses\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Classes\Utils\SRHelpers.h">
+      <Filter>SRClasses\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">
@@ -442,6 +445,9 @@
     </Filter>
     <Filter Include="SRClasses\Graphics">
       <UniqueIdentifier>{8dd675af-c80f-4306-9b1b-5a6b5503579c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SRClasses\Utils">
+      <UniqueIdentifier>{bc00f832-e2ca-4b30-8d8a-d7f20a7e8fe9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
