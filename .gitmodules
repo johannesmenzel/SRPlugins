@@ -4,3 +4,6 @@
 [submodule "Dependencies/iir1"]
 	path = Dependencies/iir1
 	url = https://github.com/berndporr/iir1.git
+[submodule "iPlug2"]
+	path = iPlug2
+	url = http://github.com/iPlug2/iPlug2.git
