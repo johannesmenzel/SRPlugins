@@ -11,8 +11,8 @@ const int kNumPresets = 1;
 enum EParams
 {
 	// Level Stage
-	kInputGain = 0,
-	kOutputGain,
+	kGainIn = 0,
+	kGainOut,
 	
 	// Sat Stage
 	kSaturationDrive,
@@ -108,8 +108,8 @@ enum ECtrlTags {
 
 	// Input Stage
 	// Level Stage
-	cInputGain = 0,
-	cOutputGain,
+	cGainIn = 0,
+	cGainOut,
 
 	// Sat Stage
 	cSaturationDrive,
@@ -227,6 +227,11 @@ public:
   void OnParamChange(int paramIdx) override;
 
 private:
+	double meterIn1, meterIn2, meterOut1, meterOut2;
+
+	SR::DSP::SRGain fGainIn;
+	SR::DSP::SRGain fGainOut;
+
 	SR::DSP::SRFilterIIR<sample, 2> fEqHp;
 	SR::DSP::SRFilterIIR<sample, 2> fEqLp;
 	SR::DSP::SRFilterIIR<sample, 2> fEqLfBoost;
@@ -235,6 +240,12 @@ private:
 	SR::DSP::SRFilterIIR<sample, 2> fEqHfCut;
 	SR::DSP::SRFilterIIR<sample, 2> fEqLmf;
 	SR::DSP::SRFilterIIR<sample, 2> fEqHmf;
+
+	SR::DSP::SRDynamicsDetector fMeterEnvelope[4];
+	IPeakSender<2, 1024> mMeterSenderIn;
+	IPeakSender<2, 1024> mMeterSenderOut;
+	SR::DSP::SRBuffer<sample, 2, 1024> mBufferInput;
+	SR::DSP::SRBuffer<sample, 2, 1024> mBufferOutput;
 
 #endif
 };
