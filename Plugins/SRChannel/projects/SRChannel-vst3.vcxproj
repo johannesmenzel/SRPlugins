@@ -254,6 +254,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="../config.h" />
+    <ClInclude Include="..\..\..\Classes\DSP\SRBuffer.h" />
+    <ClInclude Include="..\..\..\Classes\DSP\SRDynamics.h" />
+    <ClInclude Include="..\..\..\Classes\DSP\SRFilters.h" />
+    <ClInclude Include="..\..\..\Classes\DSP\SRGain.h" />
+    <ClInclude Include="..\..\..\Classes\DSP\SRSaturation.h" />
+    <ClInclude Include="..\..\..\Classes\Graphics\SRCustomKnob.h" />
+    <ClInclude Include="..\..\..\Classes\Graphics\SRCustomLayout.h" />
     <ClInclude Include="..\..\..\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\classfactoryhelpers.h" />
     <ClInclude Include="..\..\..\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fbuffer.h" />
     <ClInclude Include="..\..\..\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fcleanup.h" />

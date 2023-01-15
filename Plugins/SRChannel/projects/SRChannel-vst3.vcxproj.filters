@@ -354,6 +354,27 @@
     <ClInclude Include="..\..\..\iPlug2\IPlug\IPlugPluginBase.h">
       <Filter>IPlug</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Classes\DSP\SRBuffer.h">
+      <Filter>SRClasses\DSP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Classes\DSP\SRDynamics.h">
+      <Filter>SRClasses\DSP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Classes\DSP\SRFilters.h">
+      <Filter>SRClasses\DSP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Classes\DSP\SRGain.h">
+      <Filter>SRClasses\DSP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Classes\DSP\SRSaturation.h">
+      <Filter>SRClasses\DSP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Classes\Graphics\SRCustomKnob.h">
+      <Filter>SRClasses\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Classes\Graphics\SRCustomLayout.h">
+      <Filter>SRClasses\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">
@@ -412,6 +433,15 @@
     </Filter>
     <Filter Include="IPlug\VST3\VST3_SDK\plugininterfaces\base">
       <UniqueIdentifier>{5f06b03e-5093-46c0-9513-efb4e494c857}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SRClasses">
+      <UniqueIdentifier>{60701944-a95c-4de3-9b5a-42ebf270e5bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SRClasses\DSP">
+      <UniqueIdentifier>{ac8fd02a-6057-4ca7-870d-4dce13ddd0af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SRClasses\Graphics">
+      <UniqueIdentifier>{8dd675af-c80f-4306-9b1b-5a6b5503579c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
