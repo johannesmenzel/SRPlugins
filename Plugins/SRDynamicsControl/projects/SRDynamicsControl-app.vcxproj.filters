@@ -255,9 +255,6 @@
     <ClInclude Include="..\..\..\iPlug2\IPlug\IPlugPluginBase.h">
       <Filter>IPlug</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\iPlug2\IGraphics\ISender.h">
-      <Filter>IGraphics</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">
