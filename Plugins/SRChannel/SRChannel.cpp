@@ -3,6 +3,10 @@
 #include "IControls.h"
 #include "../../Classes/Graphics/SRCustomKnob.h"
 #include "../../Classes/Graphics/SRCustomLayout.h"
+#include "../../Classes/Graphics/SRCustomGraph.h"
+
+#define FREQUENCYRESPONSE 300
+
 
 SRChannel::SRChannel(const InstanceInfo& info)
 	: Plugin(info, MakeConfig(kNumParams, kNumPresets))
@@ -16,6 +20,11 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	, fEqHfCut()
 	, fEqLmf()
 	, fEqHmf()
+	, fCompRms()
+	, fCompPeak()
+	, fMeterEnvelope()
+	, mFreqMeterValues(new float[FREQUENCYRESPONSE])
+
 {
 	GetParam(kGainIn)->InitDouble("Input", 0., -120., 12., 0.01, "dB", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(-120., 12., 0., .5)));
 	GetParam(kGainOut)->InitDouble("Output", 0., -120., 12., 0.01, "dB", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(-120., 12., 0., .5)));
@@ -23,22 +32,20 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kStereoPan)->InitDouble("Pan", 0., -100., 100., 1., "%");
 	GetParam(kStereoWidth)->InitDouble("Width", 100., 0., 1000., 1., "%", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1000., 100., .5)));
 
-
-	GetParam(kEqHpFreq)->InitDouble("HP", 16., 16., 350., 1., "Hz");
-	GetParam(kEqLpFreq)->InitDouble("LP", 22000., 3000., 22000., 1., "Hz");
-
+	GetParam(kEqHpFreq)->InitDouble("HP", 20., 16., 400., 10., "Hz", IParam::EFlags::kFlagStepped);
+	GetParam(kEqLpFreq)->InitDouble("LP", 22000., 3000., 22000., 1000., "Hz", IParam::EFlags::kFlagStepped);
 
 	GetParam(kEqHfBoost)->InitDouble("HF Boost", 0., -0., 10., 1., "dB", IParam::EFlags::kFlagStepped);
 	GetParam(kEqHfCut)->InitDouble("HF Cut", 0., -0., 10., 1., "dB", IParam::EFlags::kFlagStepped);
 	GetParam(kEqHfFreq)->InitDouble("HF Freq", 8000., 3000., 16000., 1000., "Hz", IParam::EFlags::kFlagStepped, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(3000., 16000., 8000., .5)));
 	GetParam(kEqHfDs)->InitDouble("HF DS", 0., -20., 0., .01, "dB");
 
-	GetParam(kEqHmfGain)->InitDouble("HMF Gain", 0., -12., 12., 0.01, "dB");
+	GetParam(kEqHmfGain)->InitDouble("HMF Gain", 0., -12., 12., 1., "dB", IParam::EFlags::kFlagStepped);
 	GetParam(kEqHmfFreq)->InitDouble("HMF Freq", 3000., 600., 7000., 1., "Hz", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(600., 7000., 3000., .5)));
 	GetParam(kEqHmfQ)->InitDouble("HMF Q", .707, 0.1, 10., 0.01, "", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.1, 10., .707, .5)));
 	GetParam(kEqHmfDs)->InitDouble("HMF DS", 0., -20., 0., .01, "dB");
 
-	GetParam(kEqLmfGain)->InitDouble("LMF Gain", 0., -12., 12., 0.01, "dB");
+	GetParam(kEqLmfGain)->InitDouble("LMF Gain", 0., -12., 12., 1., "dB", IParam::EFlags::kFlagStepped);
 	GetParam(kEqLmfFreq)->InitDouble("LMF Freq", 1000., 200., 2500., 1., "Hz", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(200., 2500., 1000., .5)));
 	GetParam(kEqLmfQ)->InitDouble("LMF Q", .707, 0.1, 10., 0.01, "", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.1, 10., .707, .5)));
 	GetParam(kEqLmfDs)->InitDouble("LMF DS", 0., -20., 0., .01, "dB");
@@ -47,6 +54,20 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kEqLfCut)->InitDouble("LF Cut", 0., -0., 10., 1., "dB", IParam::EFlags::kFlagStepped);
 	GetParam(kEqLfFreq)->InitDouble("LF Freq", 100., 30., 300., 20., "Hz", IParam::EFlags::kFlagStepped, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(30., 300., 100., .5)));
 	GetParam(kEqLfDs)->InitDouble("LF DS", 0., -20., 0., .01, "dB");
+
+	GetParam(kCompRmsThresh)->InitDouble("Level Thresh", 0., -40., 0., 0.1, "dB");
+	GetParam(kCompRmsRatio)->InitDouble("Level Ratio", 2., 1., 6., .5, ":1", IParam::EFlags::kFlagStepped, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(1., 6., 2., .5)));
+	GetParam(kCompRmsAttack)->InitDouble("Level Attack", 15., 5., 50., 0.01, "ms");
+	GetParam(kCompRmsRelease)->InitDouble("Level Release", 300., 100., 3000., 1., "ms");
+	GetParam(kCompRmsMakeup)->InitDouble("Level Makeup", 0., -12., 12., 0.01, "dB");
+	GetParam(kCompRmsMix)->InitDouble("Level Mix", 100., 0., 100., 1., "%");
+
+	GetParam(kCompPeakThresh)->InitDouble("Peak Thresh", 0., -40., 0., 0.1, "dB");
+	GetParam(kCompPeakRatio)->InitDouble("Peak Ratio", 5., 2., 20., 2., ":1", IParam::EFlags::kFlagStepped, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(2., 20., 5., .5)));
+	GetParam(kCompPeakAttack)->InitDouble("Peak Attack", 5., 0.02, 20., 0.01, "ms");
+	GetParam(kCompPeakRelease)->InitDouble("Peak Release", 200., 20., 500., 0.01, "ms");
+	GetParam(kCompPeakMakeup)->InitDouble("Peak Makeup", 0., -12., 12., 0.01, "dB");
+	GetParam(kCompPeakMix)->InitDouble("Peak Mix", 100., 0., 100., 1., "%");
 
 	OnReset();
 
@@ -60,18 +81,21 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		pGraphics->AttachPanelBackground(SR::Graphics::Layout::SR_DEFAULT_COLOR_CUSTOM_PANEL_BG);
 		pGraphics->LoadFont("Roboto-Regular", ROBOTO_FN);
 		const IRECT b = pGraphics->GetBounds();
-		const IRECT rectControls = b.GetPadded(0.f, -20.f, -50.f, 0.f);
-		const IRECT rectTitle = b.GetPadded(0.f, 0.f, -50.f, -700.f);
+		const IRECT rectControls = b.GetPadded(-50.f, -20.f, -50.f, 0.f);
+		const IRECT rectTitle = b.GetPadded(50.f, 0.f, -50.f, -700.f);
+		const IRECT rectMeterGr = b.GetFromLeft(50.f);
 		const IRECT rectMeterVu = b.GetFromRight(50.f);
 		pGraphics->AttachControl(new ITextControl(rectTitle, PLUG_MFR " " PLUG_NAME " " PLUG_VERSION_STR "-alpha", SR::Graphics::Layout::SR_DEFAULT_TEXT));
 
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 11, 6, 12).GetCentredInside(100.f), kGainIn, "Input", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGainIn);
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 11, 6, 12).GetCentredInside(100.f), kGainOut, "Output", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGainOut);
 
+		pGraphics->AttachControl(new PlaceHolder(rectControls.GetGridCell(0, 0, 6, 12).FracRectHorizontal(1.f).FracRectVertical(4.f, true), "Saturation"));
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 0, 6, 12).GetCentredInside(100.f), kEqLpFreq, "LP", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLpFreq);
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 0, 6, 12).GetCentredInside(100.f), kEqHpFreq, "HP", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHpFreq);
 
-		pGraphics->AttachControl(new PlaceHolder(rectControls.GetGridCell(0, 2, 6, 12).FracRectHorizontal(4.f).FracRectVertical(2.f, true), "Frequency Response"));
+		//pGraphics->AttachControl(new PlaceHolder(rectControls.GetGridCell(0, 2, 6, 12).FracRectHorizontal(4.f).FracRectVertical(2.f, true), "Frequency Response"));
+		pGraphics->AttachControl(new SR::Graphics::Controls::SRGraphBase(rectControls.GetGridCell(0, 2, 6, 12).FracRectHorizontal(4.f).FracRectVertical(2.f, true), FREQUENCYRESPONSE, mFreqMeterValues, SR::Graphics::Layout::SR_DEFAULT_STYLE), cMeterFreqResponse);
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(2, 2, 6, 12).GetCentredInside(100.f), kEqLfBoost, "Boost", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLfBoost);
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(2, 3, 6, 12).GetCentredInside(100.f), kEqLfCut, "Cut", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLfCut);
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(2, 4, 6, 12).GetCentredInside(100.f), kEqHfBoost, "Boost", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHfBoost);
@@ -89,18 +113,34 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 4, 6, 12).GetCentredInside(80.f), kEqHmfFreq, "Freq", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHmfFreq);
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 5, 6, 12).GetCentredInside(80.f), kEqHmfDs, "DS", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHmfDs);
 
-		pGraphics->AttachControl(new PlaceHolder(rectControls.GetGridCell(0, 7, 6, 12).FracRectHorizontal(2.f).FracRectVertical(6.f, true), "Compressors"));
-		//pGraphics->AttachControl(new PlaceHolder(rectControls.GetGridCell(0, 10, 6, 12).FracRectHorizontal(1.f).FracRectVertical(6.f, true), "Stereo"));
-		
+		//pGraphics->AttachControl(new PlaceHolder(rectControls.GetGridCell(0, 7, 6, 12).FracRectHorizontal(2.f).FracRectVertical(6.f, true), "Compressors"));
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(0, 7, 6, 12).GetCentredInside(100.f), kCompRmsThresh, "Thresh", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsThresh);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(0, 8, 6, 12).GetCentredInside(100.f), kCompRmsRatio, "Ratio", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsRatio);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(1, 7, 6, 12).GetCentredInside(100.f), kCompRmsAttack, "Attack", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsAttack);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(1, 8, 6, 12).GetCentredInside(100.f), kCompRmsRelease, "Release", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsRelease);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(2, 7, 6, 12).GetCentredInside(100.f), kCompRmsMakeup, "Makeup", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsMakeup);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(2, 8, 6, 12).GetCentredInside(100.f), kCompRmsMix, "Mix", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsMix);
+
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(3, 7, 6, 12).GetCentredInside(100.f), kCompPeakThresh, "Thresh", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakThresh);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(3, 8, 6, 12).GetCentredInside(100.f), kCompPeakRatio, "Ratio", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakRatio);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 7, 6, 12).GetCentredInside(100.f), kCompPeakAttack, "Attack", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakAttack);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 8, 6, 12).GetCentredInside(100.f), kCompPeakRelease, "Release", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakRelease);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 7, 6, 12).GetCentredInside(100.f), kCompPeakMakeup, "Makeup", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakMakeup);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 8, 6, 12).GetCentredInside(100.f), kCompPeakMix, "Mix", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakMix);
+
+
+		pGraphics->AttachControl(new PlaceHolder(rectControls.GetGridCell(2, 10, 6, 12).FracRectHorizontal(1.f).FracRectVertical(4.f, true), "Stereo"));
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(0, 10, 6, 12).GetCentredInside(100.f), kStereoPan, "Pan", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoPan);
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(1, 10, 6, 12).GetCentredInside(100.f), kStereoWidth, "Width", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoWidth);
 
 		pGraphics->AttachControl(new IVMeterControl<2>(rectMeterVu.GetGridCell(0, 0, 1, 2), "In", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L", "R" }, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Linear, -60.f, 0.f), cMeterIn);
 		pGraphics->AttachControl(new IVMeterControl<2>(rectMeterVu.GetGridCell(0, 1, 1, 2), "Out", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L", "R" }, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Linear, -60.f, 0.f), cMeterOut);
+		pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 0, 1, 2), "L", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Linear, -18.f, 0.f), cMeterGrRms);
+		pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 1, 1, 2), "P", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Linear, -18.f, 0.f), cMeterGrPeak);
 
-
-
-
+		// Set GR Meters Starting from Above
+		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrRms))->SetBaseValue(1.);
+		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrPeak))->SetBaseValue(1.);
 
 	};
 #endif
@@ -141,7 +181,13 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 		outputs[0][s] = fEqLfCut.Process(outputs[0][s], 0);
 		outputs[1][s] = fEqLfCut.Process(outputs[1][s], 1);
 
+		fCompRms.Process(outputs[0][s], outputs[1][s]);
+		fCompPeak.Process(outputs[0][s], outputs[1][s]);
+
 		fGainOut.Process(outputs[0][s], outputs[1][s]);
+
+		mBufferMeterGrRms.ProcessBuffer(fCompRms.GetGrLin(), 0, s);
+		mBufferMeterGrPeak.ProcessBuffer(fCompPeak.GetGrLin(), 0, s);
 
 		fMeterEnvelope[0].process(abs(inputs[0][s]), meterIn1);
 		fMeterEnvelope[1].process(abs(inputs[1][s]), meterIn2);
@@ -156,6 +202,9 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 	//fEqLp.ProcessBlock(outputs, outputs, 2, nFrames);
 	mMeterSenderIn.ProcessBlock(mBufferInput.GetBuffer(), nFrames, cMeterIn);
 	mMeterSenderOut.ProcessBlock(mBufferOutput.GetBuffer(), nFrames, cMeterOut);
+	mMeterSenderGrRms.ProcessBlock(mBufferMeterGrRms.GetBuffer(), nFrames, cMeterGrRms);
+	mMeterSenderGrPeak.ProcessBlock(mBufferMeterGrPeak.GetBuffer(), nFrames, cMeterGrPeak);
+
 
 }
 
@@ -177,11 +226,53 @@ void SRChannel::OnReset()
 	fEqLmf.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadPeak, GetParam(kEqLmfFreq)->Value() / samplerate, GetParam(kEqLmfQ)->Value(), GetParam(kEqLmfGain)->Value(), samplerate);
 	fEqLfBoost.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadLowshelf, GetParam(kEqLfFreq)->Value() / samplerate, 0.707, GetParam(kEqLfBoost)->Value(), samplerate);
 	fEqLfCut.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadLowshelf, 1.5 * GetParam(kEqLfFreq)->Value() / samplerate, 0.707, -GetParam(kEqLfCut)->Value(), samplerate);
+
+	fCompRms.Reset();
+	fCompRms.ResetCompressor(
+		GetParam(kCompRmsThresh)->Value(),
+		GetParam(1. / kCompRmsRatio)->Value(),
+		GetParam(kCompRmsAttack)->Value(),
+		GetParam(kCompRmsRelease)->Value(),
+		16. / samplerate, // sidechain HP
+		5., // knee dB
+		true, // feedback
+		true, // automake
+		-18., // reference
+		samplerate);
+
+	fCompPeak.Reset();
+	fCompPeak.ResetCompressor(
+		GetParam(kCompPeakThresh)->Value(),
+		GetParam(1. / kCompPeakRatio)->Value(),
+		GetParam(kCompPeakAttack)->Value(),
+		GetParam(kCompPeakRelease)->Value(),
+		16. / samplerate, // sidechain HP
+		2., // knee dB
+		true, // feedback
+		true, // automake
+		-18., // reference
+		samplerate);
+
+	fMeterEnvelope[0].SetAttack(4.);
+	fMeterEnvelope[1].SetAttack(4.);
+	fMeterEnvelope[2].SetAttack(4.);
+	fMeterEnvelope[3].SetAttack(4.);
+	fMeterEnvelope[0].SetRelease(750.);
+	fMeterEnvelope[1].SetRelease(750.);
+	fMeterEnvelope[2].SetRelease(750.);
+	fMeterEnvelope[3].SetRelease(750.);
+	fMeterEnvelope[0].SetSampleRate(samplerate);
+	fMeterEnvelope[1].SetSampleRate(samplerate);
+	fMeterEnvelope[2].SetSampleRate(samplerate);
+	fMeterEnvelope[3].SetSampleRate(samplerate);
 }
 void SRChannel::OnIdle()
 {
 	mMeterSenderIn.TransmitData(*this);
 	mMeterSenderOut.TransmitData(*this);
+	mMeterSenderGrRms.TransmitData(*this);
+	mMeterSenderGrPeak.TransmitData(*this);
+	SetFreqMeterValues();
 }
 void SRChannel::OnParamChange(int paramIdx)
 {
@@ -192,10 +283,12 @@ void SRChannel::OnParamChange(int paramIdx)
 		fGainIn.SetGain(DBToAmp(GetParam(paramIdx)->Value()));
 		break;
 	case kGainOut:
-	case kStereoWidth:
-	case kStereoPan:
 		fGainOut.SetGain(DBToAmp(GetParam(kGainOut)->Value()));
+		break;
+	case kStereoPan:
 		fGainOut.SetPanPosition((GetParam(kStereoPan)->Value() + 100.) / 200.);
+		break;
+	case kStereoWidth:
 		fGainOut.SetWidth(GetParam(kStereoWidth)->Value() * 0.01);
 		break;
 	case kEqHpFreq:
@@ -226,6 +319,63 @@ void SRChannel::OnParamChange(int paramIdx)
 		fEqLfBoost.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadLowshelf, GetParam(kEqLfFreq)->Value() / samplerate, 0.707, GetParam(kEqLfBoost)->Value(), samplerate);
 		fEqLfCut.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadLowshelf, 1.5 * GetParam(kEqLfFreq)->Value() / samplerate, 0.707, -GetParam(kEqLfCut)->Value(), samplerate);
 		break;
+
+	case kCompRmsThresh:
+		fCompRms.SetThresh(GetParam(kCompRmsThresh)->Value());
+		break;
+	case kCompRmsRatio:
+		fCompRms.SetRatio(1. / GetParam(kCompRmsRatio)->Value());
+		break;
+	case kCompRmsAttack:
+		fCompRms.SetAttack(GetParam(kCompRmsAttack)->Value());
+		break;
+	case kCompRmsRelease:
+		fCompRms.SetRelease(GetParam(kCompRmsRelease)->Value());
+		break;
+	case kCompRmsMakeup:
+		break;
+	case kCompRmsMix:
+		break;
+
+
+	case kCompPeakThresh:
+		fCompPeak.SetThresh(GetParam(kCompPeakThresh)->Value());
+		break;
+	case kCompPeakRatio:
+		fCompPeak.SetRatio(1. / GetParam(kCompPeakRatio)->Value());
+		break;
+	case kCompPeakAttack:
+		fCompPeak.SetAttack(GetParam(kCompPeakAttack)->Value());
+		break;
+	case kCompPeakRelease:
+		fCompPeak.SetRelease(GetParam(kCompPeakRelease)->Value());
+		break;
+	case kCompPeakMakeup:
+		break;
+	case kCompPeakMix:
+		break;
+
 	}
+}
+void SRChannel::SetFreqMeterValues()
+{
+	const double samplerate = GetSampleRate();
+	const double shape = log10(samplerate);
+	for (int i = 0; i < FREQUENCYRESPONSE; i++) {
+		// If linear shape
+		//double freq = 0.5 * samplerate * double(i) / double(FREQUENCYRESPONSE);
+		// If pow shape
+		double freq = 0.5 * samplerate * std::pow((double(i) / double(FREQUENCYRESPONSE)), shape);
+		mFreqMeterValues[i] = 0.;
+		if (GetParam(kEqHpFreq)->Value() > 20.) mFreqMeterValues[i] += fEqHp.GetFrequencyResponse(freq / samplerate, 12., false);
+		if (GetParam(kEqLpFreq)->Value() < 22000.) mFreqMeterValues[i] += fEqLp.GetFrequencyResponse(freq / samplerate, 12., false);
+		if (GetParam(kEqHfBoost)->Value() != 0.0) mFreqMeterValues[i] += fEqHfBoost.GetFrequencyResponse(freq / samplerate, 12., false);
+		if (GetParam(kEqHfCut)->Value() != 0.0) mFreqMeterValues[i] += fEqHfCut.GetFrequencyResponse(freq / samplerate, 12., false);
+		if (GetParam(kEqHmfGain)->Value() != 0.0) mFreqMeterValues[i] += fEqHmf.GetFrequencyResponse(freq / samplerate, 12., false);
+		if (GetParam(kEqLmfGain)->Value() != 0.0) mFreqMeterValues[i] += fEqLmf.GetFrequencyResponse(freq / samplerate, 12., false);
+		if (GetParam(kEqLfBoost)->Value() != 0.0) mFreqMeterValues[i] += fEqLfBoost.GetFrequencyResponse(freq / samplerate, 12., false);
+		if (GetParam(kEqLfCut)->Value() != 0.0) mFreqMeterValues[i] += fEqLfCut.GetFrequencyResponse(freq / samplerate, 12., false);
+	}
+	if (GetUI() && mFreqMeterValues != 0) dynamic_cast<SR::Graphics::Controls::SRGraphBase*>(GetUI()->GetControlWithTag(cMeterFreqResponse))->Process(mFreqMeterValues);
 }
 #endif

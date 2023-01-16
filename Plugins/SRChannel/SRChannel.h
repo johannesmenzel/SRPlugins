@@ -206,7 +206,7 @@ enum ECtrlTags {
 	cMeterGrRms,
 	cMeterGrPeak,
 	cMeterGrLim,
-	cMeterEqGraph,
+	cMeterFreqResponse,
 
 	// Number of controls
 	kNumCtrlTags,
@@ -227,6 +227,8 @@ public:
   void OnParamChange(int paramIdx) override;
 
 private:
+	void SetFreqMeterValues();
+
 	double meterIn1, meterIn2, meterOut1, meterOut2;
 
 	SR::DSP::SRGain fGainIn;
@@ -241,11 +243,22 @@ private:
 	SR::DSP::SRFilterIIR<sample, 2> fEqLmf;
 	SR::DSP::SRFilterIIR<sample, 2> fEqHmf;
 
+	SR::DSP::SRCompressorRMS fCompRms;
+	SR::DSP::SRCompressor fCompPeak;
+
 	SR::DSP::SRDynamicsDetector fMeterEnvelope[4];
+
 	IPeakSender<2, 1024> mMeterSenderIn;
 	IPeakSender<2, 1024> mMeterSenderOut;
+	IPeakSender<1> mMeterSenderGrRms;
+	IPeakSender<1> mMeterSenderGrPeak;
+
 	SR::DSP::SRBuffer<sample, 2, 1024> mBufferInput;
 	SR::DSP::SRBuffer<sample, 2, 1024> mBufferOutput;
+	SR::DSP::SRBuffer<sample, 1, 1024> mBufferMeterGrRms;
+	SR::DSP::SRBuffer<sample, 1, 1024> mBufferMeterGrPeak;
+
+	float* mFreqMeterValues;
 
 #endif
 };
