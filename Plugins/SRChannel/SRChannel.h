@@ -247,7 +247,9 @@ private:
 	SR::DSP::SRCompressor fCompPeak;
 
 	SR::DSP::SRDynamicsDetector fMeterEnvelope[4];
-
+	// We might test this AVG Meter later
+	//IPeakAvgSender<2, 1024>mMeterSenderIn;
+	//IPeakAvgSender<2, 1024>mMeterSenderOut;
 	IPeakSender<2, 1024> mMeterSenderIn;
 	IPeakSender<2, 1024> mMeterSenderOut;
 	IPeakSender<1> mMeterSenderGrRms;
