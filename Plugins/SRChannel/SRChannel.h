@@ -13,14 +13,14 @@ enum EParams
 	// Level Stage
 	kGainIn = 0,
 	kGainOut,
-	
+
 	// Sat Stage
 	kSaturationDrive,
 	kSaturationAmount,
 	kOversamplingRate,
 
 	// EQ Stage
-	
+
 	// -- Filter
 	kEqHpFreq,
 	kEqLpFreq,
@@ -53,9 +53,9 @@ enum EParams
 	kEqLfIsSolo,
 
 	kEqAmount,
-	
+
 	// Compressor Stage
-	
+
 	// -- RMS Compressor
 	kCompRmsThresh,
 	kCompRmsRatio,
@@ -89,11 +89,11 @@ enum EParams
 	kStereoDepth,
 	kStereoMonoFreq,
 	kStereoIsPanMonoLow,
-	
+
 	kLimiterThresh,
 	kClipperThresh,
 	kIsAgc,
-	
+
 	// Bypasses
 	kSatBypass,
 	kEqBypass,
@@ -218,13 +218,13 @@ using namespace igraphics;
 class SRChannel final : public Plugin
 {
 public:
-  SRChannel(const InstanceInfo& info);
+	SRChannel(const InstanceInfo& info);
 
 #if IPLUG_DSP // http://bit.ly/2S64BDd
-  void ProcessBlock(sample** inputs, sample** outputs, int nFrames) override;
-  void OnReset() override;
-  void OnIdle() override;
-  void OnParamChange(int paramIdx) override;
+	void ProcessBlock(sample** inputs, sample** outputs, int nFrames) override;
+	void OnReset() override;
+	void OnIdle() override;
+	void OnParamChange(int paramIdx) override;
 
 private:
 	void SetFreqMeterValues();
@@ -248,8 +248,8 @@ private:
 
 	SR::DSP::SRDynamicsDetector fMeterEnvelope[4];
 	// We might test this AVG Meter later
-	//IPeakAvgSender<2, 1024>mMeterSenderIn;
-	//IPeakAvgSender<2, 1024>mMeterSenderOut;
+	//IPeakAvgSender<2, 1024>mMeterSenderIn{ -60., true, 10.f, 4.f, 750.f, 1000.f };
+	//IPeakAvgSender<2, 1024>mMeterSenderOut{ -60., true, 10.f, 4.f, 750.f, 1000.f };
 	IPeakSender<2, 1024> mMeterSenderIn;
 	IPeakSender<2, 1024> mMeterSenderOut;
 	IPeakSender<1> mMeterSenderGrRms;
