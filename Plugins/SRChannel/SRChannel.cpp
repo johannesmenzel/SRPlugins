@@ -38,7 +38,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kEqHfBoost)->InitDouble("HF Boost", 0., -0., 10., 1., "dB", IParam::EFlags::kFlagStepped);
 	GetParam(kEqHfCut)->InitDouble("HF Cut", 0., -0., 10., 1., "dB", IParam::EFlags::kFlagStepped);
 	GetParam(kEqHfFreq)->InitDouble("HF Freq", 8000., 3000., 16000., 1000., "Hz", IParam::EFlags::kFlagStepped, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(3000., 16000., 8000., .5)));
-	GetParam(kEqHfDs)->InitDouble("HF DS", 0., -20., 0., .01, "dB");
+	//GetParam(kEqHfDs)->InitDouble("HF DS", 0., -20., 0., .01, "dB");
 
 	GetParam(kEqHmfGain)->InitDouble("HMF Gain", 0., -12., 12., 1., "dB", IParam::EFlags::kFlagStepped);
 	GetParam(kEqHmfFreq)->InitDouble("HMF Freq", 3000., 600., 7000., 1., "Hz", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(600., 7000., 3000., .5)));
@@ -144,6 +144,12 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		// -- Set GR meters displaying the other way round
 		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrRms))->SetBaseValue(1.);
 		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrPeak))->SetBaseValue(1.);
+
+		
+		for (int paramIdx = 0; paramIdx < kNumParams; paramIdx++) {
+			if (!GetParam(paramIdx))
+				pGraphics->GetControlWithParamIdx(paramIdx)->SetDisabled(true);
+		}
 
 	};
 #endif
