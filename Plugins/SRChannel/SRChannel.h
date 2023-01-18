@@ -86,6 +86,7 @@ enum EParams
 	// Output Stage
 	kStereoPan,
 	kStereoWidth,
+	kStereoWidthLow,
 	kStereoDepth,
 	kStereoMonoFreq,
 	kStereoIsPanMonoLow,
@@ -183,6 +184,7 @@ enum ECtrlTags {
 	// Output Stage
 	cStereoPan,
 	cStereoWidth,
+	cStereoWidthLow,
 	cStereoDepth,
 	cStereoMonoFreq,
 	cStereoIsPanMonoLow,
@@ -229,10 +231,11 @@ public:
 private:
 	void SetFreqMeterValues();
 
-	double meterIn1, meterIn2, meterOut1, meterOut2;
+	double meterIn1, meterIn2, meterOut1, meterOut2, mLowSignalL, mLowSignalR;
 
 	SR::DSP::SRGain fGainIn;
 	SR::DSP::SRGain fGainOut;
+	SR::DSP::SRGain fGainOutLow;
 
 	SR::DSP::SRFilterIIR<sample, 2> fEqHp;
 	SR::DSP::SRFilterIIR<sample, 2> fEqLp;
@@ -242,6 +245,9 @@ private:
 	SR::DSP::SRFilterIIR<sample, 2> fEqHfCut;
 	SR::DSP::SRFilterIIR<sample, 2> fEqLmf;
 	SR::DSP::SRFilterIIR<sample, 2> fEqHmf;
+
+	SR::DSP::SRFilterIIR<sample, 2> fSplitHp;
+	SR::DSP::SRFilterIIR<sample, 2> fSplitLp;
 
 	SR::DSP::SRCompressorRMS fCompRms;
 	SR::DSP::SRCompressor fCompPeak;
@@ -259,6 +265,7 @@ private:
 	SR::DSP::SRBuffer<sample, 2, 1024> mBufferOutput;
 	SR::DSP::SRBuffer<sample, 1, 1024> mBufferMeterGrRms;
 	SR::DSP::SRBuffer<sample, 1, 1024> mBufferMeterGrPeak;
+	SR::DSP::SRBuffer<sample, 2, 1024> mBufferLowSignal;
 
 	float* mFreqMeterValues;
 

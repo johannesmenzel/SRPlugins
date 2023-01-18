@@ -12,6 +12,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	: Plugin(info, MakeConfig(kNumParams, kNumPresets))
 	, fGainIn(100)
 	, fGainOut(100)
+	, fGainOutLow(100)
 	, fEqHp()
 	, fEqLp()
 	, fEqLfBoost()
@@ -26,19 +27,21 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	, mFreqMeterValues(new float[FREQUENCYRESPONSE])
 
 {
-	GetParam(kGainIn)->InitDouble("Input", 0., -120., 12., 0.01, "dB", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(-120., 12., 0., .5)));
-	GetParam(kGainOut)->InitDouble("Output", 0., -120., 12., 0.01, "dB", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(-120., 12., 0., .5)));
+	GetParam(kGainIn)->InitDouble("Input", 0., -120., 12., 0.01, "dB", 0, "Gain", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(-120., 12., 0., .5)));
+	GetParam(kGainOut)->InitDouble("Output", 0., -120., 12., 0.01, "dB", 0, "Gain", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(-120., 12., 0., .5)));
 
-	GetParam(kStereoPan)->InitDouble("Pan", 0., -100., 100., 1., "%");
-	GetParam(kStereoWidth)->InitDouble("Width", 100., 0., 1000., 1., "%", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1000., 100., .5)));
+	GetParam(kStereoPan)->InitDouble("Pan", 0., -100., 100., 1., "%", 0, "Stereo");
+	GetParam(kStereoWidth)->InitDouble("Width", 100., 0., 1000., 1., "%", 0, "Stereo", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1000., 100., .5)));
+	GetParam(kStereoWidthLow)->InitDouble("Bass Width", 100., 0., 100., 1., "%", 0, "Stereo", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 100., 50., .5)));
+	GetParam(kStereoMonoFreq)->InitDouble("Split FQ", 20., 20., 1000., .01, "Hz", 0, "Stereo", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1000., 100., .5)));
 
-	GetParam(kEqHpFreq)->InitDouble("HP", 20., 16., 400., 10., "Hz", IParam::EFlags::kFlagStepped);
+	GetParam(kEqHpFreq)->InitDouble("HP", 20., 20., 400., 10., "Hz", IParam::EFlags::kFlagStepped);
 	GetParam(kEqLpFreq)->InitDouble("LP", 22000., 3000., 22000., 1000., "Hz", IParam::EFlags::kFlagStepped);
 
 	GetParam(kEqHfBoost)->InitDouble("HF Boost", 0., -0., 10., 1., "dB", IParam::EFlags::kFlagStepped);
 	GetParam(kEqHfCut)->InitDouble("HF Cut", 0., -0., 10., 1., "dB", IParam::EFlags::kFlagStepped);
 	GetParam(kEqHfFreq)->InitDouble("HF Freq", 8000., 3000., 16000., 1000., "Hz", IParam::EFlags::kFlagStepped, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(3000., 16000., 8000., .5)));
-	//GetParam(kEqHfDs)->InitDouble("HF DS", 0., -20., 0., .01, "dB");
+	GetParam(kEqHfDs)->InitDouble("HF DS", 0., -20., 0., .01, "dB");
 
 	GetParam(kEqHmfGain)->InitDouble("HMF Gain", 0., -12., 12., 1., "dB", IParam::EFlags::kFlagStepped);
 	GetParam(kEqHmfFreq)->InitDouble("HMF Freq", 3000., 600., 7000., 1., "Hz", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(600., 7000., 3000., .5)));
@@ -130,9 +133,10 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 7, 6, 12).GetCentredInside(100.f), kCompPeakMakeup, "Makeup", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakMakeup);
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 8, 6, 12).GetCentredInside(100.f), kCompPeakMix, "Mix", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakMix);
 		// -- Stereo Controls
-		pGraphics->AttachControl(new PlaceHolder(rectControls.GetGridCell(2, 10, 6, 12).FracRectHorizontal(1.f).FracRectVertical(4.f, true), "Stereo"));
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(0, 10, 6, 12).GetCentredInside(100.f), kStereoPan, "Pan", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoPan);
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(1, 10, 6, 12).GetCentredInside(100.f), kStereoWidth, "Width", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoWidth);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(2, 10, 6, 12).GetCentredInside(100.f), kStereoWidthLow, "Bass Width", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoWidthLow);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(3, 10, 6, 12).GetCentredInside(100.f), kStereoMonoFreq, "Split FQ", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoMonoFreq);
 		// -- Meters
 		// We might test this AVG Meter later
 		//pGraphics->AttachControl(new IVPeakAvgMeterControl<2>(rectMeterVu.GetGridCell(0, 0, 1, 2), "In", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L","R" }, 0, -60.f, 12.f, { 0,-6,-12,-24,-48 }), cMeterIn);
@@ -145,12 +149,20 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrRms))->SetBaseValue(1.);
 		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrPeak))->SetBaseValue(1.);
 
-		
-		for (int paramIdx = 0; paramIdx < kNumParams; paramIdx++) {
-			if (!GetParam(paramIdx))
-				pGraphics->GetControlWithParamIdx(paramIdx)->SetDisabled(true);
+		// Disable Parameters with no function
+		for (int ctrlTag = 0; ctrlTag < kNumCtrlTags; ctrlTag++) {
+			switch (ctrlTag)
+			{
+			case cEqHfDs:
+			case cEqHmfDs:
+			case cEqLmfDs:
+			case cEqLfDs:
+				pGraphics->GetControlWithTag(ctrlTag)->SetDisabled(true);
+				break;
+			default:
+				break;
+			}
 		}
-
 	};
 #endif
 }
@@ -204,7 +216,24 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 		fCompPeak.Process(outputs[0][s], outputs[1][s]);
 
 		// Process output gain
-		fGainOut.Process(outputs[0][s], outputs[1][s]);
+		if (GetParam(kStereoMonoFreq)->Value() <= 20.) {
+			fGainOut.Process(outputs[0][s], outputs[1][s]);
+		}
+		else {
+			// Funny nested function which stores the output signal in buffer after processing of the Linkwitz-Riley-LP
+			mBufferLowSignal.ProcessBuffer(fSplitLp.Process(outputs[0][s],0),0, s);
+			mBufferLowSignal.ProcessBuffer(fSplitLp.Process(outputs[1][s],1),1, s);
+			// Now apply the complementary LR-HP to the outputs itself
+			outputs[0][s] = fSplitHp.Process(outputs[0][s], 0);
+			outputs[1][s] = fSplitHp.Process(outputs[1][s], 1);
+			// Process output gain (with width) of low signal
+			fGainOutLow.Process(mBufferLowSignal.GetBuffer()[0][s], mBufferLowSignal.GetBuffer()[1][s]);
+			// Process output gain (with width and pan) of high signal
+			fGainOut.Process(outputs[0][s], outputs[1][s]);
+			// Mix both signals, flip phase of the latter (allpass solution would be better)
+			outputs[0][s] -= mBufferLowSignal.GetBuffer(0, s);
+			outputs[1][s] -= mBufferLowSignal.GetBuffer(1, s);
+		}
 
 		// Store current gain reduction in respective buffer
 		mBufferMeterGrRms.ProcessBuffer(fCompRms.GetGrLin(), 0, s);
@@ -245,6 +274,8 @@ void SRChannel::OnReset()
 	fEqLmf.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadPeak, GetParam(kEqLmfFreq)->Value() / samplerate, GetParam(kEqLmfQ)->Value(), GetParam(kEqLmfGain)->Value(), samplerate);
 	fEqLfBoost.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadLowshelf, GetParam(kEqLfFreq)->Value() / samplerate, 0.707, GetParam(kEqLfBoost)->Value(), samplerate);
 	fEqLfCut.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadLowshelf, 1.5 * GetParam(kEqLfFreq)->Value() / samplerate, 0.707, -GetParam(kEqLfCut)->Value(), samplerate);
+	fSplitHp.SetFilter(SR::DSP::SRFilterIIR < sample, 2>::BiquadLinkwitzHighpass, GetParam(kStereoMonoFreq)->Value() / samplerate, 0., 0., samplerate);
+	fSplitLp.SetFilter(SR::DSP::SRFilterIIR < sample, 2>::BiquadLinkwitzLowpass, GetParam(kStereoMonoFreq)->Value() / samplerate, 0., 0., samplerate);
 
 	fCompRms.Reset();
 	fCompRms.ResetCompressor(
@@ -307,12 +338,20 @@ void SRChannel::OnParamChange(int paramIdx)
 		break;
 	case kGainOut:
 		fGainOut.SetGain(DBToAmp(GetParam(kGainOut)->Value()));
+		fGainOutLow.SetGain(DBToAmp(GetParam(kGainOut)->Value()));
 		break;
 	case kStereoPan:
 		fGainOut.SetPanPosition((GetParam(kStereoPan)->Value() + 100.) / 200.);
 		break;
 	case kStereoWidth:
 		fGainOut.SetWidth(GetParam(kStereoWidth)->Value() * 0.01);
+		break;
+	case kStereoWidthLow:
+		fGainOutLow.SetWidth(GetParam(kStereoWidthLow)->Value() * 0.01);
+		break;
+	case kStereoMonoFreq:
+		fSplitHp.SetFreq(GetParam(kStereoMonoFreq)->Value() / samplerate);
+		fSplitLp.SetFreq(GetParam(kStereoMonoFreq)->Value() / samplerate);
 		break;
 	case kEqHpFreq:
 		fEqHp.SetFreq(GetParam(kEqHpFreq)->Value() / samplerate);
