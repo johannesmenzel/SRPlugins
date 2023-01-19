@@ -2,6 +2,7 @@
 
 #include "IPlug_include_in_plug_hdr.h"
 #include "../../Classes/DSP/SRGain.h"
+#include "../../Classes/DSP/SRSaturation.h"
 #include "../../Classes/DSP/SRDynamics.h"
 #include "../../Classes/DSP/SRBuffer.h"
 #include "IControls.h"
@@ -236,6 +237,8 @@ private:
 	SR::DSP::SRGain fGainIn;
 	SR::DSP::SRGain fGainOut;
 	SR::DSP::SRGain fGainOutLow;
+
+	SR::DSP::SRSaturation fSatInput[2] = { };
 
 	SR::DSP::SRFilterIIR<sample, 2> fEqHp;
 	SR::DSP::SRFilterIIR<sample, 2> fEqLp;

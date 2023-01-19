@@ -30,6 +30,9 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kGainIn)->InitDouble("Input", 0., -120., 12., 0.01, "dB", 0, "Gain", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(-120., 12., 0., .5)));
 	GetParam(kGainOut)->InitDouble("Output", 0., -120., 12., 0.01, "dB", 0, "Gain", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(-120., 12., 0., .5)));
 
+	GetParam(kSaturationDrive)->InitDouble("Sat Drive", 0., 0., 24., 0.01, "dB", 0, "Sat");
+	GetParam(kSaturationAmount)->InitDouble("Sat Amount", 0., 0., 100., 1., "%", 0, "Sat");
+
 	GetParam(kStereoPan)->InitDouble("Pan", 0., -100., 100., 1., "%", 0, "Stereo");
 	GetParam(kStereoWidth)->InitDouble("Width", 100., 0., 1000., 1., "%", 0, "Stereo", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1000., 100., .5)));
 	GetParam(kStereoWidthLow)->InitDouble("Bass Width", 100., 0., 100., 1., "%", 0, "Stereo", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 100., 50., .5)));
@@ -94,8 +97,10 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		// -- Gains		
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 11, 6, 12).GetCentredInside(100.f), kGainIn, "Input", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGainIn);
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 11, 6, 12).GetCentredInside(100.f), kGainOut, "Output", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGainOut);
+		// -- Saturation
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(0, 0, 6, 12).GetCentredInside(100.f), kSaturationDrive, "Drive", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cSaturationDrive);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(1, 0, 6, 12).GetCentredInside(100.f), kSaturationAmount, "Amount", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cSaturationAmount);
 		// -- Filters
-		pGraphics->AttachControl(new PlaceHolder(rectControls.GetGridCell(0, 0, 6, 12).FracRectHorizontal(1.f).FracRectVertical(4.f, true), "Saturation"));
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 0, 6, 12).GetCentredInside(100.f), kEqLpFreq, "LP", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLpFreq);
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 0, 6, 12).GetCentredInside(100.f), kEqHpFreq, "HP", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHpFreq);
 		// -- Freqency Response Meter
@@ -187,12 +192,17 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 		mBufferInput.ProcessBuffer(meterIn1, 0, s);
 		mBufferInput.ProcessBuffer(meterIn2, 1, s);
 
-		// Process all (EQ) filters
+		// Process filters
 		outputs[0][s] = fEqHp.Process(outputs[0][s], 0);
 		outputs[1][s] = fEqHp.Process(outputs[1][s], 1);
 		outputs[0][s] = fEqLp.Process(outputs[0][s], 0);
 		outputs[1][s] = fEqLp.Process(outputs[1][s], 1);
 
+		// Process saturation
+		outputs[0][s] = fSatInput[0].Process(outputs[0][s]);
+		outputs[1][s] = fSatInput[0].Process(outputs[1][s]);
+
+		// Process EQ
 		outputs[0][s] = fEqHfBoost.Process(outputs[0][s], 0);
 		outputs[1][s] = fEqHfBoost.Process(outputs[1][s], 1);
 
@@ -266,6 +276,10 @@ void SRChannel::OnReset()
 
 	fGainIn.InitGain(100, SR::DSP::SRGain::kSinusodial);
 	fGainOut.InitGain(100, SR::DSP::SRGain::kSinusodial);
+
+	fSatInput[0].SetSaturation(SR::DSP::SRSaturation::kSoftSat, GetParam(kSaturationDrive)->Value(), GetParam(kSaturationAmount)->Value(), 1., true, 0., 1., samplerate);
+	fSatInput[1].SetSaturation(SR::DSP::SRSaturation::kSoftSat, GetParam(kSaturationDrive)->Value(), GetParam(kSaturationAmount)->Value(), 1., true, 0., 1., samplerate);
+
 	fEqHp.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadHighpass, GetParam(kEqHpFreq)->Value() / samplerate, 0.707, 0., samplerate);
 	fEqLp.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadLowpass, GetParam(kEqLpFreq)->Value() / samplerate, 0.707, 0., samplerate);
 	fEqHfBoost.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadPeak, GetParam(kEqHfFreq)->Value() / samplerate, 0.707, GetParam(kEqHfBoost)->Value(), samplerate);
@@ -339,6 +353,14 @@ void SRChannel::OnParamChange(int paramIdx)
 	case kGainOut:
 		fGainOut.SetGain(DBToAmp(GetParam(kGainOut)->Value()));
 		fGainOutLow.SetGain(DBToAmp(GetParam(kGainOut)->Value()));
+		break;
+	case kSaturationDrive:
+		fSatInput[0].SetDrive(GetParam(kSaturationDrive)->Value());
+		fSatInput[1].SetDrive(GetParam(kSaturationDrive)->Value());
+		break;
+	case kSaturationAmount:
+		fSatInput[0].SetAmount(GetParam(kSaturationAmount)->Value() * .01);
+		fSatInput[1].SetAmount(GetParam(kSaturationAmount)->Value() * .01);
 		break;
 	case kStereoPan:
 		fGainOut.SetPanPosition((GetParam(kStereoPan)->Value() + 100.) / 200.);
