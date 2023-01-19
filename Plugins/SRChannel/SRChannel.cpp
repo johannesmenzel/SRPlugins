@@ -38,7 +38,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kStereoWidthLow)->InitDouble("Bass Width", 100., 0., 100., 1., "%", 0, "Stereo", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 100., 50., .5)));
 	GetParam(kStereoMonoFreq)->InitDouble("Split FQ", 20., 20., 1000., .01, "Hz", 0, "Stereo", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1000., 100., .5)));
 
-	GetParam(kEqHpFreq)->InitDouble("HP", 20., 20., 400., 10., "Hz", IParam::EFlags::kFlagStepped);
+	GetParam(kEqHpFreq)->InitDouble("HP", 0., 0., 400., 10., "Hz", IParam::EFlags::kFlagStepped);
 	GetParam(kEqLpFreq)->InitDouble("LP", 22000., 3000., 22000., 1000., "Hz", IParam::EFlags::kFlagStepped);
 
 	GetParam(kEqHfBoost)->InitDouble("HF Boost", 0., -0., 10., 1., "dB", IParam::EFlags::kFlagStepped);
@@ -47,12 +47,12 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kEqHfDs)->InitDouble("HF DS", 0., -20., 0., .01, "dB");
 
 	GetParam(kEqHmfGain)->InitDouble("HMF Gain", 0., -12., 12., 1., "dB", IParam::EFlags::kFlagStepped);
-	GetParam(kEqHmfFreq)->InitDouble("HMF Freq", 3000., 600., 7000., 1., "Hz", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(600., 7000., 3000., .5)));
+	GetParam(kEqHmfFreq)->InitDouble("HMF Freq", 3000., 600., 15000., 1., "Hz", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(600., 15000., 3000., .5)));
 	GetParam(kEqHmfQ)->InitDouble("HMF Q", .707, 0.1, 10., 0.01, "", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.1, 10., .707, .5)));
 	GetParam(kEqHmfDs)->InitDouble("HMF DS", 0., -20., 0., .01, "dB");
 
 	GetParam(kEqLmfGain)->InitDouble("LMF Gain", 0., -12., 12., 1., "dB", IParam::EFlags::kFlagStepped);
-	GetParam(kEqLmfFreq)->InitDouble("LMF Freq", 1000., 200., 2500., 1., "Hz", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(200., 2500., 1000., .5)));
+	GetParam(kEqLmfFreq)->InitDouble("LMF Freq", 1000., 20., 2500., 1., "Hz", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(20., 2500., 1000., .5)));
 	GetParam(kEqLmfQ)->InitDouble("LMF Q", .707, 0.1, 10., 0.01, "", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.1, 10., .707, .5)));
 	GetParam(kEqLmfDs)->InitDouble("LMF DS", 0., -20., 0., .01, "dB");
 
@@ -193,7 +193,7 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 		mBufferInput.ProcessBuffer(meterIn2, 1, s);
 
 		// Process filters
-		if (GetParam(kEqHpFreq)->Value() > 20.) {
+		if (GetParam(kEqHpFreq)->Value() > 0.) {
 			outputs[0][s] = fEqHp.Process(outputs[0][s], 0);
 			outputs[1][s] = fEqHp.Process(outputs[1][s], 1);
 		}
@@ -286,12 +286,12 @@ void SRChannel::OnReset()
 
 	fEqHp.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadHighpass, GetParam(kEqHpFreq)->Value() / samplerate, 0.707, 0., samplerate);
 	fEqLp.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadLowpass, GetParam(kEqLpFreq)->Value() / samplerate, 0.707, 0., samplerate);
-	fEqHfBoost.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadPeak, GetParam(kEqHfFreq)->Value() / samplerate, 0.707, GetParam(kEqHfBoost)->Value(), samplerate);
-	fEqHfCut.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadHighshelf, fmin(1.5 * GetParam(kEqHfFreq)->Value() / samplerate, .499), 0.707, -GetParam(kEqHfCut)->Value(), samplerate);
+	fEqHfBoost.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadPeak, GetParam(kEqHfFreq)->Value() / samplerate, 1., GetParam(kEqHfBoost)->Value(), samplerate);
+	fEqHfCut.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadPeak, GetParam(kEqHfFreq)->Value() / samplerate, .1, -GetParam(kEqHfCut)->Value(), samplerate);
 	fEqHmf.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadPeak, GetParam(kEqHmfFreq)->Value() / samplerate, GetParam(kEqHmfQ)->Value(), GetParam(kEqHmfGain)->Value(), samplerate);
 	fEqLmf.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadPeak, GetParam(kEqLmfFreq)->Value() / samplerate, GetParam(kEqLmfQ)->Value(), GetParam(kEqLmfGain)->Value(), samplerate);
-	fEqLfBoost.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadLowshelf, GetParam(kEqLfFreq)->Value() / samplerate, 0.707, GetParam(kEqLfBoost)->Value(), samplerate);
-	fEqLfCut.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadLowshelf, 1.5 * GetParam(kEqLfFreq)->Value() / samplerate, 0.707, -GetParam(kEqLfCut)->Value(), samplerate);
+	fEqLfBoost.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadPeak, GetParam(kEqLfFreq)->Value() / samplerate, .12, GetParam(kEqLfBoost)->Value(), samplerate);
+	fEqLfCut.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadPeak, GetParam(kEqLfFreq)->Value() / samplerate, .08, -GetParam(kEqLfCut)->Value(), samplerate);
 	fSplitHp.SetFilter(SR::DSP::SRFilterIIR < sample, 2>::BiquadLinkwitzHighpass, GetParam(kStereoMonoFreq)->Value() / samplerate, 0., 0., samplerate);
 	fSplitLp.SetFilter(SR::DSP::SRFilterIIR < sample, 2>::BiquadLinkwitzLowpass, GetParam(kStereoMonoFreq)->Value() / samplerate, 0., 0., samplerate);
 
@@ -389,7 +389,7 @@ void SRChannel::OnParamChange(int paramIdx)
 		fEqHfBoost.SetPeakGain(GetParam(kEqHfBoost)->Value());
 		break;
 	case kEqHfCut:
-		fEqHfBoost.SetPeakGain(-GetParam(kEqHfBoost)->Value());
+		fEqHfCut.SetPeakGain(-GetParam(kEqHfCut)->Value());
 		break;
 	case kEqHfFreq:
 		fEqHfBoost.SetFreq(GetParam(kEqHfFreq)->Value() / samplerate);
@@ -470,7 +470,7 @@ void SRChannel::SetFreqMeterValues()
 		// If pow shape
 		double freq = 0.5 * samplerate * std::pow((double(i) / double(FREQUENCYRESPONSE)), shape);
 		mFreqMeterValues[i] = 0.;
-		if (GetParam(kEqHpFreq)->Value() > 20.) mFreqMeterValues[i] += fEqHp.GetFrequencyResponse(freq / samplerate, 12., false);
+		if (GetParam(kEqHpFreq)->Value() > 0.) mFreqMeterValues[i] += fEqHp.GetFrequencyResponse(freq / samplerate, 12., false);
 		if (GetParam(kEqLpFreq)->Value() < 22000.) mFreqMeterValues[i] += fEqLp.GetFrequencyResponse(freq / samplerate, 12., false);
 		if (GetParam(kEqHfBoost)->Value() != 0.0) mFreqMeterValues[i] += fEqHfBoost.GetFrequencyResponse(freq / samplerate, 12., false);
 		if (GetParam(kEqHfCut)->Value() != 0.0) mFreqMeterValues[i] += fEqHfCut.GetFrequencyResponse(freq / samplerate, 12., false);
