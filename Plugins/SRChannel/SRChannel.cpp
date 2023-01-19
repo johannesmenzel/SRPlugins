@@ -56,9 +56,9 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kEqLmfQ)->InitDouble("LMF Q", .707, 0.1, 10., 0.01, "", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.1, 10., .707, .5)));
 	GetParam(kEqLmfDs)->InitDouble("LMF DS", 0., -20., 0., .01, "dB");
 
-	GetParam(kEqLfBoost)->InitDouble("LF Boost", 0., -0., 10., 1., "dB", IParam::EFlags::kFlagStepped);
-	GetParam(kEqLfCut)->InitDouble("LF Cut", 0., -0., 10., 1., "dB", IParam::EFlags::kFlagStepped);
-	GetParam(kEqLfFreq)->InitDouble("LF Freq", 100., 30., 300., 20., "Hz", IParam::EFlags::kFlagStepped, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(30., 300., 100., .5)));
+	GetParam(kEqLfBoost)->InitDouble("LF Boost", 0., 0., 10., 1., "dB", IParam::EFlags::kFlagStepped);
+	GetParam(kEqLfCut)->InitDouble("LF Cut", 0., 0., 10., 1., "dB", IParam::EFlags::kFlagStepped);
+	GetParam(kEqLfFreq)->InitDouble("LF Freq", 100., 30., 300., 10., "Hz", IParam::EFlags::kFlagStepped, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(30., 300., 100., .5)));
 	GetParam(kEqLfDs)->InitDouble("LF DS", 0., -20., 0., .01, "dB");
 
 	GetParam(kCompRmsThresh)->InitDouble("Level Thresh", 0., -40., 0., 0.1, "dB");
@@ -193,10 +193,14 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 		mBufferInput.ProcessBuffer(meterIn2, 1, s);
 
 		// Process filters
-		outputs[0][s] = fEqHp.Process(outputs[0][s], 0);
-		outputs[1][s] = fEqHp.Process(outputs[1][s], 1);
-		outputs[0][s] = fEqLp.Process(outputs[0][s], 0);
-		outputs[1][s] = fEqLp.Process(outputs[1][s], 1);
+		if (GetParam(kEqHpFreq)->Value() > 20.) {
+			outputs[0][s] = fEqHp.Process(outputs[0][s], 0);
+			outputs[1][s] = fEqHp.Process(outputs[1][s], 1);
+		}
+		if (GetParam(kEqLpFreq)->Value() < 22000.) {
+			outputs[0][s] = fEqLp.Process(outputs[0][s], 0);
+			outputs[1][s] = fEqLp.Process(outputs[1][s], 1);
+		}
 
 		// Process saturation
 		outputs[0][s] = fSatInput[0].Process(outputs[0][s]);
@@ -231,8 +235,8 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 		}
 		else {
 			// Funny nested function which stores the output signal in buffer after processing of the Linkwitz-Riley-LP
-			mBufferLowSignal.ProcessBuffer(fSplitLp.Process(outputs[0][s],0),0, s);
-			mBufferLowSignal.ProcessBuffer(fSplitLp.Process(outputs[1][s],1),1, s);
+			mBufferLowSignal.ProcessBuffer(fSplitLp.Process(outputs[0][s], 0), 0, s);
+			mBufferLowSignal.ProcessBuffer(fSplitLp.Process(outputs[1][s], 1), 1, s);
 			// Now apply the complementary LR-HP to the outputs itself
 			outputs[0][s] = fSplitHp.Process(outputs[0][s], 0);
 			outputs[1][s] = fSplitHp.Process(outputs[1][s], 1);
