@@ -386,28 +386,43 @@ void SRChannel::OnParamChange(int paramIdx)
 		fEqLp.SetFreq(GetParam(kEqLpFreq)->Value() / samplerate);
 		break;
 	case kEqHfBoost:
+		fEqHfBoost.SetPeakGain(GetParam(kEqHfBoost)->Value());
+		break;
 	case kEqHfCut:
+		fEqHfBoost.SetPeakGain(-GetParam(kEqHfBoost)->Value());
+		break;
 	case kEqHfFreq:
-		fEqHfBoost.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadPeak, GetParam(kEqHfFreq)->Value() / samplerate, 0.707, GetParam(kEqHfBoost)->Value(), samplerate);
-		fEqHfCut.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadHighshelf, fmin(1.5 * GetParam(kEqHfFreq)->Value() / samplerate, .4999), 0.707, -GetParam(kEqHfCut)->Value(), samplerate);
+		fEqHfBoost.SetFreq(GetParam(kEqHfFreq)->Value() / samplerate);
+		fEqHfCut.SetFreq(fmin(1.5 * GetParam(kEqHfFreq)->Value() / samplerate, .4999));
 		break;
 	case kEqHmfFreq:
+		fEqHmf.SetFreq(GetParam(kEqHmfFreq)->Value() / samplerate);
+		break;
 	case kEqHmfGain:
+		fEqHmf.SetPeakGain(GetParam(kEqHmfGain)->Value());
+		break;
 	case kEqHmfQ:
-		fEqHmf.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadPeak, GetParam(kEqHmfFreq)->Value() / samplerate, GetParam(kEqHmfQ)->Value(), GetParam(kEqHmfGain)->Value(), samplerate);
+		fEqHmf.SetQ(GetParam(kEqHmfQ)->Value());
 		break;
 	case kEqLmfFreq:
+		fEqLmf.SetFreq(GetParam(kEqLmfFreq)->Value() / samplerate);
+		break;
 	case kEqLmfGain:
+		fEqLmf.SetPeakGain(GetParam(kEqLmfGain)->Value());
+		break;
 	case kEqLmfQ:
-		fEqLmf.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadPeak, GetParam(kEqLmfFreq)->Value() / samplerate, GetParam(kEqLmfQ)->Value(), GetParam(kEqLmfGain)->Value(), samplerate);
+		fEqLmf.SetQ(GetParam(kEqLmfQ)->Value());
 		break;
 	case kEqLfBoost:
-	case kEqLfCut:
-	case kEqLfFreq:
-		fEqLfBoost.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadLowshelf, GetParam(kEqLfFreq)->Value() / samplerate, 0.707, GetParam(kEqLfBoost)->Value(), samplerate);
-		fEqLfCut.SetFilter(SR::DSP::SRFilterIIR<sample, 2>::BiquadLowshelf, 1.5 * GetParam(kEqLfFreq)->Value() / samplerate, 0.707, -GetParam(kEqLfCut)->Value(), samplerate);
+		fEqLfBoost.SetPeakGain(GetParam(kEqLfBoost)->Value());
 		break;
-
+	case kEqLfCut:
+		fEqLfCut.SetPeakGain(-GetParam(kEqLfCut)->Value());
+		break;
+	case kEqLfFreq:
+		fEqLfBoost.SetFreq(GetParam(kEqLfFreq)->Value() / samplerate);
+		fEqLfCut.SetFreq(1.5 * GetParam(kEqLfFreq)->Value() / samplerate);
+		break;
 	case kCompRmsThresh:
 		fCompRms.SetThresh(GetParam(kCompRmsThresh)->Value());
 		break;
