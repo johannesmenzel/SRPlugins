@@ -38,42 +38,42 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kStereoWidthLow)->InitDouble("Bass Width", 100., 0., 100., 1., "%", 0, "Stereo", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 100., 50., .5)));
 	GetParam(kStereoMonoFreq)->InitDouble("Split FQ", 20., 20., 1000., .01, "Hz", 0, "Stereo", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1000., 100., .5)));
 
-	GetParam(kEqHpFreq)->InitDouble("HP", 0., 0., 400., 10., "Hz", IParam::EFlags::kFlagStepped);
-	GetParam(kEqLpFreq)->InitDouble("LP", 22000., 3000., 22000., 1000., "Hz", IParam::EFlags::kFlagStepped);
+	GetParam(kEqHpFreq)->InitDouble("HP", 0., 0., 400., 10., "Hz", IParam::EFlags::kFlagStepped, "Filter");
+	GetParam(kEqLpFreq)->InitDouble("LP", 22000., 3000., 22000., 1000., "Hz", IParam::EFlags::kFlagStepped, "Filter");
 
-	GetParam(kEqHfBoost)->InitDouble("HF Boost", 0., -0., 10., 1., "dB", IParam::EFlags::kFlagStepped);
-	GetParam(kEqHfCut)->InitDouble("HF Cut", 0., -0., 10., 1., "dB", IParam::EFlags::kFlagStepped);
-	GetParam(kEqHfFreq)->InitDouble("HF Freq", 8000., 3000., 16000., 1000., "Hz", IParam::EFlags::kFlagStepped, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(3000., 16000., 8000., .5)));
-	GetParam(kEqHfDs)->InitDouble("HF DS", 0., -20., 0., .01, "dB");
+	GetParam(kEqHfBoost)->InitDouble("HF Boost", 0., -0., 10., 1., "dB", IParam::EFlags::kFlagStepped, "EQ");
+	GetParam(kEqHfCut)->InitDouble("HF Cut", 0., -0., 10., 1., "dB", IParam::EFlags::kFlagStepped, "EQ");
+	GetParam(kEqHfFreq)->InitDouble("HF Freq", 8000., 3000., 16000., 1000., "Hz", IParam::EFlags::kFlagStepped, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(3000., 16000., 8000., .5)));
+	GetParam(kEqHfDs)->InitDouble("HF DS", 0., -20., 0., .01, "dB", 0, "EQ");
 
-	GetParam(kEqHmfGain)->InitDouble("HMF Gain", 0., -12., 12., 1., "dB", IParam::EFlags::kFlagStepped);
-	GetParam(kEqHmfFreq)->InitDouble("HMF Freq", 3000., 600., 15000., 1., "Hz", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(600., 15000., 3000., .5)));
-	GetParam(kEqHmfQ)->InitDouble("HMF Q", .707, 0.1, 10., 0.01, "", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.1, 10., .707, .5)));
-	GetParam(kEqHmfDs)->InitDouble("HMF DS", 0., -20., 0., .01, "dB");
+	GetParam(kEqHmfGain)->InitDouble("HMF Gain", 0., -12., 12., 1., "dB", IParam::EFlags::kFlagStepped, "EQ");
+	GetParam(kEqHmfFreq)->InitDouble("HMF Freq", 3000., 600., 15000., 1., "Hz", 0, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(600., 15000., 3000., .5)));
+	GetParam(kEqHmfQ)->InitDouble("HMF Q", .707, 0.1, 10., 0.01, "", 0, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.1, 10., .707, .5)));
+	GetParam(kEqHmfDs)->InitDouble("HMF DS", 0., -20., 0., .01, "dB", 0,  "EQ");
 
-	GetParam(kEqLmfGain)->InitDouble("LMF Gain", 0., -12., 12., 1., "dB", IParam::EFlags::kFlagStepped);
-	GetParam(kEqLmfFreq)->InitDouble("LMF Freq", 1000., 20., 2500., 1., "Hz", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(20., 2500., 1000., .5)));
-	GetParam(kEqLmfQ)->InitDouble("LMF Q", .707, 0.1, 10., 0.01, "", 0, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.1, 10., .707, .5)));
-	GetParam(kEqLmfDs)->InitDouble("LMF DS", 0., -20., 0., .01, "dB");
+	GetParam(kEqLmfGain)->InitDouble("LMF Gain", 0., -12., 12., 1., "dB", IParam::EFlags::kFlagStepped, "EQ");
+	GetParam(kEqLmfFreq)->InitDouble("LMF Freq", 1000., 20., 2500., 1., "Hz", 0, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(20., 2500., 1000., .5)));
+	GetParam(kEqLmfQ)->InitDouble("LMF Q", .707, 0.1, 10., 0.01, "", 0, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.1, 10., .707, .5)));
+	GetParam(kEqLmfDs)->InitDouble("LMF DS", 0., -20., 0., .01, "dB", 0, "EQ");
 
-	GetParam(kEqLfBoost)->InitDouble("LF Boost", 0., 0., 10., 1., "dB", IParam::EFlags::kFlagStepped);
-	GetParam(kEqLfCut)->InitDouble("LF Cut", 0., 0., 10., 1., "dB", IParam::EFlags::kFlagStepped);
-	GetParam(kEqLfFreq)->InitDouble("LF Freq", 100., 30., 300., 10., "Hz", IParam::EFlags::kFlagStepped, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(30., 300., 100., .5)));
-	GetParam(kEqLfDs)->InitDouble("LF DS", 0., -20., 0., .01, "dB");
+	GetParam(kEqLfBoost)->InitDouble("LF Boost", 0., 0., 10., 1., "dB", IParam::EFlags::kFlagStepped, "EQ");
+	GetParam(kEqLfCut)->InitDouble("LF Cut", 0., 0., 10., 1., "dB", IParam::EFlags::kFlagStepped, "EQ");
+	GetParam(kEqLfFreq)->InitDouble("LF Freq", 100., 30., 300., 10., "Hz", IParam::EFlags::kFlagStepped, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(30., 300., 100., .5)));
+	GetParam(kEqLfDs)->InitDouble("LF DS", 0., -20., 0., .01, "dB", 0, "EQ");
 
-	GetParam(kCompRmsThresh)->InitDouble("Level Thresh", 0., -40., 0., 0.1, "dB");
-	GetParam(kCompRmsRatio)->InitDouble("Level Ratio", 2., 1., 6., .5, ":1", IParam::EFlags::kFlagStepped, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(1., 6., 2., .5)));
-	GetParam(kCompRmsAttack)->InitDouble("Level Attack", 15., 5., 50., 0.01, "ms");
-	GetParam(kCompRmsRelease)->InitDouble("Level Release", 300., 100., 3000., 1., "ms");
-	GetParam(kCompRmsMakeup)->InitDouble("Level Makeup", 0., -12., 12., 0.01, "dB");
-	GetParam(kCompRmsMix)->InitDouble("Level Mix", 100., 0., 100., 1., "%");
+	GetParam(kCompRmsThresh)->InitDouble("Level Thresh", 0., -40., 0., 0.1, "dB", 0, "Comp");
+	GetParam(kCompRmsRatio)->InitDouble("Level Ratio", 2., 1., 6., .5, ":1", IParam::EFlags::kFlagStepped, "Comp", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(1., 6., 2., .5)));
+	GetParam(kCompRmsAttack)->InitDouble("Level Attack", 15., 5., 50., 0.01, "ms", 0, "Comp");
+	GetParam(kCompRmsRelease)->InitDouble("Level Release", 300., 100., 3000., 1., "ms", 0, "Comp");
+	GetParam(kCompRmsMakeup)->InitDouble("Level Makeup", 0., -12., 12., 0.01, "dB", 0, "Comp");
+	GetParam(kCompRmsMix)->InitDouble("Level Mix", 100., 0., 100., 1., "%", 0, "Comp");
 
-	GetParam(kCompPeakThresh)->InitDouble("Peak Thresh", 0., -40., 0., 0.1, "dB");
-	GetParam(kCompPeakRatio)->InitDouble("Peak Ratio", 5., 2., 20., 2., ":1", IParam::EFlags::kFlagStepped, "", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(2., 20., 5., .5)));
-	GetParam(kCompPeakAttack)->InitDouble("Peak Attack", 5., 0.02, 20., 0.01, "ms");
-	GetParam(kCompPeakRelease)->InitDouble("Peak Release", 200., 20., 500., 0.01, "ms");
-	GetParam(kCompPeakMakeup)->InitDouble("Peak Makeup", 0., -12., 12., 0.01, "dB");
-	GetParam(kCompPeakMix)->InitDouble("Peak Mix", 100., 0., 100., 1., "%");
+	GetParam(kCompPeakThresh)->InitDouble("Peak Thresh", 0., -40., 0., 0.1, "dB", 0, "Comp");
+	GetParam(kCompPeakRatio)->InitDouble("Peak Ratio", 5., 2., 20., 2., ":1", IParam::EFlags::kFlagStepped, "Comp", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(2., 20., 5., .5)));
+	GetParam(kCompPeakAttack)->InitDouble("Peak Attack", 5., 0.02, 20., 0.01, "ms", 0, "Comp");
+	GetParam(kCompPeakRelease)->InitDouble("Peak Release", 200., 20., 500., 0.01, "ms", 0, "Comp");
+	GetParam(kCompPeakMakeup)->InitDouble("Peak Makeup", 0., -12., 12., 0.01, "dB", 0, "Comp");
+	GetParam(kCompPeakMix)->InitDouble("Peak Mix", 100., 0., 100., 1., "%", 0, "Comp");
 
 	OnReset();
 
@@ -95,61 +95,60 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		// -- Title		
 		pGraphics->AttachControl(new ITextControl(rectTitle, PLUG_MFR " " PLUG_NAME " " PLUG_VERSION_STR "-alpha", SR::Graphics::Layout::SR_DEFAULT_TEXT));
 		// -- Gains		
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 11, 6, 12).GetCentredInside(100.f), kGainIn, "Input", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGainIn);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 11, 6, 12).GetCentredInside(100.f), kGainOut, "Output", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGainOut);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 7, 6, 8).GetCentredInside(100.f), kGainIn, "Input", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGainIn, "Gain");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 7, 6, 8).GetCentredInside(100.f), kGainOut, "Output", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGainOut, "Gain");
 		// -- Saturation
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(0, 0, 6, 12).GetCentredInside(100.f), kSaturationDrive, "Drive", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cSaturationDrive);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(1, 0, 6, 12).GetCentredInside(100.f), kSaturationAmount, "Amount", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cSaturationAmount);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(0, 0, 6, 8).GetCentredInside(100.f), kSaturationDrive, "Drive", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cSaturationDrive, "Sat");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(1, 0, 6, 8).GetCentredInside(100.f), kSaturationAmount, "Amount", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cSaturationAmount, "Sat");
 		// -- Filters
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 0, 6, 12).GetCentredInside(100.f), kEqLpFreq, "LP", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLpFreq);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 0, 6, 12).GetCentredInside(100.f), kEqHpFreq, "HP", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHpFreq);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 0, 6, 8).GetCentredInside(100.f), kEqLpFreq, "LP", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLpFreq, "Filter");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 0, 6, 8).GetCentredInside(100.f), kEqHpFreq, "HP", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHpFreq, "Filter");
 		// -- Freqency Response Meter
-		//pGraphics->AttachControl(new PlaceHolder(rectControls.GetGridCell(0, 2, 6, 12).FracRectHorizontal(4.f).FracRectVertical(2.f, true), "Frequency Response"));
-		pGraphics->AttachControl(new SR::Graphics::Controls::SRGraphBase(rectControls.GetGridCell(0, 2, 6, 12).FracRectHorizontal(4.f).FracRectVertical(2.f, true), FREQUENCYRESPONSE, mFreqMeterValues, SR::Graphics::Layout::SR_DEFAULT_STYLE), cMeterFreqResponse);
+		pGraphics->AttachControl(new SR::Graphics::Controls::SRGraphBase(rectControls.GetGridCell(0, 1, 6, 8).FracRectHorizontal(4.f).FracRectVertical(2.f, true), FREQUENCYRESPONSE, mFreqMeterValues, SR::Graphics::Layout::SR_DEFAULT_STYLE), cMeterFreqResponse, "Response");
 		// -- EQ
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(2, 2, 6, 12).GetCentredInside(100.f), kEqLfBoost, "Boost", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLfBoost);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(2, 3, 6, 12).GetCentredInside(100.f), kEqLfCut, "Cut", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLfCut);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(2, 4, 6, 12).GetCentredInside(100.f), kEqHfBoost, "Boost", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHfBoost);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(2, 5, 6, 12).GetCentredInside(100.f), kEqHfCut, "Cut", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHfCut);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(3, 2, 6, 12).GetCentredInside(80.f), kEqLfFreq, "Freq", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLfFreq);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(3, 3, 6, 12).GetCentredInside(80.f), kEqLfDs, "DS", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLfDs);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(3, 4, 6, 12).GetCentredInside(80.f), kEqHfFreq, "Freq", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHfFreq);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(3, 5, 6, 12).GetCentredInside(80.f), kEqHfDs, "DS", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHfDs);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 2, 6, 12).GetCentredInside(100.f), kEqLmfGain, "Gain", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLmfGain);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 3, 6, 12).GetCentredInside(100.f), kEqLmfQ, "Q", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLmfQ);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 4, 6, 12).GetCentredInside(100.f), kEqHmfGain, "Gain", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHmfGain);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 5, 6, 12).GetCentredInside(100.f), kEqHmfQ, "Q", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHmfQ);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 2, 6, 12).GetCentredInside(80.f), kEqLmfFreq, "Freq", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLmfFreq);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 3, 6, 12).GetCentredInside(80.f), kEqLmfDs, "DS", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLmfDs);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 4, 6, 12).GetCentredInside(80.f), kEqHmfFreq, "Freq", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHmfFreq);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 5, 6, 12).GetCentredInside(80.f), kEqHmfDs, "DS", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHmfDs);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(2, 1, 6, 8).GetCentredInside(100.f), kEqLfBoost, "Boost", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLfBoost, "Passive EQ");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(2, 2, 6, 8).GetCentredInside(100.f), kEqLfCut, "Cut", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLfCut, "Passive EQ");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(2, 3, 6, 8).GetCentredInside(100.f), kEqHfBoost, "Boost", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHfBoost, "Passive EQ");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(2, 4, 6, 8).GetCentredInside(100.f), kEqHfCut, "Cut", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHfCut, "Passive EQ");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(3, 1, 6, 8).GetCentredInside(80.f), kEqLfFreq, "Freq", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLfFreq, "Passive EQ");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(3, 2, 6, 8).GetCentredInside(80.f), kEqLfDs, "DS", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLfDs, "Passive EQ");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(3, 3, 6, 8).GetCentredInside(80.f), kEqHfFreq, "Freq", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHfFreq, "Passive EQ");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(3, 4, 6, 8).GetCentredInside(80.f), kEqHfDs, "DS", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHfDs, "Passive EQ");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 1, 6, 8).GetCentredInside(100.f), kEqLmfGain, "Gain", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLmfGain, "Parametric EQ");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 2, 6, 8).GetCentredInside(100.f), kEqLmfQ, "Q", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLmfQ, "Parametric EQ");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 3, 6, 8).GetCentredInside(100.f), kEqHmfGain, "Gain", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHmfGain, "Parametric EQ");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 4, 6, 8).GetCentredInside(100.f), kEqHmfQ, "Q", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHmfQ, "Parametric EQ");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 1, 6, 8).GetCentredInside(80.f), kEqLmfFreq, "Freq", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLmfFreq, "Parametric EQ");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 2, 6, 8).GetCentredInside(80.f), kEqLmfDs, "DS", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLmfDs, "Parametric EQ");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 3, 6, 8).GetCentredInside(80.f), kEqHmfFreq, "Freq", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHmfFreq, "Parametric EQ");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 4, 6, 8).GetCentredInside(80.f), kEqHmfDs, "DS", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHmfDs, "Parametric EQ");
 		// -- Compressors
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(0, 7, 6, 12).GetCentredInside(100.f), kCompRmsThresh, "Thresh", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsThresh);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(0, 8, 6, 12).GetCentredInside(100.f), kCompRmsRatio, "Ratio", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsRatio);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(1, 7, 6, 12).GetCentredInside(100.f), kCompRmsAttack, "Attack", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsAttack);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(1, 8, 6, 12).GetCentredInside(100.f), kCompRmsRelease, "Release", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsRelease);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(2, 7, 6, 12).GetCentredInside(100.f), kCompRmsMakeup, "Makeup", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsMakeup);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(2, 8, 6, 12).GetCentredInside(100.f), kCompRmsMix, "Mix", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsMix);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(0, 5, 6, 8).GetCentredInside(100.f), kCompRmsThresh, "Thresh", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsThresh, "Comp Level");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(0, 6, 6, 8).GetCentredInside(100.f), kCompRmsRatio, "Ratio", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsRatio, "Comp Level");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(1, 5, 6, 8).GetCentredInside(100.f), kCompRmsAttack, "Attack", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsAttack, "Comp Level");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(1, 6, 6, 8).GetCentredInside(100.f), kCompRmsRelease, "Release", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsRelease, "Comp Level");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(2, 5, 6, 8).GetCentredInside(100.f), kCompRmsMakeup, "Makeup", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsMakeup, "Comp Level");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(2, 6, 6, 8).GetCentredInside(100.f), kCompRmsMix, "Mix", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsMix, "Comp Level");
 
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(3, 7, 6, 12).GetCentredInside(100.f), kCompPeakThresh, "Thresh", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakThresh);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(3, 8, 6, 12).GetCentredInside(100.f), kCompPeakRatio, "Ratio", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakRatio);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 7, 6, 12).GetCentredInside(100.f), kCompPeakAttack, "Attack", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakAttack);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 8, 6, 12).GetCentredInside(100.f), kCompPeakRelease, "Release", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakRelease);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 7, 6, 12).GetCentredInside(100.f), kCompPeakMakeup, "Makeup", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakMakeup);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 8, 6, 12).GetCentredInside(100.f), kCompPeakMix, "Mix", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakMix);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(3, 5, 6, 8).GetCentredInside(100.f), kCompPeakThresh, "Thresh", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakThresh, "Comp Peak");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(3, 6, 6, 8).GetCentredInside(100.f), kCompPeakRatio, "Ratio", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakRatio, "Comp Peak");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 5, 6, 8).GetCentredInside(100.f), kCompPeakAttack, "Attack", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakAttack, "Comp Peak");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(4, 6, 6, 8).GetCentredInside(100.f), kCompPeakRelease, "Release", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakRelease, "Comp Peak");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 5, 6, 8).GetCentredInside(100.f), kCompPeakMakeup, "Makeup", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakMakeup, "Comp Peak");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(5, 6, 6, 8).GetCentredInside(100.f), kCompPeakMix, "Mix", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakMix, "Comp Peak");
 		// -- Stereo Controls
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(0, 10, 6, 12).GetCentredInside(100.f), kStereoPan, "Pan", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoPan);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(1, 10, 6, 12).GetCentredInside(100.f), kStereoWidth, "Width", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoWidth);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(2, 10, 6, 12).GetCentredInside(100.f), kStereoWidthLow, "Bass Width", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoWidthLow);
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(3, 10, 6, 12).GetCentredInside(100.f), kStereoMonoFreq, "Split FQ", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoMonoFreq);
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(0, 7, 6, 8).GetCentredInside(100.f), kStereoPan, "Pan", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoPan, "Stereo");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(1, 7, 6, 8).GetCentredInside(100.f), kStereoWidth, "Width", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoWidth, "Stereo");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(2, 7, 6, 8).GetCentredInside(100.f), kStereoWidthLow, "Bass Width", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoWidthLow, "Stereo");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(3, 7, 6, 8).GetCentredInside(100.f), kStereoMonoFreq, "Split FQ", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoMonoFreq, "Stereo");
 		// -- Meters
 		// We might test this AVG Meter later
 		//pGraphics->AttachControl(new IVPeakAvgMeterControl<2>(rectMeterVu.GetGridCell(0, 0, 1, 2), "In", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L","R" }, 0, -60.f, 12.f, { 0,-6,-12,-24,-48 }), cMeterIn);
 		//pGraphics->AttachControl(new IVPeakAvgMeterControl<2>(rectMeterVu.GetGridCell(0, 1, 1, 2), "Out", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L","R" }, 0, -60.f, 12.f, { 0,-6,-12,-24,-48 }), cMeterOut);
-		pGraphics->AttachControl(new IVMeterControl<2>(rectMeterVu.GetGridCell(0, 0, 1, 2), "In", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L", "R" }, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Log, -60.f, 12.f, { 0, -6, -12, -24, -48 }), cMeterIn);
-		pGraphics->AttachControl(new IVMeterControl<2>(rectMeterVu.GetGridCell(0, 1, 1, 2), "Out", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L", "R" }, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Log, -60.f, 12.f, { 0, -6, -12, -24, -48 }), cMeterOut);
-		pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 0, 1, 2), "L", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -12.f, 0.f, { 0,-1,-2,-3,-4,-6,-9 }), cMeterGrRms);
-		pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 1, 1, 2), "P", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -12.f, 0.f, { 0,-1,-2,-3,-4,-6,-9 }), cMeterGrPeak);
+		pGraphics->AttachControl(new IVMeterControl<2>(rectMeterVu.GetGridCell(0, 0, 1, 2), "In", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L", "R" }, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Log, -60.f, 12.f, { 0, -6, -12, -24, -48 }), cMeterIn, "VU");
+		pGraphics->AttachControl(new IVMeterControl<2>(rectMeterVu.GetGridCell(0, 1, 1, 2), "Out", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L", "R" }, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Log, -60.f, 12.f, { 0, -6, -12, -24, -48 }), cMeterOut, "VU");
+		pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 0, 1, 2), "L", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -12.f, 0.f, { 0,-1,-2,-3,-4,-6,-9 }), cMeterGrRms, "GR");
+		pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 1, 1, 2), "P", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -12.f, 0.f, { 0,-1,-2,-3,-4,-6,-9 }), cMeterGrPeak, "GR");
 		// -- Set GR meters displaying the other way round
 		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrRms))->SetBaseValue(1.);
 		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrPeak))->SetBaseValue(1.);
@@ -162,12 +161,26 @@ SRChannel::SRChannel(const InstanceInfo& info)
 			case cEqHmfDs:
 			case cEqLmfDs:
 			case cEqLfDs:
+			case cCompRmsMakeup:
+			case cCompRmsMix:
+			case cCompPeakMakeup:
+			case cCompPeakMix:
 				pGraphics->GetControlWithTag(ctrlTag)->SetDisabled(true);
 				break;
 			default:
 				break;
 			}
 		}
+		pGraphics->AttachControl(new IVGroupControl("Gain", "Gain", 0.f, 20.f, 0.f, 0.f, SR::Graphics::Layout::SR_DEFAULT_STYLE));
+		pGraphics->AttachControl(new IVGroupControl("Filter", "Filter", 0.f, 20.f, 0.f, 0.f, SR::Graphics::Layout::SR_DEFAULT_STYLE));
+		pGraphics->AttachControl(new IVGroupControl("Sat", "Sat", 0.f, 20.f, 0.f, 0.f, SR::Graphics::Layout::SR_DEFAULT_STYLE));
+		pGraphics->AttachControl(new IVGroupControl("Parametric EQ", "Parametric EQ", 0.f, 20.f, 0.f, 0.f, SR::Graphics::Layout::SR_DEFAULT_STYLE));
+		pGraphics->AttachControl(new IVGroupControl("Passive EQ", "Passive EQ", 0.f, 20.f, 0.f, 0.f, SR::Graphics::Layout::SR_DEFAULT_STYLE));
+		pGraphics->AttachControl(new IVGroupControl("Comp Level", "Comp Level", 0.f, 20.f, 0.f, 0.f, SR::Graphics::Layout::SR_DEFAULT_STYLE));
+		pGraphics->AttachControl(new IVGroupControl("Comp Peak", "Comp Peak", 0.f, 20.f, 0.f, 0.f, SR::Graphics::Layout::SR_DEFAULT_STYLE));
+		pGraphics->AttachControl(new IVGroupControl("Stereo", "Stereo", 0.f, 20.f, 0.f, 0.f, SR::Graphics::Layout::SR_DEFAULT_STYLE));
+		pGraphics->AttachControl(new IVGroupControl("Response", "Response", 0.f, 20.f, 0.f, 0.f, SR::Graphics::Layout::SR_DEFAULT_STYLE));
+
 	};
 #endif
 }
