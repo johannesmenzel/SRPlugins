@@ -224,29 +224,30 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 			outputs[1][s] = fEqLp.Process(outputs[1][s], 1);
 		}
 
+		// Process parametric dynamic eq
+		fEqHmf.Process(outputs[0][s], outputs[1][s]);
+		fEqLmf.Process(outputs[0][s], outputs[1][s]);
+
 		// Process saturation
 		outputs[0][s] = fSatInput[0].Process(outputs[0][s]);
 		outputs[1][s] = fSatInput[0].Process(outputs[1][s]);
 
-		// Process EQ
+		// Process compressors
+		fCompRms.Process(outputs[0][s], outputs[1][s]);
+		fCompPeak.Process(outputs[0][s], outputs[1][s]);
+
+		// Process "passive" EQ
 		outputs[0][s] = fEqHfBoost.Process(outputs[0][s], 0);
 		outputs[1][s] = fEqHfBoost.Process(outputs[1][s], 1);
 
 		outputs[0][s] = fEqHfCut.Process(outputs[0][s], 0);
 		outputs[1][s] = fEqHfCut.Process(outputs[1][s], 1);
 
-		fEqHmf.Process(outputs[0][s], outputs[1][s]);
-		fEqLmf.Process(outputs[0][s], outputs[1][s]);
-
 		outputs[0][s] = fEqLfBoost.Process(outputs[0][s], 0);
 		outputs[1][s] = fEqLfBoost.Process(outputs[1][s], 1);
 
 		outputs[0][s] = fEqLfCut.Process(outputs[0][s], 0);
 		outputs[1][s] = fEqLfCut.Process(outputs[1][s], 1);
-
-		// Process compressors
-		fCompRms.Process(outputs[0][s], outputs[1][s]);
-		fCompPeak.Process(outputs[0][s], outputs[1][s]);
 
 		// Process output gain
 		if (GetParam(kStereoMonoFreq)->Value() <= 20.) {
