@@ -114,7 +114,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsFilter.GetGridCell(0, 0, 2, 1).GetReducedFromTop(20.f), kEqLpFreq, "LP", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLpFreq, "Filter");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsFilter.GetGridCell(1, 0, 2, 1).GetReducedFromTop(20.f), kEqHpFreq, "HP", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHpFreq, "Filter");
 		// -- Freqency Response Meter
-		pGraphics->AttachControl(new SR::Graphics::Controls::SRGraphBase(rectControlsFreqResponse.GetReducedFromTop(20.f), FREQUENCYRESPONSE, mFreqMeterValues, SR::Graphics::Layout::SR_DEFAULT_STYLE), cMeterFreqResponse, "Response");
+		pGraphics->AttachControl(new SR::Graphics::Controls::SRGraphBase(rectControlsFreqResponse.GetReducedFromTop(20.f), FREQUENCYRESPONSE, mFreqMeterValues, .5f, SR::Graphics::Layout::SR_DEFAULT_STYLE), cMeterFreqResponse, "Response");
 		// -- EQ
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqPassive.GetGridCell(0, 0, 2, 4).GetReducedFromTop(20.f), kEqLfBoost, "Boost", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLfBoost, "Passive EQ");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqPassive.GetGridCell(0, 1, 2, 4).GetReducedFromTop(20.f), kEqLfCut, "Cut", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLfCut, "Passive EQ");
