@@ -246,8 +246,8 @@ private:
 	SR::DSP::SRFilterIIR<sample, 2> fEqLfCut;
 	SR::DSP::SRFilterIIR<sample, 2> fEqHfBoost;
 	SR::DSP::SRFilterIIR<sample, 2> fEqHfCut;
-	SR::DSP::SRFilterIIR<sample, 2> fEqLmf;
-	SR::DSP::SRFilterIIR<sample, 2> fEqHmf;
+	SR::DSP::SRDeesser fEqLmf;
+	SR::DSP::SRDeesser fEqHmf;
 
 	SR::DSP::SRFilterIIR<sample, 2> fSplitHp;
 	SR::DSP::SRFilterIIR<sample, 2> fSplitLp;
