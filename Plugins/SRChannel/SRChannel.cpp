@@ -170,9 +170,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 			{
 			case cEqHfDs:
 			case cEqLfDs:
-			case cCompRmsMakeup:
 			case cCompRmsMix:
-			case cCompPeakMakeup:
 			case cCompPeakMix:
 				pGraphics->GetControlWithTag(ctrlTag)->SetDisabled(true);
 				break;
@@ -462,6 +460,7 @@ void SRChannel::OnParamChange(int paramIdx)
 		fCompRms.SetRelease(GetParam(kCompRmsRelease)->Value());
 		break;
 	case kCompRmsMakeup:
+		fCompRms.SetMakeup(GetParam(kCompRmsMakeup)->Value());
 		break;
 	case kCompRmsMix:
 		break;
@@ -480,6 +479,7 @@ void SRChannel::OnParamChange(int paramIdx)
 		fCompPeak.SetRelease(GetParam(kCompPeakRelease)->Value());
 		break;
 	case kCompPeakMakeup:
+		fCompPeak.SetMakeup(GetParam(kCompPeakMakeup)->Value());
 		break;
 	case kCompPeakMix:
 		break;
