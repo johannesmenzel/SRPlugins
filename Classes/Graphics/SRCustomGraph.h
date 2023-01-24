@@ -95,64 +95,64 @@ namespace SR {
 			};
 
 
-			// TODO: Draw with PathConvexShape from ptr to member array updated from Updatefunction
-			class SRFrequencyResponseMeter
-				: public IControl
-				, public IVectorBase
-			{
-			public:
-				SRFrequencyResponseMeter(IRECT bounds, int numValues, double* values, double shape = 1.0, const IVStyle& style = DEFAULT_STYLE)
-					: IControl(bounds, -1)
-					, IVectorBase(style)
-					, mValues(values)
-					, mNumValues(numValues)
-					, mShape(shape)
-					, mPatternFill(IPattern(EPatternType::Solid))
-					, mPatternStroke(IPattern(EPatternType::Solid))
-				{
-					mStrokeOptions.mPreserve = true;
-					mFillOptions.mPreserve = true;
-					mPatternStroke = IPattern(GetColor(kFG));
-					mPatternFill = IPattern(GetColor(kHL));
-					AttachIControl(this, ""); // TODO: shoud hand label
-				}
+			//// TODO: Draw with PathConvexShape from ptr to member array updated from Updatefunction
+			//class SRFrequencyResponseMeter
+			//	: public IControl
+			//	, public IVectorBase
+			//{
+			//public:
+			//	SRFrequencyResponseMeter(IRECT bounds, int numValues, double* values, double shape = 1.0, const IVStyle& style = DEFAULT_STYLE)
+			//		: IControl(bounds, -1)
+			//		, IVectorBase(style)
+			//		, mValues(values)
+			//		, mNumValues(numValues)
+			//		, mShape(shape)
+			//		, mPatternFill(IPattern(EPatternType::Solid))
+			//		, mPatternStroke(IPattern(EPatternType::Solid))
+			//	{
+			//		mStrokeOptions.mPreserve = true;
+			//		mFillOptions.mPreserve = true;
+			//		mPatternStroke = IPattern(GetColor(kFG));
+			//		mPatternFill = IPattern(GetColor(kHL));
+			//		AttachIControl(this, ""); // TODO: shoud hand label
+			//	}
 
-				~SRFrequencyResponseMeter() {}
+			//	~SRFrequencyResponseMeter() {}
 
-				void Draw(IGraphics& g) override {
-					g.PathClear();
-					g.PathMoveTo(mRECT.L, mRECT.MH());
+			//	void Draw(IGraphics& g) override {
+			//		g.PathClear();
+			//		g.PathMoveTo(mRECT.L, mRECT.MH());
 
-					for (int i = 0; i < mNumValues; i++) {
-						const float y = mRECT.MH() - ((float)mValues[i] * 0.5f * mRECT.H());
-						const float x = mRECT.L + ((float)i / ((float)mNumValues - 1.f)) * mRECT.W();
-						g.PathLineTo(x, y);
-					}
+			//		for (int i = 0; i < mNumValues; i++) {
+			//			const float y = mRECT.MH() - ((float)mValues[i] * 0.5f * mRECT.H());
+			//			const float x = mRECT.L + ((float)i / ((float)mNumValues - 1.f)) * mRECT.W();
+			//			g.PathLineTo(x, y);
+			//		}
 
-					g.PathLineTo(mRECT.R, mRECT.MH());
-					//g.PathClose();
-					g.PathFill(mPatternFill, mFillOptions, 0);
-					g.PathStroke(mPatternStroke, 1.f, mStrokeOptions, 0);
-				};
+			//		g.PathLineTo(mRECT.R, mRECT.MH());
+			//		//g.PathClose();
+			//		g.PathFill(mPatternFill, mFillOptions, 0);
+			//		g.PathStroke(mPatternStroke, 1.f, mStrokeOptions, 0);
+			//	};
 
-				void Process(double* values) {
-					mValues = values;
-					for (int i = 0; i < mNumValues; i++) {
-						mValues[i] = Clip<double>(mValues[i], -1.f, 1.f);
-					}
-					SetDirty(false);
-				};
-				//void OnMouseDown(float x, float y, const IMouseMod& mod) override;
-			private:
-				//WDL_String mDisp;
-				double* mValues;
-				int mNumValues;
-				double mShape;
-				IStrokeOptions mStrokeOptions;
-				IFillOptions mFillOptions;
-				IPattern mPatternFill;
-				IPattern mPatternStroke;
-			};
+			//	void Process(double* values) {
+			//		mValues = values;
+			//		for (int i = 0; i < mNumValues; i++) {
+			//			mValues[i] = Clip<double>(mValues[i], -1.f, 1.f);
+			//		}
+			//		SetDirty(false);
+			//	};
+			//	//void OnMouseDown(float x, float y, const IMouseMod& mod) override;
+			//private:
+			//	//WDL_String mDisp;
+			//	double* mValues;
+			//	int mNumValues;
+			//	double mShape;
+			//	IStrokeOptions mStrokeOptions;
+			//	IFillOptions mFillOptions;
+			//	IPattern mPatternFill;
+			//	IPattern mPatternStroke;
+			//};
 
 		}
 	}
