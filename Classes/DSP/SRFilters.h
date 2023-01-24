@@ -244,26 +244,26 @@ namespace SR {
 
 
 
+		enum EFilterType {
+			BiquadLowpass = 0,
+			BiquadHighpass,
+			BiquadBandpass,
+			BiquadNotch,
+			BiquadPeak,
+			BiquadPeakNcq,
+			BiquadLowshelf,
+			BiquadHighshelf,
+			BiquadLinkwitzHighpass,
+			BiquadLinkwitzLowpass,
+			OnepoleHighpass,
+			OnepoleLowpass
+		};
 
 		// TWO POLE FILTERS
 		template<typename T = double, int MAXNUMCHANNELS = 1>
 		class SRFilterIIR {
 		public:
 
-			enum EFilterType {
-				BiquadLowpass = 0,
-				BiquadHighpass,
-				BiquadBandpass,
-				BiquadNotch,
-				BiquadPeak,
-				BiquadPeakNcq,
-				BiquadLowshelf,
-				BiquadHighshelf,
-				BiquadLinkwitzHighpass,
-				BiquadLinkwitzLowpass,
-				OnepoleHighpass,
-				OnepoleLowpass
-			};
 
 			SRFilterIIR() {
 				mType = EFilterType::BiquadLowpass;
