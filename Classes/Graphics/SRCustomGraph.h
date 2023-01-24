@@ -17,10 +17,17 @@ namespace SR {
 				, public IVectorBase
 			{
 			public:
-				SRGraphBase(IRECT bounds, int numValues, float* values, const IVStyle& style = DEFAULT_STYLE)
+				/** SRGraphBase Constructor
+				* @param bounds The rectangular area that the control occupies
+				* @param numValues Number of values in the value array given to the control 
+				* @param values A pointer type float which will hold the values
+				* @param baseline value on Y axis considered as the base value between 0.f and 1.f 
+				* @param style Style used for drawing that control */
+				SRGraphBase(IRECT bounds, int numValues, float* values, float baseline = .5f, const IVStyle& style = DEFAULT_STYLE)
 					: IControl(bounds, -1)
 					, IVectorBase(style)
 					, mValues(values)
+					, mBaseline(baseline)
 					, mNumValues(numValues)
 					, mX(new float[numValues])
 					, mY(new float[numValues])
@@ -29,24 +36,25 @@ namespace SR {
 				}
 
 				~SRGraphBase() {
-					//delete[] mX;
-					//delete[] mY;
-					//delete[] mValues;
+					delete[] mX;
+					delete[] mY;
+					delete[] mValues;
 				}
 
 				void Draw(IGraphics& g) override {
 					// Fill Graph
 					g.PathClear();
-					g.PathMoveTo(mRECT.L, mRECT.MH());
+					g.PathMoveTo(mRECT.L, (mRECT.B - mRECT.H() * mBaseline));
 					for (int i = 0; i < mNumValues; i++) {
 						g.PathLineTo(mX[i], mY[i]);
 					}
-					g.PathLineTo(mRECT.R, mRECT.MH());
+					g.PathLineTo(mRECT.R, (mRECT.B - mRECT.H() * mBaseline));
 					g.PathClose();
 					g.PathFill(GetColor(kHL));
 
 					// Draw Graph
 					g.PathClear();
+					// -- For stroke move to first value and create path only if values are within bounds to prevent drawing at the edges
 					g.PathMoveTo(mX[0], mY[0]);
 					for (int i = 1; i < mNumValues; i++) {
 						if (mY[i] >= mRECT.B || mY[i] <= mRECT.T) {
@@ -74,11 +82,14 @@ namespace SR {
 					}
 					OnResize();
 				};
+
 				//void OnMouseDown(float x, float y, const IMouseMod& mod) override;
+
 			private:
 				//WDL_String mDisp;
 				float* mValues;
 				int mNumValues;
+				float mBaseline;
 				float* mX;
 				float* mY;
 			};
