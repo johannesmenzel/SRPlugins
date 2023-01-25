@@ -170,8 +170,6 @@ SRChannel::SRChannel(const InstanceInfo& info)
 			{
 			case cEqHfDs:
 			case cEqLfDs:
-			case cCompRmsMix:
-			case cCompPeakMix:
 				pGraphics->GetControlWithTag(ctrlTag)->SetDisabled(true);
 				break;
 			default:
@@ -324,6 +322,7 @@ void SRChannel::OnReset()
 		true, // feedback
 		true, // automake
 		-18., // reference
+		GetParam(kCompRmsMix)->Value() * .01, // mix
 		samplerate);
 
 	fCompPeak.Reset();
@@ -337,6 +336,7 @@ void SRChannel::OnReset()
 		true, // feedback
 		true, // automake
 		-18., // reference
+		GetParam(kCompPeakMix)->Value() * .01, // mix
 		samplerate);
 
 	fMeterEnvelope[0].SetAttack(4.);
@@ -463,6 +463,7 @@ void SRChannel::OnParamChange(int paramIdx)
 		fCompRms.SetMakeup(GetParam(kCompRmsMakeup)->Value());
 		break;
 	case kCompRmsMix:
+		fCompRms.SetMix(GetParam(kCompRmsMix)->Value() * .01);
 		break;
 
 
@@ -482,6 +483,7 @@ void SRChannel::OnParamChange(int paramIdx)
 		fCompPeak.SetMakeup(GetParam(kCompPeakMakeup)->Value());
 		break;
 	case kCompPeakMix:
+		fCompPeak.SetMix(GetParam(kCompPeakMix)->Value() * .01);
 		break;
 
 	}
@@ -496,7 +498,7 @@ void SRChannel::SetFreqMeterValues()
 		//double freq = 0.5 * samplerate * double(i) / double(FREQRESP_NUMVALUES);
 		// If pow shape
 		// -- By adding 60 to the counter and the numValues we just spread the values leaving the first 60 out, which is the range 0 - 20 Hz in log(10)
-		double freq = 22000. * std::pow((double(i+60) / double(FREQRESP_NUMVALUES+60)), shape);
+		double freq = 22000. * std::pow((double(i + 60) / double(FREQRESP_NUMVALUES + 60)), shape);
 		//double freq = 0.5 * samplerate * std::pow((double(i) / double(FREQRESP_NUMVALUES)), shape);
 		mFreqMeterValues[i] = 0.;
 		if (GetParam(kEqHpFreq)->Value() > 0.) mFreqMeterValues[i] += fEqHp.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
