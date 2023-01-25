@@ -234,7 +234,7 @@ public:
 private:
 	void SetFreqMeterValues();
 
-	double meterIn1, meterIn2, meterOut1, meterOut2, mLowSignalL, mLowSignalR;
+	double meterIn1, meterIn2, meterOut1, meterOut2;
 
 	SR::DSP::SRGain fGainIn;
 	SR::DSP::SRGain fGainOut;
