@@ -28,7 +28,7 @@ namespace SR {
 			};
 
 			inline Knob::Knob(const IRECT& bounds, int paramIdx, const char* label, const IVStyle& style, bool valueIsEditable, bool valueInWidget, float a1, float a2, float aAnchor, EDirection direction, double gearing, float trackSize, float innerPointerFrac, float outerPointerFrac, float pointerThickness)
-				: IVKnobControl(bounds, paramIdx, label, style, valueIsEditable, valueInWidget, a1, a2, aAnchor, direction, gearing, trackSize) 
+				: IVKnobControl(bounds, paramIdx, label, style, valueIsEditable, valueInWidget, a1, a2, aAnchor, direction, gearing, trackSize)
 			{
 				SetPointerThickness(pointerThickness);
 				SetInnerPointerFrac(innerPointerFrac);
@@ -37,23 +37,13 @@ namespace SR {
 
 			inline void Knob::DrawWidget(IGraphics& g)
 			{
-				float widgetRadius; // The radius out to the indicator track arc
-
-				if (mWidgetBounds.W() > mWidgetBounds.H())
-					widgetRadius = (mWidgetBounds.H() / 2.f);
-				else
-					widgetRadius = (mWidgetBounds.W() / 2.f);
-
+				const float widgetRadius = mWidgetBounds.GetLengthOfShortestSide() * .5f - (mTrackSize * .5f); // The radius out to the indicator track arc
+				const float innerWidgetRadius = widgetRadius * .92f;
 				const float cx = mWidgetBounds.MW(), cy = mWidgetBounds.MH();
-
-				widgetRadius -= (mTrackSize / 2.f);
-				float innerWidgetRadius = widgetRadius * .92f;
-
 				IRECT knobHandleBounds = mWidgetBounds.GetCentredInside((widgetRadius - mTrackToHandleDistance) * 2.f);
 				const float angle = mAngle1 + (static_cast<float>(GetValue()) * (mAngle2 - mAngle1));
 				//DrawIndicatorTrack(g, angle, cx, cy, widgetRadius);
-				if (mTrackSize > 0.f)
-				{
+				if (mTrackSize > 0.f) {
 					//g.DrawArc(GetColor(kX1), cx, cy, widgetRadius, angle >= mAnchorAngle ? mAnchorAngle : mAnchorAngle - (mAnchorAngle - angle), angle >= mAnchorAngle ? angle : mAnchorAngle, &mBlend, mTrackSize);
 					g.DrawArc(SR::Graphics::Layout::SR_DEFAULT_COLOR_FG, cx, cy, innerWidgetRadius, angle - 15.f, angle + 15.f, &mBlend, mTrackSize);
 					g.DrawRadialLine(SR::Graphics::Layout::SR_DEFAULT_COLOR_FG, cx, cy, angle + 15.f, innerWidgetRadius, widgetRadius, &mBlend, mTrackSize);
@@ -82,11 +72,9 @@ namespace SR {
 					g.DrawCircle(SR::Graphics::Layout::SR_DEFAULT_COLOR_FG, cx, cy, widgetRadius * mOuterPointerFrac, &mBlend, mTrackSize);
 					g.DrawRadialLine(SR::Graphics::Layout::SR_DEFAULT_COLOR_FG, cx, cy, angle, mInnerPointerFrac * widgetRadius, mOuterPointerFrac * widgetRadius, &mBlend, mPointerThickness + 2.f * mTrackSize);
 					g.DrawRadialLine(SR::Graphics::Layout::SR_DEFAULT_COLOR_CUSTOM_PANEL_BG, cx, cy, angle, mInnerPointerFrac * widgetRadius + mTrackSize, mOuterPointerFrac * widgetRadius + mTrackSize, &mBlend, mPointerThickness);
-
 				}
 				//DrawPressableShape(g, /*mShape*/ EVShape::Ellipse, knobHandleBounds, mMouseDown, mMouseIsOver, IsDisabled());
 				//DrawPointer(g, angle, cx, cy, knobHandleBounds.W() / 2.f);
-
 			}
 
 		}
