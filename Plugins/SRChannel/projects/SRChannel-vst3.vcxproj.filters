@@ -384,6 +384,9 @@
     <ClInclude Include="..\..\..\Classes\Graphics\SRCustomGraph.h">
       <Filter>SRClasses\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Classes\Graphics\SRCustomSwitch.h">
+      <Filter>SRClasses\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">

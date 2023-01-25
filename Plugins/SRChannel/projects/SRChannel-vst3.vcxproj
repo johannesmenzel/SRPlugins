@@ -262,6 +262,7 @@
     <ClInclude Include="..\..\..\Classes\Graphics\SRCustomGraph.h" />
     <ClInclude Include="..\..\..\Classes\Graphics\SRCustomKnob.h" />
     <ClInclude Include="..\..\..\Classes\Graphics\SRCustomLayout.h" />
+    <ClInclude Include="..\..\..\Classes\Graphics\SRCustomSwitch.h" />
     <ClInclude Include="..\..\..\Classes\SRConstants.h" />
     <ClInclude Include="..\..\..\Classes\Utils\SRHelpers.h" />
     <ClInclude Include="..\..\..\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\classfactoryhelpers.h" />

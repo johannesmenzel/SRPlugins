@@ -2,6 +2,7 @@
 #include "IPlug_include_in_plug_src.h"
 #include "IControls.h"
 #include "../../Classes/Graphics/SRCustomKnob.h"
+#include "../../Classes/Graphics/SRCustomSwitch.h"
 #include "../../Classes/Graphics/SRCustomLayout.h"
 #include "../../Classes/Graphics/SRCustomGraph.h"
 
@@ -76,6 +77,8 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kCompPeakMakeup)->InitDouble("Peak Makeup", 0., -12., 12., 0.01, "dB", 0, "Comp");
 	GetParam(kCompPeakMix)->InitDouble("Peak Mix", 100., 0., 100., 1., "%", 0, "Comp");
 
+	GetParam(kBypass)->InitBool("Bypass", false, "Bypass", 0, "Global", "Off", "On");
+
 	OnReset();
 
 #if IPLUG_EDITOR // http://bit.ly/2S64BDd
@@ -88,7 +91,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		pGraphics->AttachPanelBackground(SR::Graphics::Layout::SR_DEFAULT_COLOR_CUSTOM_PANEL_BG);
 		pGraphics->LoadFont("Roboto-Regular", ROBOTO_FN);
 		const IRECT b = pGraphics->GetBounds();
-		const IRECT rectTitle = b.GetPadded(50.f, 0.f, -50.f, -660.f);
+		const IRECT rectTitle = b.GetPadded(-50.f, 0.f, -50.f, -660.f);
 		const IRECT rectMeterGr = b.GetFromLeft(50.f);
 		const IRECT rectMeterVu = b.GetFromRight(50.f);
 		const IRECT rectControls = b.GetPadded(-50.f, -60.f, -50.f, 0.f);
@@ -105,6 +108,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		// Attach Controls
 		// -- Title		
 		pGraphics->AttachControl(new ITextControl(rectTitle, PLUG_MFR " " PLUG_NAME " " PLUG_VERSION_STR "-alpha", SR::Graphics::Layout::SR_DEFAULT_TEXT));
+		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectTitle.GetGridCell(0, 0, 1, 8).GetCentredInside(40.f), kBypass, "Byp", SR::Graphics::Layout::SR_DEFAULT_STYLE, true));
 		// -- Gains		
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsGain.GetGridCell(0, 0, 2, 1).GetReducedFromTop(20.f), kGainIn, "Input", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGainIn, "Gain");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsGain.GetGridCell(1, 0, 2, 1).GetReducedFromTop(20.f), kGainOut, "Output", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGainOut, "Gain");
@@ -194,6 +198,8 @@ SRChannel::SRChannel(const InstanceInfo& info)
 void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 {
 	const int nChans = NOutChansConnected();
+
+
 	for (int s = 0; s < nFrames; s++) {
 
 		// Store input in output data, perform processing here later
@@ -202,7 +208,8 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 		}
 
 		// Process input gain
-		fGainIn.Process(outputs[0][s], outputs[1][s]);
+		if (!GetParam(kBypass)->Bool())
+			fGainIn.Process(outputs[0][s], outputs[1][s]);
 
 		// Run input data through envelope filter to match VU like metering, then send to respective buffer. (After input gain) 
 		fMeterEnvelope[0].process(abs(outputs[0][s]), meterIn1);
@@ -210,65 +217,73 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 		mBufferInput.ProcessBuffer(meterIn1, 0, s);
 		mBufferInput.ProcessBuffer(meterIn2, 1, s);
 
-		// Process filters
-		if (GetParam(kEqHpFreq)->Value() > 0.) {
-			outputs[0][s] = fEqHp.Process(outputs[0][s], 0);
-			outputs[1][s] = fEqHp.Process(outputs[1][s], 1);
-		}
-		if (GetParam(kEqLpFreq)->Value() < 22000.) {
-			outputs[0][s] = fEqLp.Process(outputs[0][s], 0);
-			outputs[1][s] = fEqLp.Process(outputs[1][s], 1);
-		}
+		if (!GetParam(kBypass)->Bool()) {
+			// Process filters
+			if (GetParam(kEqHpFreq)->Value() > 0.) {
+				outputs[0][s] = fEqHp.Process(outputs[0][s], 0);
+				outputs[1][s] = fEqHp.Process(outputs[1][s], 1);
+			}
+			if (GetParam(kEqLpFreq)->Value() < 22000.) {
+				outputs[0][s] = fEqLp.Process(outputs[0][s], 0);
+				outputs[1][s] = fEqLp.Process(outputs[1][s], 1);
+			}
 
-		// Process parametric dynamic eq
-		fEqHmf.Process(outputs[0][s], outputs[1][s]);
-		fEqLmf.Process(outputs[0][s], outputs[1][s]);
+			// Process parametric dynamic eq
+			fEqHmf.Process(outputs[0][s], outputs[1][s]);
+			fEqLmf.Process(outputs[0][s], outputs[1][s]);
 
-		// Process saturation
-		outputs[0][s] = fSatInput[0].Process(outputs[0][s]);
-		outputs[1][s] = fSatInput[0].Process(outputs[1][s]);
+			// Process saturation
+			outputs[0][s] = fSatInput[0].Process(outputs[0][s]);
+			outputs[1][s] = fSatInput[0].Process(outputs[1][s]);
 
-		// Process compressors
-		fCompRms.Process(outputs[0][s], outputs[1][s]);
-		fCompPeak.Process(outputs[0][s], outputs[1][s]);
+			// Process compressors
+			fCompRms.Process(outputs[0][s], outputs[1][s]);
+			fCompPeak.Process(outputs[0][s], outputs[1][s]);
 
-		// Process "passive" EQ
-		outputs[0][s] = fEqHfBoost.Process(outputs[0][s], 0);
-		outputs[1][s] = fEqHfBoost.Process(outputs[1][s], 1);
+			// Process "passive" EQ
+			outputs[0][s] = fEqHfBoost.Process(outputs[0][s], 0);
+			outputs[1][s] = fEqHfBoost.Process(outputs[1][s], 1);
 
-		outputs[0][s] = fEqHfCut.Process(outputs[0][s], 0);
-		outputs[1][s] = fEqHfCut.Process(outputs[1][s], 1);
+			outputs[0][s] = fEqHfCut.Process(outputs[0][s], 0);
+			outputs[1][s] = fEqHfCut.Process(outputs[1][s], 1);
 
-		outputs[0][s] = fEqLfBoost.Process(outputs[0][s], 0);
-		outputs[1][s] = fEqLfBoost.Process(outputs[1][s], 1);
+			outputs[0][s] = fEqLfBoost.Process(outputs[0][s], 0);
+			outputs[1][s] = fEqLfBoost.Process(outputs[1][s], 1);
 
-		outputs[0][s] = fEqLfCut.Process(outputs[0][s], 0);
-		outputs[1][s] = fEqLfCut.Process(outputs[1][s], 1);
+			outputs[0][s] = fEqLfCut.Process(outputs[0][s], 0);
+			outputs[1][s] = fEqLfCut.Process(outputs[1][s], 1);
 
-		// Process output gain
-		if (GetParam(kStereoMonoFreq)->Value() <= 20.) {
-			fGainOut.Process(outputs[0][s], outputs[1][s]);
-		}
-		else {
-			// Funny nested function which stores the output signal in buffer after processing of the Linkwitz-Riley-LP
-			mBufferLowSignal.ProcessBuffer(fSplitLp.Process(outputs[0][s], 0), 0, s);
-			mBufferLowSignal.ProcessBuffer(fSplitLp.Process(outputs[1][s], 1), 1, s);
-			// Now apply the complementary LR-HP to the outputs itself
-			outputs[0][s] = fSplitHp.Process(outputs[0][s], 0);
-			outputs[1][s] = fSplitHp.Process(outputs[1][s], 1);
-			// Process output gain (with width) of low signal
-			fGainOutLow.Process(mBufferLowSignal.GetBuffer()[0][s], mBufferLowSignal.GetBuffer()[1][s]);
-			// Process output gain (with width and pan) of high signal
-			fGainOut.Process(outputs[0][s], outputs[1][s]);
-			// Mix both signals, flip phase of the latter (allpass solution would be better)
-			outputs[0][s] -= mBufferLowSignal.GetBuffer(0, s);
-			outputs[1][s] -= mBufferLowSignal.GetBuffer(1, s);
+			// Process output gain
+			if (GetParam(kStereoMonoFreq)->Value() <= 20.) {
+				fGainOut.Process(outputs[0][s], outputs[1][s]);
+			}
+			else {
+				// Funny nested function which stores the output signal in buffer after processing of the Linkwitz-Riley-LP
+				mBufferLowSignal.ProcessBuffer(fSplitLp.Process(outputs[0][s], 0), 0, s);
+				mBufferLowSignal.ProcessBuffer(fSplitLp.Process(outputs[1][s], 1), 1, s);
+				// Now apply the complementary LR-HP to the outputs itself
+				outputs[0][s] = fSplitHp.Process(outputs[0][s], 0);
+				outputs[1][s] = fSplitHp.Process(outputs[1][s], 1);
+				// Process output gain (with width) of low signal
+				fGainOutLow.Process(mBufferLowSignal.GetBuffer()[0][s], mBufferLowSignal.GetBuffer()[1][s]);
+				// Process output gain (with width and pan) of high signal
+				fGainOut.Process(outputs[0][s], outputs[1][s]);
+				// Mix both signals, flip phase of the latter (allpass solution would be better)
+				outputs[0][s] -= mBufferLowSignal.GetBuffer(0, s);
+				outputs[1][s] -= mBufferLowSignal.GetBuffer(1, s);
+			}
 		}
 
 		// Store current gain reduction in respective buffer
-		mBufferMeterGrRms.ProcessBuffer(fCompRms.GetGrLin(), 0, s);
-		mBufferMeterGrPeak.ProcessBuffer(fCompPeak.GetGrLin(), 0, s);
-
+		if (!GetParam(kBypass)->Bool()) {
+			mBufferMeterGrRms.ProcessBuffer(fCompRms.GetGrLin(), 0, s);
+			mBufferMeterGrPeak.ProcessBuffer(fCompPeak.GetGrLin(), 0, s);
+		}
+		else {
+			// Prevent freezing when bypassed, just set to no gain reduction
+			mBufferMeterGrRms.ProcessBuffer(1., 0, s);
+			mBufferMeterGrPeak.ProcessBuffer(1., 0, s);
+		}
 
 		// Run input data through envelope filter to match VU like metering, then send to respective buffer.
 		fMeterEnvelope[2].process(abs(outputs[0][s]), meterOut1);
@@ -485,7 +500,6 @@ void SRChannel::OnParamChange(int paramIdx)
 	case kCompPeakMix:
 		fCompPeak.SetMix(GetParam(kCompPeakMix)->Value() * .01);
 		break;
-
 	}
 }
 void SRChannel::SetFreqMeterValues()
