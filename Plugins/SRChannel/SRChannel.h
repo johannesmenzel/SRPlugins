@@ -38,12 +38,14 @@ enum EParams
 	kEqHmfFreq,
 	kEqHmfQ,
 	kEqHmfDs,
+	kEqHmfIsShelf,
 	kEqHmfIsSolo,
 
 	kEqLmfGain,
 	kEqLmfFreq,
 	kEqLmfQ,
 	kEqLmfDs,
+	kEqLmfIsShelf,
 	kEqLmfIsSolo,
 
 	kEqLfBoost,
@@ -136,12 +138,14 @@ enum ECtrlTags {
 	cEqHmfFreq,
 	cEqHmfQ,
 	cEqHmfDs,
+	cEqHmfIsShelf,
 	cEqHmfIsSolo,
 
 	cEqLmfGain,
 	cEqLmfFreq,
 	cEqLmfQ,
 	cEqLmfDs,
+	cEqLmfIsShelf,
 	cEqLmfIsSolo,
 
 	cEqLfBoost,
