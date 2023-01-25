@@ -69,6 +69,33 @@ namespace SR {
 						g.PathLineTo(bounds.R, bounds.T + .2f * bounds.H());
 						g.PathStroke(GetColor(kFG), mTrackSize);
 					}
+					// Draw parallel processing symbol (unfinised)
+					else if (strcmp(mValueStr.Get(), "PARALLEL") == 0) {
+						g.PathClear();
+						g.PathMoveTo(bounds.L, bounds.T + .3f * bounds.H());
+						g.PathLineTo(bounds.L + .2f * bounds.W(), bounds.T + .3f * bounds.H());
+						g.PathMoveTo(bounds.L, bounds.T + .7f * bounds.H());
+						g.PathLineTo(bounds.L + .2f * bounds.W(), bounds.T + .7f * bounds.H());
+						g.PathMoveTo(bounds.L + .8f * bounds.W(), bounds.T + .3f * bounds.H());
+						g.PathLineTo(bounds.R, bounds.T + .3f * bounds.H());
+						g.PathMoveTo(bounds.L + .8f * bounds.W(), bounds.T + .7f * bounds.H());
+						g.PathLineTo(bounds.R, bounds.T + .7f * bounds.H());
+						g.PathRect(IRECT(bounds.L + .2f * bounds.W(), bounds.T + .2f * bounds.H(), bounds.L + .8f * bounds.W(), bounds.T + .4f * bounds.H()));
+						g.PathRect(IRECT(bounds.L + .2f * bounds.W(), bounds.T + .6f * bounds.H(), bounds.L + .8f * bounds.W(), bounds.T + .8f * bounds.H()));
+						g.PathStroke(GetColor(kFG), mTrackSize);
+					}
+					else if (strcmp(mValueStr.Get(), "SERIAL") == 0) {
+						g.PathClear();
+						g.PathMoveTo(bounds.L, bounds.T + .5f * bounds.H());
+						g.PathLineTo(bounds.L + .2f * bounds.W(), bounds.T + .5f * bounds.H());
+						g.PathMoveTo(bounds.L + .4f * bounds.W(), bounds.T + .5f * bounds.H());
+						g.PathLineTo(bounds.L + .6f * bounds.W(), bounds.T + .5f * bounds.H());
+						g.PathMoveTo(bounds.L + .8f * bounds.W(), bounds.T + .5f * bounds.H());
+						g.PathLineTo(bounds.R, bounds.T + .5f * bounds.H());
+						g.PathRect(IRECT(bounds.L + .2f * bounds.W(), bounds.T + .2f * bounds.H(), bounds.L + .4f * bounds.W(), bounds.T + .8f * bounds.H()));
+						g.PathRect(IRECT(bounds.L + .6f * bounds.W(), bounds.T + .2f * bounds.H(), bounds.L + .8f * bounds.W(), bounds.T + .8f * bounds.H()));
+						g.PathStroke(GetColor(kFG), mTrackSize);
+					}
 					// if not, draw text
 					else
 					{
