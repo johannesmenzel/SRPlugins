@@ -8,6 +8,8 @@
 
 #define FREQRESP_NUMVALUES 300
 #define FREQRESP_RANGEDB 12.
+#define VU_ATTACK 4.
+#define VU_RELEASE 750.
 
 
 SRChannel::SRChannel(const InstanceInfo& info)
@@ -161,8 +163,8 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsStereo.GetGridCell(2, 0, 4, 1).GetReducedFromTop(20.f), kStereoWidthLow, "Bass Width", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoWidthLow, "Stereo");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsStereo.GetGridCell(3, 0, 4, 1).GetReducedFromTop(20.f), kStereoMonoFreq, "Split FQ", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoMonoFreq, "Stereo");
 		// -- Meters
-		pGraphics->AttachControl(new IVMeterControl<4>(rectMeterVu, "In Out", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "", "", "", ""}, 0, iplug::igraphics::IVMeterControl<4>::EResponse::Log, -60.f, 12.f, {0, -6, -12, -24, -48}), cMeterVu, "VU");
-		pGraphics->AttachControl(new IVMeterControl<2>(rectMeterGr, "GR", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, {"", ""}, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Log, -12.f, 0.f, {0,-1,-2,-3,-4,-6,-9}), cMeterGr, "GR");
+		pGraphics->AttachControl(new IVMeterControl<4>(rectMeterVu, "In Out", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "", "", "", "" }, 0, iplug::igraphics::IVMeterControl<4>::EResponse::Log, -60.f, 12.f, { 0, -6, -12, -24, -48 }), cMeterVu, "VU");
+		pGraphics->AttachControl(new IVMeterControl<2>(rectMeterGr, "GR", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "", "" }, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Log, -12.f, 0.f, { 0,-1,-2,-3,-4,-6,-9 }), cMeterGr, "GR");
 		// -- Set GR meter displaying the other way round
 		dynamic_cast<IVMeterControl<2>*>(pGraphics->GetControlWithTag(cMeterGr))->SetBaseValue(1.);
 
@@ -332,6 +334,7 @@ void SRChannel::OnReset()
 		-18., // reference
 		GetParam(kCompRmsMix)->Value() * .01, // mix
 		samplerate);
+	fCompRms.SetWindow(10.);
 
 	fCompPeak.Reset();
 	fCompPeak.ResetCompressor(
@@ -347,18 +350,11 @@ void SRChannel::OnReset()
 		GetParam(kCompPeakMix)->Value() * .01, // mix
 		samplerate);
 
-	fMeterEnvelope[0].SetAttack(4.);
-	fMeterEnvelope[1].SetAttack(4.);
-	fMeterEnvelope[2].SetAttack(4.);
-	fMeterEnvelope[3].SetAttack(4.);
-	fMeterEnvelope[0].SetRelease(750.);
-	fMeterEnvelope[1].SetRelease(750.);
-	fMeterEnvelope[2].SetRelease(750.);
-	fMeterEnvelope[3].SetRelease(750.);
-	fMeterEnvelope[0].SetSampleRate(samplerate);
-	fMeterEnvelope[1].SetSampleRate(samplerate);
-	fMeterEnvelope[2].SetSampleRate(samplerate);
-	fMeterEnvelope[3].SetSampleRate(samplerate);
+	for (int e = 0; e < 4; e++) {
+		fMeterEnvelope[e].SetAttack(VU_ATTACK);
+		fMeterEnvelope[e].SetRelease(VU_RELEASE);
+		fMeterEnvelope[e].SetSampleRate(samplerate);
+	}
 }
 
 void SRChannel::OnIdle()
