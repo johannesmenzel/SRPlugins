@@ -93,7 +93,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		pGraphics->AttachPanelBackground(SR::Graphics::Layout::SR_DEFAULT_COLOR_CUSTOM_PANEL_BG);
 		pGraphics->LoadFont("Roboto-Regular", ROBOTO_FN);
 		const IRECT b = pGraphics->GetBounds();
-		const IRECT rectTitle = b.GetPadded(-50.f, 0.f, -50.f, -660.f);
+		const IRECT rectTitle = b.GetPadded(-50.f, 0.f, -50.f, -700.f);
 		const IRECT rectMeterGr = b.GetFromLeft(50.f);
 		const IRECT rectMeterVu = b.GetFromRight(50.f);
 		const IRECT rectControls = b.GetPadded(-50.f, -60.f, -50.f, 0.f);
