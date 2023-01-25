@@ -32,13 +32,13 @@ namespace SR {
 
 					// Draw on/off symbol not highlighted
 					if (strcmp(mValueStr.Get(), "OFF") == 0) {
-						g.DrawArc(SR::Graphics::Layout::SR_DEFAULT_COLOR_FG, cx, cy, r, 25.f, -25.f, 0, mTrackSize);
-						g.DrawRadialLine(SR::Graphics::Layout::SR_DEFAULT_COLOR_FG, cx, cy, 0.f, .0f, r, 0, mTrackSize);
+						g.DrawArc(SR::Graphics::Layout::SR_DEFAULT_COLOR_FG, cx, cy, r, 25.f, -25.f, 0, mTrackSize * 2.f);
+						g.DrawRadialLine(SR::Graphics::Layout::SR_DEFAULT_COLOR_FG, cx, cy, 0.f, .0f, r, 0, mTrackSize * 2.f);
 					}
 					// Draw on/off symbol highlighted
 					else if (strcmp(mValueStr.Get(), "ON") == 0) {
-						g.DrawArc(SR::Graphics::Layout::SR_DEFAULT_COLOR_PR, cx, cy, r, 25.f, -25.f, 0, mTrackSize);
-						g.DrawRadialLine(SR::Graphics::Layout::SR_DEFAULT_COLOR_PR, cx, cy, 0.f, .0f, r, 0, mTrackSize);
+						g.DrawArc(SR::Graphics::Layout::SR_DEFAULT_COLOR_PR, cx, cy, r, 25.f, -25.f, 0, mTrackSize * 2.f);
+						g.DrawRadialLine(SR::Graphics::Layout::SR_DEFAULT_COLOR_PR, cx, cy, 0.f, .0f, r, 0, mTrackSize * 2.f);
 					}
 					// Draw peak filter symbol
 					else if (strcmp(mValueStr.Get(), "PEAK") == 0) {
