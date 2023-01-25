@@ -55,13 +55,13 @@ SRDynamicsControl::SRDynamicsControl(const InstanceInfo& info)
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(1, 1, 2, 5).GetCentredInside(100.f), kRatio, "Ratio", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cRatio);
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(1, 2, 2, 5).GetCentredInside(100.f), kMix, "Mix", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cMix);
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControls.GetGridCell(1, 4, 2, 5).GetCentredInside(100.f), kOutGain, "Output", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cOutGain);
-		pGraphics->AttachControl(new IVMeterControl<2>(rectMeterVu.GetGridCell(0, 0, 1, 2), "In", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L", "R" }, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Linear, -60.f, 0.f), cMeterIn);
-		pGraphics->AttachControl(new IVMeterControl<2>(rectMeterVu.GetGridCell(0, 1, 1, 2), "Out", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L", "R" }, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Linear, -60.f, 0.f), cMeterOut);
-		pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 0, 1, 5), "L", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Linear, -18.f, 0.f), cMeterGrLevel);
-		pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 1, 1, 5), "O", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Linear, -18.f, 0.f), cMeterGrOpto);
-		pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 2, 1, 5), "V", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Linear, -18.f, 0.f), cMeterGrVca);
-		pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 3, 1, 5), "F", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Linear, -18.f, 0.f), cMeterGrFet);
-		pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 4, 1, 5), "L", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Linear, -18.f, 0.f), cMeterGrLim);
+		pGraphics->AttachControl(new IVMeterControl<2>(rectMeterVu.GetGridCell(0, 0, 1, 2), "In", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "", "" }, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Log, -60.f, 0.f), cMeterIn);
+		pGraphics->AttachControl(new IVMeterControl<2>(rectMeterVu.GetGridCell(0, 1, 1, 2), "Out", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "", "" }, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Log, -60.f, 0.f), cMeterOut);
+		pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 0, 1, 5), "L", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -18.f, 0.f, {}), cMeterGrLevel);
+		pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 1, 1, 5), "O", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -18.f, 0.f, {}), cMeterGrOpto);
+		pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 2, 1, 5), "V", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -18.f, 0.f, {}), cMeterGrVca);
+		pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 3, 1, 5), "F", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -18.f, 0.f, {}), cMeterGrFet);
+		pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 4, 1, 5), "L", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -18.f, 0.f, {}), cMeterGrLim);
 		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrLevel))->SetBaseValue(1.);
 		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrOpto))->SetBaseValue(1.);
 		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrVca))->SetBaseValue(1.);
@@ -190,6 +190,7 @@ void SRDynamicsControl::OnReset() {
 		false, // feedback
 		true, // automake
 		-18., // reference
+		1., // mix
 		samplerate);
 	fCompLevel.SetWindow(100.);
 	
@@ -204,6 +205,7 @@ void SRDynamicsControl::OnReset() {
 		true, // feedback
 		true, // automake
 		-18., // reference
+		1., // mix
 		samplerate);
 	fCompOpto.SetMaxGrDb(10., true);
 	fCompOpto.SetWindow(4.);
@@ -219,6 +221,7 @@ void SRDynamicsControl::OnReset() {
 		false, // feedback
 		true, // automake
 		-18., // reference
+		1., // mix
 		samplerate);
 
 	fCompFet.Reset();
@@ -232,6 +235,7 @@ void SRDynamicsControl::OnReset() {
 		true, // feedback
 		true, // automake
 		-18., // reference
+		1., // mix
 		samplerate);
 
 	fCompLim.Reset();
