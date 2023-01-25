@@ -66,16 +66,16 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kEqLfDs)->InitDouble("LF DS", 0., -20., 0., .01, "dB", 0, "EQ");
 
 	GetParam(kCompRmsThresh)->InitDouble("Level Thresh", 0., -40., 0., 0.1, "dB", 0, "Comp");
-	GetParam(kCompRmsRatio)->InitDouble("Level Ratio", 2., 1., 6., .5, ":1", IParam::EFlags::kFlagStepped, "Comp", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(1., 6., 2., .5)));
-	GetParam(kCompRmsAttack)->InitDouble("Level Attack", 15., 5., 50., 0.01, "ms", 0, "Comp");
-	GetParam(kCompRmsRelease)->InitDouble("Level Release", 300., 100., 3000., 1., "ms", 0, "Comp");
+	GetParam(kCompRmsRatio)->InitDouble("Level Ratio", 2.5, 1., 6., .5, ":1", IParam::EFlags::kFlagStepped, "Comp", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(1., 6., 2.5, .5)));
+	GetParam(kCompRmsAttack)->InitDouble("Level Attack", 20., 4., 50., 1., "ms", 0, "Comp", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(4., 50., 20., .5)));
+	GetParam(kCompRmsRelease)->InitDouble("Level Release", 300., 100., 3000., 10., "ms", IParam::EFlags::kFlagStepped, "Comp", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(100., 3000., 300., .5)));
 	GetParam(kCompRmsMakeup)->InitDouble("Level Makeup", 0., -12., 12., 0.01, "dB", 0, "Comp");
 	GetParam(kCompRmsMix)->InitDouble("Level Mix", 100., 0., 100., 1., "%", 0, "Comp");
 
-	GetParam(kCompPeakThresh)->InitDouble("Peak Thresh", 0., -40., 0., 0.1, "dB", 0, "Comp");
-	GetParam(kCompPeakRatio)->InitDouble("Peak Ratio", 5., 2., 20., 2., ":1", IParam::EFlags::kFlagStepped, "Comp", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(2., 20., 5., .5)));
-	GetParam(kCompPeakAttack)->InitDouble("Peak Attack", 5., 0.02, 20., 0.01, "ms", 0, "Comp");
-	GetParam(kCompPeakRelease)->InitDouble("Peak Release", 200., 20., 500., 0.01, "ms", 0, "Comp");
+	GetParam(kCompPeakThresh)->InitDouble("Peak Thresh", 0., -30., 0., 0.1, "dB", 0, "Comp");
+	GetParam(kCompPeakRatio)->InitDouble("Peak Ratio", 8., 2., 20., 2., ":1", IParam::EFlags::kFlagStepped, "Comp", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(2., 20., 8., .5)));
+	GetParam(kCompPeakAttack)->InitDouble("Peak Attack", 4., 0.02, 20., 0.01, "ms", 0, "Comp", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.02, 20., 4., .5)));
+	GetParam(kCompPeakRelease)->InitDouble("Peak Release", 120., 20., 500., 10., "ms", IParam::EFlags::kFlagStepped, "Comp", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(20., 500., 120., .5)));
 	GetParam(kCompPeakMakeup)->InitDouble("Peak Makeup", 0., -12., 12., 0.01, "dB", 0, "Comp");
 	GetParam(kCompPeakMix)->InitDouble("Peak Mix", 100., 0., 100., 1., "%", 0, "Comp");
 
