@@ -139,7 +139,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqParametric.GetGridCell(1, 1, 2, 4).GetReducedFromTop(20.f), kEqLmfDs, "DS", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLmfDs, "Parametric EQ");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqParametric.GetGridCell(1, 2, 2, 4).GetReducedFromTop(20.f), kEqHmfFreq, "Freq", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHmfFreq, "Parametric EQ");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqParametric.GetGridCell(1, 3, 2, 4).GetReducedFromTop(20.f), kEqHmfDs, "DS", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHmfDs, "Parametric EQ");
-		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectControlsEqParametric.GetGridCell(0, 0, 1, 2).GetCentredInside(40.f), kEqLmfIsShelf, "Shelf", SR::Graphics::Layout::SR_DEFAULT_STYLE, true));
+		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectControlsEqParametric.GetGridCell(0, 0, 1, 2).GetCentredInside(30.f, 50.f), kEqLmfIsShelf, "Shelf", SR::Graphics::Layout::SR_DEFAULT_STYLE, true));
 		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectControlsEqParametric.GetGridCell(0, 1, 1, 2).GetCentredInside(40.f), kEqHmfIsShelf, "Shelf", SR::Graphics::Layout::SR_DEFAULT_STYLE, true));
 		// -- Compressors
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsCompLevel.GetGridCell(0, 0, 3, 2).GetReducedFromTop(20.f), kCompRmsThresh, "Thresh", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsThresh, "Comp Level");
@@ -516,8 +516,8 @@ void SRChannel::OnParamChange(int paramIdx)
 	case kCompPeakMix:
 		fCompPeak.SetMix(GetParam(kCompPeakMix)->Value() * .01);
 		break;
-
-
+	default:
+		break;
 	}
 }
 void SRChannel::SetFreqMeterValues()
@@ -533,16 +533,19 @@ void SRChannel::SetFreqMeterValues()
 		double freq = 22000. * std::pow((double(i + 60) / double(FREQRESP_NUMVALUES + 60)), shape);
 		//double freq = 0.5 * samplerate * std::pow((double(i) / double(FREQRESP_NUMVALUES)), shape);
 		mFreqMeterValues[i] = 0.;
-		if (GetParam(kEqHpFreq)->Value() > 0.) mFreqMeterValues[i] += fEqHp.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
-		if (GetParam(kEqLpFreq)->Value() < 22000.) mFreqMeterValues[i] += fEqLp.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
-		if (GetParam(kEqHfBoost)->Value() != 0.0) mFreqMeterValues[i] += fEqHfBoost.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
-		if (GetParam(kEqHfCut)->Value() != 0.0) mFreqMeterValues[i] += fEqHfCut.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
-		mFreqMeterValues[i] += fEqHmf.fDynamicEqFilter.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
-		mFreqMeterValues[i] += fEqLmf.fDynamicEqFilter.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
-		//if (GetParam(kEqHmfGain)->Value() != 0.0) mFreqMeterValues[i] += fEqHmf.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB., false);
-		//if (GetParam(kEqLmfGain)->Value() != 0.0) mFreqMeterValues[i] += fEqLmf.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB., false);
-		if (GetParam(kEqLfBoost)->Value() != 0.0) mFreqMeterValues[i] += fEqLfBoost.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
-		if (GetParam(kEqLfCut)->Value() != 0.0) mFreqMeterValues[i] += fEqLfCut.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
+		// We want a nice flat line if plugin is bypassed
+		if (!GetParam(kBypass)->Bool()) {
+			if (GetParam(kEqHpFreq)->Value() > 0.) mFreqMeterValues[i] += fEqHp.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
+			if (GetParam(kEqLpFreq)->Value() < 22000.) mFreqMeterValues[i] += fEqLp.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
+			if (GetParam(kEqHfBoost)->Value() != 0.0) mFreqMeterValues[i] += fEqHfBoost.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
+			if (GetParam(kEqHfCut)->Value() != 0.0) mFreqMeterValues[i] += fEqHfCut.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
+			mFreqMeterValues[i] += fEqHmf.fDynamicEqFilter.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
+			mFreqMeterValues[i] += fEqLmf.fDynamicEqFilter.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
+			//if (GetParam(kEqHmfGain)->Value() != 0.0) mFreqMeterValues[i] += fEqHmf.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB., false);
+			//if (GetParam(kEqLmfGain)->Value() != 0.0) mFreqMeterValues[i] += fEqLmf.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB., false);
+			if (GetParam(kEqLfBoost)->Value() != 0.0) mFreqMeterValues[i] += fEqLfBoost.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
+			if (GetParam(kEqLfCut)->Value() != 0.0) mFreqMeterValues[i] += fEqLfCut.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
+		}
 	}
 	if (GetUI() && mFreqMeterValues != 0) dynamic_cast<SR::Graphics::Controls::SRGraphBase*>(GetUI()->GetControlWithTag(cMeterFreqResponse))->Process(mFreqMeterValues);
 }
