@@ -14,14 +14,16 @@ namespace SR {
 			class Switch
 				: public IVSwitchControl {
 			public:
-				Switch(const IRECT& bounds, int paramIdx = kNoParameter, const char* label = "", const IVStyle& style = DEFAULT_STYLE, bool valueInButton = true)
+				Switch(const IRECT& bounds, int paramIdx = kNoParameter, const char* label = "", const IVStyle& style = DEFAULT_STYLE, bool valueInButton = true, float tracksize = 1.f)
 					:IVSwitchControl(bounds, paramIdx, label, style, valueInButton) 
 				{
+					mTrackSize = tracksize;
 				};
 
 
 				void DrawWidget(IGraphics& g) override {
-					g.DrawRect(SR::Graphics::Layout::SR_DEFAULT_COLOR_FG, mWidgetBounds, 0, mTrackSize);
+					// Decided for fixed 3.f roundness, maybe align in other places
+					g.DrawRoundRect(SR::Graphics::Layout::SR_DEFAULT_COLOR_FG, mWidgetBounds, 3.f, 0, mTrackSize);
 				};
 
 				virtual void DrawValue(IGraphics& g, bool mouseOver) override {
