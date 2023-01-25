@@ -263,15 +263,23 @@ private:
 	// We might test this AVG Meter later
 	//IPeakAvgSender<2, 1024>mMeterSenderIn{ -60., true, 10.f, 4.f, 750.f, 1000.f };
 	//IPeakAvgSender<2, 1024>mMeterSenderOut{ -60., true, 10.f, 4.f, 750.f, 1000.f };
-	IPeakSender<2, 1024> mMeterSenderIn;
-	IPeakSender<2, 1024> mMeterSenderOut;
-	IPeakSender<1> mMeterSenderGrRms;
-	IPeakSender<1> mMeterSenderGrPeak;
 
-	SR::DSP::SRBuffer<sample, 2, 1024> mBufferInput;
-	SR::DSP::SRBuffer<sample, 2, 1024> mBufferOutput;
-	SR::DSP::SRBuffer<sample, 1, 1024> mBufferMeterGrRms;
-	SR::DSP::SRBuffer<sample, 1, 1024> mBufferMeterGrPeak;
+	//IPeakSender<2, 1024> mMeterSenderIn;
+	//IPeakSender<2, 1024> mMeterSenderOut;
+	IPeakSender<4, 1024> mMeterSender;
+
+	//IPeakSender<1> mMeterSenderGrRms;
+	//IPeakSender<1> mMeterSenderGrPeak;
+	IPeakSender<2> mMeterSenderGr;
+
+
+	//SR::DSP::SRBuffer<sample, 2, 1024> mBufferInput;
+	//SR::DSP::SRBuffer<sample, 2, 1024> mBufferOutput;
+	SR::DSP::SRBuffer<sample, 4, 1024> mBuffer;
+
+	//SR::DSP::SRBuffer<sample, 1, 1024> mBufferMeterGrRms;
+	//SR::DSP::SRBuffer<sample, 1, 1024> mBufferMeterGrPeak;
+	SR::DSP::SRBuffer<sample, 2, 1024> mBufferMeterGr;
 	SR::DSP::SRBuffer<sample, 2, 1024> mBufferLowSignal;
 
 	float* mFreqMeterValues;

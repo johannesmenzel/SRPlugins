@@ -164,13 +164,16 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		// We might test this AVG Meter later
 		//pGraphics->AttachControl(new IVPeakAvgMeterControl<2>(rectMeterVu.GetGridCell(0, 0, 1, 2), "In", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L","R" }, 0, -60.f, 12.f, { 0,-6,-12,-24,-48 }), cMeterIn);
 		//pGraphics->AttachControl(new IVPeakAvgMeterControl<2>(rectMeterVu.GetGridCell(0, 1, 1, 2), "Out", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L","R" }, 0, -60.f, 12.f, { 0,-6,-12,-24,-48 }), cMeterOut);
-		pGraphics->AttachControl(new IVMeterControl<2>(rectMeterVu.GetGridCell(0, 0, 1, 2), "In", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L", "R" }, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Log, -60.f, 12.f, { 0, -6, -12, -24, -48 }), cMeterIn, "VU");
-		pGraphics->AttachControl(new IVMeterControl<2>(rectMeterVu.GetGridCell(0, 1, 1, 2), "Out", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L", "R" }, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Log, -60.f, 12.f, { 0, -6, -12, -24, -48 }), cMeterOut, "VU");
-		pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 0, 1, 2), "L", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -12.f, 0.f, { 0,-1,-2,-3,-4,-6,-9 }), cMeterGrRms, "GR");
-		pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 1, 1, 2), "P", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -12.f, 0.f, { 0,-1,-2,-3,-4,-6,-9 }), cMeterGrPeak, "GR");
+		//pGraphics->AttachControl(new IVMeterControl<2>(rectMeterVu.GetGridCell(0, 0, 1, 2), "In", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L", "R" }, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Log, -60.f, 12.f, { 0, -6, -12, -24, -48 }), cMeterIn, "VU");
+		//pGraphics->AttachControl(new IVMeterControl<2>(rectMeterVu.GetGridCell(0, 1, 1, 2), "Out", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L", "R" }, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Log, -60.f, 12.f, { 0, -6, -12, -24, -48 }), cMeterOut, "VU");
+		pGraphics->AttachControl(new IVMeterControl<4>(rectMeterVu, "In Out", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "", "", "", ""}, 0, iplug::igraphics::IVMeterControl<4>::EResponse::Log, -60.f, 12.f, {0, -6, -12, -24, -48}), cMeterIn, "VU");
+		//pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 0, 1, 2), "L", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -12.f, 0.f, { 0,-1,-2,-3,-4,-6,-9 }), cMeterGrRms, "GR");
+		//pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 1, 1, 2), "P", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -12.f, 0.f, { 0,-1,-2,-3,-4,-6,-9 }), cMeterGrPeak, "GR");
+		pGraphics->AttachControl(new IVMeterControl<2>(rectMeterGr, "GR", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, {"", ""}, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Log, -12.f, 0.f, {0,-1,-2,-3,-4,-6,-9}), cMeterGrRms, "GR");
 		// -- Set GR meters displaying the other way round
-		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrRms))->SetBaseValue(1.);
-		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrPeak))->SetBaseValue(1.);
+		//dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrRms))->SetBaseValue(1.);
+		//dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrPeak))->SetBaseValue(1.);
+		dynamic_cast<IVMeterControl<2>*>(pGraphics->GetControlWithTag(cMeterGrRms))->SetBaseValue(1.);
 
 		// Disable Parameters with no function
 		for (int ctrlTag = 0; ctrlTag < kNumCtrlTags; ctrlTag++) {
@@ -218,8 +221,11 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 		// Run input data through envelope filter to match VU like metering, then send to respective buffer. (After input gain) 
 		fMeterEnvelope[0].process(abs(outputs[0][s]), meterIn1);
 		fMeterEnvelope[1].process(abs(outputs[1][s]), meterIn2);
-		mBufferInput.ProcessBuffer(meterIn1, 0, s);
-		mBufferInput.ProcessBuffer(meterIn2, 1, s);
+
+		//mBufferInput.ProcessBuffer(meterIn1, 0, s);
+		//mBufferInput.ProcessBuffer(meterIn2, 1, s);
+		mBuffer.ProcessBuffer(meterIn1, 0, s);
+		mBuffer.ProcessBuffer(meterIn2, 1, s);
 
 		if (!GetParam(kBypass)->Bool()) {
 			// Process filters
@@ -280,29 +286,36 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 
 		// Store current gain reduction in respective buffer
 		if (!GetParam(kBypass)->Bool()) {
-			mBufferMeterGrRms.ProcessBuffer(fCompRms.GetGrLin(), 0, s);
-			mBufferMeterGrPeak.ProcessBuffer(fCompPeak.GetGrLin(), 0, s);
+			//mBufferMeterGrRms.ProcessBuffer(fCompRms.GetGrLin(), 0, s);
+			//mBufferMeterGrPeak.ProcessBuffer(fCompPeak.GetGrLin(), 0, s);
+			mBufferMeterGr.ProcessBuffer(fCompRms.GetGrLin(), 0, s);
+			mBufferMeterGr.ProcessBuffer(fCompPeak.GetGrLin(), 1, s);
 		}
 		else {
 			// Prevent freezing when bypassed, just set to no gain reduction
-			mBufferMeterGrRms.ProcessBuffer(1., 0, s);
-			mBufferMeterGrPeak.ProcessBuffer(1., 0, s);
+			//mBufferMeterGrRms.ProcessBuffer(1., 0, s);
+			//mBufferMeterGrPeak.ProcessBuffer(1., 0, s);
+			mBufferMeterGr.ProcessBuffer(1., 0, s);
+			mBufferMeterGr.ProcessBuffer(1., 1, s);
 		}
 
 		// Run input data through envelope filter to match VU like metering, then send to respective buffer.
 		fMeterEnvelope[2].process(abs(outputs[0][s]), meterOut1);
 		fMeterEnvelope[3].process(abs(outputs[1][s]), meterOut2);
-		mBufferOutput.ProcessBuffer(meterOut1, 0, s);
-		mBufferOutput.ProcessBuffer(meterOut2, 1, s);
+
+		//mBufferOutput.ProcessBuffer(meterOut1, 0, s);
+		//mBufferOutput.ProcessBuffer(meterOut2, 1, s);
+		mBuffer.ProcessBuffer(meterOut1, 2, s);
+		mBuffer.ProcessBuffer(meterOut2, 3, s);
 	}
 	//fEqHp.ProcessBlock(outputs, outputs, 2, nFrames);
 	//fEqLp.ProcessBlock(outputs, outputs, 2, nFrames);
-	mMeterSenderIn.ProcessBlock(mBufferInput.GetBuffer(), nFrames, cMeterIn, 2);
-	mMeterSenderOut.ProcessBlock(mBufferOutput.GetBuffer(), nFrames, cMeterOut, 2);
-	mMeterSenderGrRms.ProcessBlock(mBufferMeterGrRms.GetBuffer(), nFrames, cMeterGrRms);
-	mMeterSenderGrPeak.ProcessBlock(mBufferMeterGrPeak.GetBuffer(), nFrames, cMeterGrPeak);
-
-
+	//mMeterSenderIn.ProcessBlock(mBufferInput.GetBuffer(), nFrames, cMeterIn, 2);
+	//mMeterSenderOut.ProcessBlock(mBufferOutput.GetBuffer(), nFrames, cMeterOut, 2);
+	mMeterSender.ProcessBlock(mBuffer.GetBuffer(), nFrames, cMeterIn, 4);
+	//mMeterSenderGrRms.ProcessBlock(mBufferMeterGrRms.GetBuffer(), nFrames, cMeterGrRms);
+	//mMeterSenderGrPeak.ProcessBlock(mBufferMeterGrPeak.GetBuffer(), nFrames, cMeterGrPeak);
+	mMeterSenderGr.ProcessBlock(mBufferMeterGr.GetBuffer(), nFrames, cMeterGrRms);
 }
 
 void SRChannel::OnReset()
@@ -377,10 +390,12 @@ void SRChannel::OnReset()
 }
 void SRChannel::OnIdle()
 {
-	mMeterSenderIn.TransmitData(*this);
-	mMeterSenderOut.TransmitData(*this);
-	mMeterSenderGrRms.TransmitData(*this);
-	mMeterSenderGrPeak.TransmitData(*this);
+	//mMeterSenderIn.TransmitData(*this);
+	//mMeterSenderOut.TransmitData(*this);
+	mMeterSender.TransmitData(*this);
+	//mMeterSenderGrRms.TransmitData(*this);
+	//mMeterSenderGrPeak.TransmitData(*this);
+	mMeterSenderGr.TransmitData(*this);
 	SetFreqMeterValues();
 }
 void SRChannel::OnParamChange(int paramIdx)
