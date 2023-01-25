@@ -543,8 +543,10 @@ namespace SR {
 			}
 
 			// Apply mix parameter:
-			in1 = mMix * in1 + drySignal1 * (1. - mMix);
-			in2 = mMix * in2 + drySignal2 * (1. - mMix);
+			if (mMix != 1.) {
+				in1 = mMix * in1 + drySignal1 * (1. - mMix);
+				in2 = mMix * in2 + drySignal2 * (1. - mMix);
+			}
 
 		}
 
