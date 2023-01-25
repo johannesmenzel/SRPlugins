@@ -161,19 +161,10 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsStereo.GetGridCell(2, 0, 4, 1).GetReducedFromTop(20.f), kStereoWidthLow, "Bass Width", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoWidthLow, "Stereo");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsStereo.GetGridCell(3, 0, 4, 1).GetReducedFromTop(20.f), kStereoMonoFreq, "Split FQ", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoMonoFreq, "Stereo");
 		// -- Meters
-		// We might test this AVG Meter later
-		//pGraphics->AttachControl(new IVPeakAvgMeterControl<2>(rectMeterVu.GetGridCell(0, 0, 1, 2), "In", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L","R" }, 0, -60.f, 12.f, { 0,-6,-12,-24,-48 }), cMeterIn);
-		//pGraphics->AttachControl(new IVPeakAvgMeterControl<2>(rectMeterVu.GetGridCell(0, 1, 1, 2), "Out", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L","R" }, 0, -60.f, 12.f, { 0,-6,-12,-24,-48 }), cMeterOut);
-		//pGraphics->AttachControl(new IVMeterControl<2>(rectMeterVu.GetGridCell(0, 0, 1, 2), "In", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L", "R" }, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Log, -60.f, 12.f, { 0, -6, -12, -24, -48 }), cMeterIn, "VU");
-		//pGraphics->AttachControl(new IVMeterControl<2>(rectMeterVu.GetGridCell(0, 1, 1, 2), "Out", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "L", "R" }, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Log, -60.f, 12.f, { 0, -6, -12, -24, -48 }), cMeterOut, "VU");
-		pGraphics->AttachControl(new IVMeterControl<4>(rectMeterVu, "In Out", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "", "", "", ""}, 0, iplug::igraphics::IVMeterControl<4>::EResponse::Log, -60.f, 12.f, {0, -6, -12, -24, -48}), cMeterIn, "VU");
-		//pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 0, 1, 2), "L", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -12.f, 0.f, { 0,-1,-2,-3,-4,-6,-9 }), cMeterGrRms, "GR");
-		//pGraphics->AttachControl(new IVMeterControl<1>(rectMeterGr.GetGridCell(0, 1, 1, 2), "P", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -12.f, 0.f, { 0,-1,-2,-3,-4,-6,-9 }), cMeterGrPeak, "GR");
-		pGraphics->AttachControl(new IVMeterControl<2>(rectMeterGr, "GR", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, {"", ""}, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Log, -12.f, 0.f, {0,-1,-2,-3,-4,-6,-9}), cMeterGrRms, "GR");
-		// -- Set GR meters displaying the other way round
-		//dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrRms))->SetBaseValue(1.);
-		//dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrPeak))->SetBaseValue(1.);
-		dynamic_cast<IVMeterControl<2>*>(pGraphics->GetControlWithTag(cMeterGrRms))->SetBaseValue(1.);
+		pGraphics->AttachControl(new IVMeterControl<4>(rectMeterVu, "In Out", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "", "", "", ""}, 0, iplug::igraphics::IVMeterControl<4>::EResponse::Log, -60.f, 12.f, {0, -6, -12, -24, -48}), cMeterVu, "VU");
+		pGraphics->AttachControl(new IVMeterControl<2>(rectMeterGr, "GR", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, {"", ""}, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Log, -12.f, 0.f, {0,-1,-2,-3,-4,-6,-9}), cMeterGr, "GR");
+		// -- Set GR meter displaying the other way round
+		dynamic_cast<IVMeterControl<2>*>(pGraphics->GetControlWithTag(cMeterGr))->SetBaseValue(1.);
 
 		// Disable Parameters with no function
 		for (int ctrlTag = 0; ctrlTag < kNumCtrlTags; ctrlTag++) {
@@ -222,10 +213,9 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 		fMeterEnvelope[0].process(abs(outputs[0][s]), meterIn1);
 		fMeterEnvelope[1].process(abs(outputs[1][s]), meterIn2);
 
-		//mBufferInput.ProcessBuffer(meterIn1, 0, s);
-		//mBufferInput.ProcessBuffer(meterIn2, 1, s);
-		mBuffer.ProcessBuffer(meterIn1, 0, s);
-		mBuffer.ProcessBuffer(meterIn2, 1, s);
+
+		mBufferVu.ProcessBuffer(meterIn1, 0, s);
+		mBufferVu.ProcessBuffer(meterIn2, 1, s);
 
 		if (!GetParam(kBypass)->Bool()) {
 			// Process filters
@@ -286,15 +276,11 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 
 		// Store current gain reduction in respective buffer
 		if (!GetParam(kBypass)->Bool()) {
-			//mBufferMeterGrRms.ProcessBuffer(fCompRms.GetGrLin(), 0, s);
-			//mBufferMeterGrPeak.ProcessBuffer(fCompPeak.GetGrLin(), 0, s);
 			mBufferMeterGr.ProcessBuffer(fCompRms.GetGrLin(), 0, s);
 			mBufferMeterGr.ProcessBuffer(fCompPeak.GetGrLin(), 1, s);
 		}
 		else {
 			// Prevent freezing when bypassed, just set to no gain reduction
-			//mBufferMeterGrRms.ProcessBuffer(1., 0, s);
-			//mBufferMeterGrPeak.ProcessBuffer(1., 0, s);
 			mBufferMeterGr.ProcessBuffer(1., 0, s);
 			mBufferMeterGr.ProcessBuffer(1., 1, s);
 		}
@@ -302,26 +288,16 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 		// Run input data through envelope filter to match VU like metering, then send to respective buffer.
 		fMeterEnvelope[2].process(abs(outputs[0][s]), meterOut1);
 		fMeterEnvelope[3].process(abs(outputs[1][s]), meterOut2);
-
-		//mBufferOutput.ProcessBuffer(meterOut1, 0, s);
-		//mBufferOutput.ProcessBuffer(meterOut2, 1, s);
-		mBuffer.ProcessBuffer(meterOut1, 2, s);
-		mBuffer.ProcessBuffer(meterOut2, 3, s);
+		mBufferVu.ProcessBuffer(meterOut1, 2, s);
+		mBufferVu.ProcessBuffer(meterOut2, 3, s);
 	}
-	//fEqHp.ProcessBlock(outputs, outputs, 2, nFrames);
-	//fEqLp.ProcessBlock(outputs, outputs, 2, nFrames);
-	//mMeterSenderIn.ProcessBlock(mBufferInput.GetBuffer(), nFrames, cMeterIn, 2);
-	//mMeterSenderOut.ProcessBlock(mBufferOutput.GetBuffer(), nFrames, cMeterOut, 2);
-	mMeterSender.ProcessBlock(mBuffer.GetBuffer(), nFrames, cMeterIn, 4);
-	//mMeterSenderGrRms.ProcessBlock(mBufferMeterGrRms.GetBuffer(), nFrames, cMeterGrRms);
-	//mMeterSenderGrPeak.ProcessBlock(mBufferMeterGrPeak.GetBuffer(), nFrames, cMeterGrPeak);
-	mMeterSenderGr.ProcessBlock(mBufferMeterGr.GetBuffer(), nFrames, cMeterGrRms);
+	mMeterSender.ProcessBlock(mBufferVu.GetBuffer(), nFrames, cMeterVu, 4);
+	mMeterSenderGr.ProcessBlock(mBufferMeterGr.GetBuffer(), nFrames, cMeterGr);
 }
 
 void SRChannel::OnReset()
 {
 	// Here we set our complete range of filters and other effects
-	// ToDo: This 1.5 Ratio in The Cut Freq is still arbitrary
 	// ToDo: Match boost and cut behaviour to normal passive equalizing
 	// ToDo: Match all above ToDos in OnParamChange and think of procedure to prevent double code
 	const double samplerate = GetSampleRate();
@@ -383,18 +359,11 @@ void SRChannel::OnReset()
 	fMeterEnvelope[1].SetSampleRate(samplerate);
 	fMeterEnvelope[2].SetSampleRate(samplerate);
 	fMeterEnvelope[3].SetSampleRate(samplerate);
-
-	// Only needed fpr PeakAVGMeterSender
-	//mMeterSenderIn.Reset(samplerate);
-	//mMeterSenderOut.Reset(samplerate);
 }
+
 void SRChannel::OnIdle()
 {
-	//mMeterSenderIn.TransmitData(*this);
-	//mMeterSenderOut.TransmitData(*this);
 	mMeterSender.TransmitData(*this);
-	//mMeterSenderGrRms.TransmitData(*this);
-	//mMeterSenderGrPeak.TransmitData(*this);
 	mMeterSenderGr.TransmitData(*this);
 	SetFreqMeterValues();
 }
@@ -556,8 +525,6 @@ void SRChannel::SetFreqMeterValues()
 			if (GetParam(kEqHfCut)->Value() != 0.0) mFreqMeterValues[i] += fEqHfCut.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
 			mFreqMeterValues[i] += fEqHmf.fDynamicEqFilter.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
 			mFreqMeterValues[i] += fEqLmf.fDynamicEqFilter.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
-			//if (GetParam(kEqHmfGain)->Value() != 0.0) mFreqMeterValues[i] += fEqHmf.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB., false);
-			//if (GetParam(kEqLmfGain)->Value() != 0.0) mFreqMeterValues[i] += fEqLmf.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB., false);
 			if (GetParam(kEqLfBoost)->Value() != 0.0) mFreqMeterValues[i] += fEqLfBoost.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
 			if (GetParam(kEqLfCut)->Value() != 0.0) mFreqMeterValues[i] += fEqLfCut.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
 		}
