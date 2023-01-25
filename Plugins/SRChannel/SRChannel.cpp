@@ -77,7 +77,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kCompPeakMakeup)->InitDouble("Peak Makeup", 0., -12., 12., 0.01, "dB", 0, "Comp");
 	GetParam(kCompPeakMix)->InitDouble("Peak Mix", 100., 0., 100., 1., "%", 0, "Comp");
 
-	GetParam(kBypass)->InitBool("Bypass", false, "Bypass", 0, "Global", "Off", "On");
+	GetParam(kBypass)->InitBool("Bypass", false, "Bypass", 0, "Global", "OFF", "ON");
 
 	OnReset();
 
