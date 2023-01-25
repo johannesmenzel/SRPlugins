@@ -171,6 +171,7 @@ namespace SR {
 				, mIsAutoMakeup(autoMakeup)
 				, mAutoMakeup(1.0)
 				, mReferenceDb(0.0)
+				, mMix(1.0)
 				, fMakeup(100)
 				, fAutoMakeup(100)
 			{
@@ -217,6 +218,12 @@ namespace SR {
 				mKneeWidthDb = kneeDb;
 			}
 
+			virtual void SetMix(double mix) {
+				assert(mix <= 1.);
+				assert(mix >= 0.);
+				mMix = mix;
+			}
+
 			// Call before runtime, typically in OnReset() or similar
 			virtual void Reset(void) {
 				currentOvershootDb = DC_OFFSET;
@@ -230,6 +237,7 @@ namespace SR {
 			virtual double GetKneeDb(void) const { return mKneeWidthDb; }   // Returns dynamic processors soft knee width in dB
 			virtual double GetGrLin(void) { return mGrLin; }                // Returns dynamic processors linear gain reduction (0..1)
 			virtual double GetGrDb(void) { return mGrDb; }                  // Returns dynamic processors logarithmic gain reduction
+			virtual double GetMix(void) { return mMix; }					// Returns dynamic processors mix percentage (0..1)
 
 		protected:
 
@@ -267,6 +275,7 @@ namespace SR {
 			double mKneeWidthDb;            // Dynamic processors soft knee width in dB
 			double mGrLin;                  // Dynamic processors linear gain reduction (0..1)
 			double mGrDb;                   // Dynamic processors logarithmic gain reduction
+			double mMix;					// Dynamic Processors mix behaviour
 			double currentOvershootDb;      // Logarithmic over-threshold envelope
 			double currentOvershootLin;     // Linear over-threshold envelope
 			double mAverageOfSquares;       // Dynamic processors gain detectors average of squares
@@ -300,30 +309,32 @@ namespace SR {
 			virtual ~SRCompressor() {}
 
 			// parameters
-			virtual void InitCompressor(double threshDb, double ratio, double attackMs, double releaseMs, double sidechainFc, double kneeDb, bool isFeedbackCompressor, bool autoMakeup, double referenceDb, double samplerate) {
+			virtual void InitCompressor(double threshDb, double ratio, double attackMs, double releaseMs, double sidechainFc, double kneeDb, bool isFeedbackCompressor, bool autoMakeup, double referenceDb, double mix, double samplerate) {
 				SRDynamicsDetector::SetSampleRate(samplerate);
 				SRDynamicsBase::SetThresh(threshDb);
 				SRDynamicsBase::SetRatio(ratio);
 				SRDynamicsBase::SetIsAutoMakeup(autoMakeup);
 				SRDynamicsBase::SetReference(referenceDb);
+				SRDynamicsBase::SetMix(mix);
+				SRDynamicsBase::SetKnee(kneeDb);
 				SRDynamicsDetector::SetAttack(attackMs);
 				SRDynamicsDetector::SetRelease(releaseMs);
 				InitSidechainFilter(sidechainFc);
-				SRDynamicsBase::SetKnee(kneeDb);
 				SetTopologyFeedback(isFeedbackCompressor);
 				SRDynamicsBase::Reset();
 			}
 
-			virtual void ResetCompressor(double threshDb, double ratio, double attackMs, double releaseMs, double sidechainFc, double kneeDb, bool isFeedbackCompressor, bool autoMakeup, double referenceDb, double samplerate) {
+			virtual void ResetCompressor(double threshDb, double ratio, double attackMs, double releaseMs, double sidechainFc, double kneeDb, bool isFeedbackCompressor, bool autoMakeup, double referenceDb, double mix, double samplerate) {
 				SRDynamicsDetector::SetSampleRate(samplerate);
 				SRDynamicsBase::SetThresh(threshDb);
 				SRDynamicsBase::SetRatio(ratio);
 				SRDynamicsBase::SetIsAutoMakeup(autoMakeup);
 				SRDynamicsBase::SetReference(referenceDb);
+				SRDynamicsBase::SetMix(mix);
+				SRDynamicsBase::SetKnee(kneeDb);
 				SRDynamicsDetector::SetAttack(attackMs);
 				SRDynamicsDetector::SetRelease(releaseMs);
 				InitSidechainFilter(sidechainFc);
-				SRDynamicsBase::SetKnee(kneeDb);
 				SetTopologyFeedback(isFeedbackCompressor);
 			}
 
@@ -350,9 +361,9 @@ namespace SR {
 
 			void Process(double& in1, double& in2); // Compressor runtime process for internal sidechain 
 			void Process(double& in1, double& in2, double& extSC1, double& extSC2); // Compressor runtime process for external sidechain
-			void process(double& in1, double& in2, double sidechain);	// Compressor runtime process with stereo-linked key
 
 		protected:
+			void process(double& in1, double& in2, double sidechain);	// Compressor runtime process with stereo-linked key
 			SRFilterIIR<double, 2> fSidechainFilter; // Compressors stereo sidechain filter
 			bool mTopologyFeedback; // True if its a feedback compressor, false for modern feedforward
 			double sidechainSignal1, sidechainSignal2;      // Gain reduced signal to get used as new sidechain for feedback topology
@@ -513,6 +524,10 @@ namespace SR {
 
 			mGrDb = grRaw; // Store logarithmic gain reduction
 			grRaw = mGrLin = SR::Utils::DBToAmp(grRaw);// Logarithmic to linear conversion
+
+			const double drySignal1 = in1;
+			const double drySignal2 = in2;
+
 			// Apply gain reduction to inputs:
 			in1 *= grRaw;
 			in2 *= grRaw;
@@ -526,6 +541,11 @@ namespace SR {
 			if (mIsAutoMakeup) {
 				fAutoMakeup.Process(in1, in2);
 			}
+
+			// Apply mix parameter:
+			in1 = mMix * in1 + drySignal1 * (1. - mMix);
+			in2 = mMix * in2 + drySignal2 * (1. - mMix);
+
 		}
 
 
