@@ -260,7 +260,7 @@ private:
 	SR::DSP::SRDynamicsDetector fMeterEnvelope[4];
 
 	IPeakSender<4, 1024> mMeterSender;
-	IPeakSender<2> mMeterSenderGr;
+	IPeakSender<2, 1024> mMeterSenderGr;
 
 	SR::DSP::SRBuffer<sample, 4, 1024> mBufferVu;
 	SR::DSP::SRBuffer<sample, 2, 1024> mBufferMeterGr;

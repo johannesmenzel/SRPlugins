@@ -294,7 +294,7 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 		mBufferVu.ProcessBuffer(meterOut2, 3, s);
 	}
 	mMeterSender.ProcessBlock(mBufferVu.GetBuffer(), nFrames, cMeterVu, 4);
-	mMeterSenderGr.ProcessBlock(mBufferMeterGr.GetBuffer(), nFrames, cMeterGr);
+	mMeterSenderGr.ProcessBlock(mBufferMeterGr.GetBuffer(), nFrames, cMeterGr, 2);
 }
 
 void SRChannel::OnReset()
