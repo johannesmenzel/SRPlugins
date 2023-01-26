@@ -7,7 +7,7 @@
 #include "../../Classes/DSP/SRBuffer.h"
 #include "IControls.h"
 
-const int kNumPresets = 1;
+const int kNumPresets = 3;
 
 enum EParams
 {

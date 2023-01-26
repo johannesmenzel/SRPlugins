@@ -11,6 +11,39 @@
 #define VU_ATTACK 4.
 #define VU_RELEASE 750.
 
+class MainMenu : public IControl
+{
+public:
+	MainMenu(const IRECT& bounds)
+		: IControl(bounds)
+	{}
+
+	void Draw(IGraphics& g) override
+	{
+		g.FillRect(COLOR_RED, mRECT);
+	}
+
+	void OnMouseDown(float x, float y, const IMouseMod& mod) override
+	{
+		//mMenu.CheckItemAlone(mUiSize);
+		GetUI()->CreatePopupMenu(*this, mMenu, x, y);
+	}
+
+	void OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx) override
+	{
+		auto* pPluginBase = static_cast<iplug::IPluginBase*>(GetDelegate());
+		auto chosenItemIdx = pSelectedMenu->GetChosenItemIdx();
+		switch (chosenItemIdx) {
+		case 0: pPluginBase->DumpMakePresetSrc("Preset.txt"); break;
+		case 1: break;
+		case 2: break;
+		default:
+			break;
+		}
+	}
+private:
+	IPopupMenu mMenu{ "Menu", {"Dump Preset TXT", "...", "..."} };
+};
 
 SRChannel::SRChannel(const InstanceInfo& info)
 	: Plugin(info, MakeConfig(kNumParams, kNumPresets))
@@ -32,6 +65,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	, mFreqMeterValues(new float[FREQRESP_NUMVALUES])
 
 {
+
 	GetParam(kGainIn)->InitDouble("Input", 0., -120., 12., 0.01, "dB", 0, "Gain", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(-120., 12., 0., .5)));
 	GetParam(kGainOut)->InitDouble("Output", 0., -120., 12., 0.01, "dB", 0, "Gain", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(-120., 12., 0., .5)));
 
@@ -88,6 +122,11 @@ SRChannel::SRChannel(const InstanceInfo& info)
 
 	OnReset();
 
+	MakeDefaultPreset("Init", 1);
+	MakePreset("VC De-ess", 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 22000.000000, 0.000000, 0.000000, 8000.000000, 0.000000, 0.000000, 0.000000, 8192.059190, 4.432813, -26.370989, false, 0.000000, 1000.000000, 0.707000, 0.000000, false, 0.000000, 0.000000, 100.000000, 0.000000, 0.000000, 0, 0.000000, 0.000000, 2.500000, 20.000000, 300.000000, 0.000000, 0.000000, 100.000000, 0.000000, 0.000000, 0.000000, 8.000000, 4.000000, 120.000000, 0.000000, 0.000000, 100.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 100.000000, 100.000000, 0.000000, 20.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, false);
+	MakePreset("MS Mastering", 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 30.000000, 21000.000000, 0.000000, 0.000000, 8000.000000, 0.000000, 0.000000, 2.000000, 11165.008820, 0.707000, -26.612924, true, 2.000000, 123.792685, 0.707000, -21.290339, true, 0.000000, 0.000000, 100.000000, 0.000000, 0.000000, 0, 0.000000, -20.812508, 2.000000, 10.434966, 120.000000, 0.000000, 1.237500, 100.000000, 0.000000, 0.000000, -14.203114, 8.000000, 2.281333, 80.000000, 0.000000, 0.450000, 100.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 110.000000, 0.000000, 0.000000, 100.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, false);
+
+
 #if IPLUG_EDITOR // http://bit.ly/2S64BDd
 	mMakeGraphicsFunc = [&]() {
 		return MakeGraphics(*this, PLUG_WIDTH, PLUG_HEIGHT, PLUG_FPS, GetScaleForScreen(PLUG_WIDTH, PLUG_HEIGHT));
@@ -117,6 +156,9 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		pGraphics->AttachControl(new ITextControl(rectTitle, PLUG_MFR " " PLUG_NAME " " PLUG_VERSION_STR "-alpha", SR::Graphics::Layout::SR_DEFAULT_TEXT));
 		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectTitle.GetGridCell(0, 0, 1, 8).GetCentredInside(20.f), kBypass, "Byp", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cBypass, "Global");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectTitle.GetGridCell(0, 1, 1, 8).GetCentredInside(20.f), kEqBandSolo, "Solo", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cEqBandSolo, "Global");
+		pGraphics->AttachControl(new IVBakedPresetManagerControl(rectTitle.GetGridCell(1, 2, 2, 8).FracRectHorizontal(5.f, false), SR::Graphics::Layout::SR_DEFAULT_STYLE_METER));
+		//pGraphics->AttachControl(new IVDiskPresetManagerControl(rectTitle.GetGridCell(1, 2, 2, 8).FracRectHorizontal(6.f, false), ".", "vstpreset", false, DEFAULT_STYLE));
+		pGraphics->AttachControl(new MainMenu(rectTitle.GetGridCell(1, 7, 2, 8)));
 		// -- Gains		
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsGain.GetGridCell(0, 0, 2, 1).GetReducedFromTop(20.f), kGainIn, "Input", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGainIn, "Gain");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsGain.GetGridCell(1, 0, 2, 1).GetReducedFromTop(20.f), kGainOut, "Output", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGainOut, "Gain");
