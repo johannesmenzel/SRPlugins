@@ -64,21 +64,21 @@ namespace SR {
                 false,
                 false,
                 false,
-                0.1f, // roundness
+                0.0f, // roundness
                 2.f, // frame-thick, def: 1.f
                 3.f, // shadow-off
                 DEFAULT_WIDGET_FRAC,
                 DEFAULT_WIDGET_ANGLE
             );
+
             const IVStyle SR_DEFAULT_STYLE_KNOB = SR_DEFAULT_STYLE;
             const IVStyle SR_DEFAULT_STYLE_BUTTON = SR_DEFAULT_STYLE
                 .WithLabelText(SR_DEFAULT_TEXT_BUTTON_LABEL)
                 .WithValueText(SR_DEFAULT_TEXT_BUTTON_VALUE)
-                /*.WithShowLabel(false)*/
+                .WithShowLabel(false);
+            const IVStyle SR_DEFAULT_STYLE_FADER = SR_DEFAULT_STYLE
                 .WithColor(EVColor::kFG, IColor(255, 30, 50, 70))
-                /*.WithDrawShadows(false)*/
-                .WithWidgetFrac(0.8f);
-            const IVStyle SR_DEFAULT_STYLE_FADER = SR_DEFAULT_STYLE.WithColor(EVColor::kFG, IColor(255, 30, 50, 70)).WithDrawFrame(false);
+                .WithDrawFrame(false);
             const IVStyle SR_DEFAULT_STYLE_METER = SR_DEFAULT_STYLE_FADER;
             const IVStyle SR_DEFAULT_STYLE_GRAPH = SR_DEFAULT_STYLE_FADER;
 
