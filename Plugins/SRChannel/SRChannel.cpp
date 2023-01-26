@@ -18,31 +18,28 @@ public:
 		: IControl(bounds)
 	{}
 
-	void Draw(IGraphics& g) override
-	{
-		g.FillRect(COLOR_RED, mRECT);
+	void Draw(IGraphics& g) override {
+		const IRECT c = mRECT.GetCentredInside(20.f);
+		g.FillRect(COLOR_WHITE, c.GetGridCell(0, 0, 5, 1));
+		g.FillRect(COLOR_WHITE, c.GetGridCell(2, 0, 5, 1));
+		g.FillRect(COLOR_WHITE, c.GetGridCell(4, 0, 5, 1));
+		g.DrawRoundRect(COLOR_WHITE, c.GetPadded(3.f), 3.f);
 	}
-
-	void OnMouseDown(float x, float y, const IMouseMod& mod) override
-	{
-		//mMenu.CheckItemAlone(mUiSize);
-		GetUI()->CreatePopupMenu(*this, mMenu, x, y);
-	}
-
-	void OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx) override
-	{
-		auto* pPluginBase = static_cast<iplug::IPluginBase*>(GetDelegate());
-		auto chosenItemIdx = pSelectedMenu->GetChosenItemIdx();
+	void OnMouseDown(float x, float y, const IMouseMod& mod) override {	GetUI()->CreatePopupMenu(*this, mMenu, x, y);}
+	void OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx) override {
+		auto* delegate = static_cast<iplug::IPluginBase*>(GetDelegate());
+		auto chosenItemIdx = (pSelectedMenu->GetChosenItemIdx()) ? pSelectedMenu->GetChosenItemIdx() : -1;
 		switch (chosenItemIdx) {
-		case 0: pPluginBase->DumpMakePresetSrc("Preset.txt"); break;
-		case 1: break;
-		case 2: break;
+		case 0: delegate->DumpMakePresetSrc("Preset.txt"); 
+			break;
+		//case 1: break;
+		//case 2: break;
 		default:
 			break;
 		}
 	}
 private:
-	IPopupMenu mMenu{ "Menu", {"Dump Preset TXT", "...", "..."} };
+	IPopupMenu mMenu{ "Menu", {"Dump Preset TXT"/*, "...", "..."*/} };
 };
 
 SRChannel::SRChannel(const InstanceInfo& info)
