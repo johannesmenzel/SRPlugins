@@ -64,7 +64,7 @@ namespace SR {
                 false,
                 false,
                 false,
-                0.0f, // roundness
+                0.05f, // roundness
                 2.f, // frame-thick, def: 1.f
                 3.f, // shadow-off
                 DEFAULT_WIDGET_FRAC,
