@@ -25,10 +25,12 @@ public:
 		g.FillRect(COLOR_WHITE, c.GetGridCell(4, 0, 5, 1));
 		g.DrawRoundRect(COLOR_WHITE, c.GetPadded(3.f), 3.f);
 	}
-	void OnMouseDown(float x, float y, const IMouseMod& mod) override {	GetUI()->CreatePopupMenu(*this, mMenu, x, y);}
+	void OnMouseDown(float x, float y, const IMouseMod& mod) override {	
+		GetUI()->CreatePopupMenu(*this, mMenu, x, y);
+	}
 	void OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx) override {
 		auto* delegate = static_cast<iplug::IPluginBase*>(GetDelegate());
-		auto chosenItemIdx = (pSelectedMenu->GetChosenItemIdx()) ? pSelectedMenu->GetChosenItemIdx() : -1;
+		auto chosenItemIdx = pSelectedMenu->GetChosenItemIdx();
 		switch (chosenItemIdx) {
 		case 0: delegate->DumpMakePresetSrc("Preset.txt"); 
 			break;
