@@ -32,29 +32,26 @@ enum EParams
 	kEqHfFreq,
 	kEqHfDs,
 	kEqHfIsBell,
-	kEqHfIsSolo,
 
 	kEqHmfGain,
 	kEqHmfFreq,
 	kEqHmfQ,
 	kEqHmfDs,
 	kEqHmfIsShelf,
-	kEqHmfIsSolo,
 
 	kEqLmfGain,
 	kEqLmfFreq,
 	kEqLmfQ,
 	kEqLmfDs,
 	kEqLmfIsShelf,
-	kEqLmfIsSolo,
 
 	kEqLfBoost,
 	kEqLfCut,
 	kEqLfFreq,
 	kEqLfDs,
 	kEqLfIsBell,
-	kEqLfIsSolo,
 
+	kEqBandSolo,
 	kEqAmount,
 
 	// Compressor Stage
@@ -132,29 +129,26 @@ enum ECtrlTags {
 	cEqHfFreq,
 	cEqHfDs,
 	cEqHfIsBell,
-	cEqHfIsSolo,
 
 	cEqHmfGain,
 	cEqHmfFreq,
 	cEqHmfQ,
 	cEqHmfDs,
 	cEqHmfIsShelf,
-	cEqHmfIsSolo,
 
 	cEqLmfGain,
 	cEqLmfFreq,
 	cEqLmfQ,
 	cEqLmfDs,
 	cEqLmfIsShelf,
-	cEqLmfIsSolo,
 
 	cEqLfBoost,
 	cEqLfCut,
 	cEqLfFreq,
 	cEqLfDs,
 	cEqLfIsBell,
-	cEqLfIsSolo,
 
+	cEqBandSolo,
 	cEqAmount,
 
 	// Compressor Stage
@@ -231,6 +225,8 @@ public:
 	void OnIdle() override;
 	void OnParamChange(int paramIdx) override;
 
+	void AdjustBandSolo();
+
 private:
 	void SetFreqMeterValues();
 
@@ -250,6 +246,7 @@ private:
 	SR::DSP::SRFilterIIR<sample, 2> fEqHfCut;
 	SR::DSP::SRDeesser fEqLmf;
 	SR::DSP::SRDeesser fEqHmf;
+	SR::DSP::SRFilterIIR<sample, 2> fEqBandSolo;
 
 	SR::DSP::SRFilterIIR<sample, 2> fSplitHp;
 	SR::DSP::SRFilterIIR<sample, 2> fSplitLp;

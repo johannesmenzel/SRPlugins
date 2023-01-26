@@ -25,6 +25,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	, fEqHfCut()
 	, fEqLmf()
 	, fEqHmf()
+	, fEqBandSolo()
 	, fCompRms()
 	, fCompPeak()
 	, fMeterEnvelope()
@@ -83,6 +84,8 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kEqHmfIsShelf)->InitBool("Hmf Shelf", false, "Hmf Shelf", 0, "EQ", "PEAK", "HS");
 	GetParam(kEqLmfIsShelf)->InitBool("Lmf Shelf", false, "Lmf Shelf", 0, "EQ", "PEAK", "LS");
 
+	GetParam(kEqBandSolo)->InitEnum("Band Solo", 0, { "Off", "HP", "LP", "Hmf", "Lmf", "Hf", "Lf" }, 0, "EQ");
+
 	OnReset();
 
 #if IPLUG_EDITOR // http://bit.ly/2S64BDd
@@ -112,7 +115,8 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		// Attach Controls
 		// -- Title		
 		pGraphics->AttachControl(new ITextControl(rectTitle, PLUG_MFR " " PLUG_NAME " " PLUG_VERSION_STR "-alpha", SR::Graphics::Layout::SR_DEFAULT_TEXT));
-		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectTitle.GetGridCell(0, 0, 1, 8).GetCentredInside(40.f), kBypass, "Byp", SR::Graphics::Layout::SR_DEFAULT_STYLE, true));
+		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectTitle.GetGridCell(0, 0, 1, 8).GetCentredInside(20.f), kBypass, "Byp", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cBypass, "Global");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectTitle.GetGridCell(0, 1, 1, 8).GetCentredInside(20.f), kEqBandSolo, "Solo", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cEqBandSolo, "Global");
 		// -- Gains		
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsGain.GetGridCell(0, 0, 2, 1).GetReducedFromTop(20.f), kGainIn, "Input", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGainIn, "Gain");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsGain.GetGridCell(1, 0, 2, 1).GetReducedFromTop(20.f), kGainOut, "Output", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGainOut, "Gain");
@@ -141,8 +145,8 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqParametric.GetGridCell(1, 1, 2, 4).GetReducedFromTop(20.f), kEqLmfDs, "DS", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLmfDs, "Parametric EQ");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqParametric.GetGridCell(1, 2, 2, 4).GetReducedFromTop(20.f), kEqHmfFreq, "Freq", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHmfFreq, "Parametric EQ");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqParametric.GetGridCell(1, 3, 2, 4).GetReducedFromTop(20.f), kEqHmfDs, "DS", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHmfDs, "Parametric EQ");
-		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectControlsEqParametric.GetGridCell(0, 0, 1, 2).GetCentredInside(40.f), kEqLmfIsShelf, "Shelf", SR::Graphics::Layout::SR_DEFAULT_STYLE, true));
-		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectControlsEqParametric.GetGridCell(0, 1, 1, 2).GetCentredInside(40.f), kEqHmfIsShelf, "Shelf", SR::Graphics::Layout::SR_DEFAULT_STYLE, true));
+		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectControlsEqParametric.GetGridCell(0, 0, 1, 2).GetCentredInside(20.f), kEqLmfIsShelf, "Shelf", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cEqLmfIsShelf, "Parametric EQ");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectControlsEqParametric.GetGridCell(0, 1, 1, 2).GetCentredInside(20.f), kEqHmfIsShelf, "Shelf", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cEqHmfIsShelf, "Parametric EQ");
 		// -- Compressors
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsCompLevel.GetGridCell(0, 0, 3, 2).GetReducedFromTop(20.f), kCompRmsThresh, "Thresh", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsThresh, "Comp Level");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsCompLevel.GetGridCell(0, 1, 3, 2).GetReducedFromTop(20.f), kCompRmsRatio, "Ratio", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsRatio, "Comp Level");
@@ -163,8 +167,8 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsStereo.GetGridCell(2, 0, 4, 1).GetReducedFromTop(20.f), kStereoWidthLow, "Bass Width", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoWidthLow, "Stereo");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsStereo.GetGridCell(3, 0, 4, 1).GetReducedFromTop(20.f), kStereoMonoFreq, "Split FQ", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoMonoFreq, "Stereo");
 		// -- Meters
-		pGraphics->AttachControl(new IVMeterControl<4>(rectMeterVu, "In Out", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "", "", "", "" }, 0, iplug::igraphics::IVMeterControl<4>::EResponse::Log, -60.f, 12.f, { 0, -6, -12, -24, -48 }), cMeterVu, "VU");
-		pGraphics->AttachControl(new IVMeterControl<2>(rectMeterGr, "GR", SR::Graphics::Layout::SR_DEFAULT_STYLE, EDirection::Vertical, { "", "" }, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Log, -12.f, 0.f, { 0,-1,-2,-3,-4,-6,-9 }), cMeterGr, "GR");
+		pGraphics->AttachControl(new IVMeterControl<4>(rectMeterVu, "In Out", SR::Graphics::Layout::SR_DEFAULT_STYLE_METER, EDirection::Vertical, { "", "", "", "" }, 0, iplug::igraphics::IVMeterControl<4>::EResponse::Log, -60.f, 12.f, { 0, -6, -12, -24, -48 }), cMeterVu, "VU");
+		pGraphics->AttachControl(new IVMeterControl<2>(rectMeterGr, "GR", SR::Graphics::Layout::SR_DEFAULT_STYLE_METER, EDirection::Vertical, { "", "" }, 0, iplug::igraphics::IVMeterControl<2>::EResponse::Log, -12.f, 0.f, { 0,-1,-2,-3,-4,-6,-9 }), cMeterGr, "GR");
 		// -- Set GR meter displaying the other way round
 		dynamic_cast<IVMeterControl<2>*>(pGraphics->GetControlWithTag(cMeterGr))->SetBaseValue(1.);
 
@@ -274,6 +278,11 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 				outputs[0][s] -= mBufferLowSignal.GetBuffer(0, s);
 				outputs[1][s] -= mBufferLowSignal.GetBuffer(1, s);
 			}
+
+			if (GetParam(kEqBandSolo)->Int()) {
+				outputs[0][s] = fEqBandSolo.Process(outputs[0][s], 0);
+				outputs[1][s] = fEqBandSolo.Process(outputs[1][s], 1);
+			}
 		}
 
 		// Store current gain reduction in respective buffer
@@ -320,6 +329,8 @@ void SRChannel::OnReset()
 	fEqLfCut.SetFilter(SR::DSP::BiquadPeak, GetParam(kEqLfFreq)->Value() / samplerate, .08, -GetParam(kEqLfCut)->Value(), samplerate);
 	fSplitHp.SetFilter(SR::DSP::BiquadLinkwitzHighpass, GetParam(kStereoMonoFreq)->Value() / samplerate, 0., 0., samplerate);
 	fSplitLp.SetFilter(SR::DSP::BiquadLinkwitzLowpass, GetParam(kStereoMonoFreq)->Value() / samplerate, 0., 0., samplerate);
+
+	AdjustBandSolo();
 
 	fCompRms.Reset();
 	fCompRms.ResetCompressor(
@@ -396,14 +407,18 @@ void SRChannel::OnParamChange(int paramIdx)
 		fSplitHp.SetFreq(GetParam(kStereoMonoFreq)->Value() / samplerate);
 		fSplitLp.SetFreq(GetParam(kStereoMonoFreq)->Value() / samplerate);
 		break;
+
 	case kEqHpFreq:
 		fEqHp.SetFreq(GetParam(kEqHpFreq)->Value() / samplerate);
+		AdjustBandSolo();
 		break;
 	case kEqLpFreq:
+		AdjustBandSolo();
 		fEqLp.SetFreq(GetParam(kEqLpFreq)->Value() / samplerate);
 		break;
 	case kEqHfBoost:
 		fEqHfBoost.SetPeakGain(GetParam(kEqHfBoost)->Value());
+		AdjustBandSolo();
 		break;
 	case kEqHfCut:
 		fEqHfCut.SetPeakGain(-GetParam(kEqHfCut)->Value());
@@ -411,15 +426,19 @@ void SRChannel::OnParamChange(int paramIdx)
 	case kEqHfFreq:
 		fEqHfBoost.SetFreq(GetParam(kEqHfFreq)->Value() / samplerate);
 		fEqHfCut.SetFreq(fmin(1.5 * GetParam(kEqHfFreq)->Value() / samplerate, .4999));
+		AdjustBandSolo();
 		break;
 	case kEqHmfFreq:
 		fEqHmf.SetFrequency(GetParam(kEqHmfFreq)->Value() / samplerate);
+		AdjustBandSolo();
 		break;
 	case kEqHmfGain:
 		fEqHmf.SetGain(GetParam(kEqHmfGain)->Value());
+		AdjustBandSolo();
 		break;
 	case kEqHmfQ:
 		fEqHmf.SetQ(GetParam(kEqHmfQ)->Value());
+		AdjustBandSolo();
 		break;
 	case kEqHmfDs:
 		fEqHmf.SetThresh(GetParam(kEqHmfDs)->Value());
@@ -429,15 +448,19 @@ void SRChannel::OnParamChange(int paramIdx)
 			fEqHmf.SetType(SR::DSP::BiquadHighshelf);
 		else
 			fEqHmf.SetType(SR::DSP::BiquadPeak);
+		AdjustBandSolo();
 		break;
 	case kEqLmfFreq:
 		fEqLmf.SetFrequency(GetParam(kEqLmfFreq)->Value() / samplerate);
+		AdjustBandSolo();
 		break;
 	case kEqLmfGain:
 		fEqLmf.SetGain(GetParam(kEqLmfGain)->Value());
+		AdjustBandSolo();
 		break;
 	case kEqLmfQ:
 		fEqLmf.SetQ(GetParam(kEqLmfQ)->Value());
+		AdjustBandSolo();
 		break;
 	case kEqLmfDs:
 		fEqLmf.SetThresh(GetParam(kEqLmfDs)->Value());
@@ -447,9 +470,11 @@ void SRChannel::OnParamChange(int paramIdx)
 			fEqLmf.SetType(SR::DSP::BiquadLowshelf);
 		else
 			fEqLmf.SetType(SR::DSP::BiquadPeak);
+		AdjustBandSolo();
 		break;
 	case kEqLfBoost:
 		fEqLfBoost.SetPeakGain(GetParam(kEqLfBoost)->Value());
+		AdjustBandSolo();
 		break;
 	case kEqLfCut:
 		fEqLfCut.SetPeakGain(-GetParam(kEqLfCut)->Value());
@@ -457,6 +482,10 @@ void SRChannel::OnParamChange(int paramIdx)
 	case kEqLfFreq:
 		fEqLfBoost.SetFreq(GetParam(kEqLfFreq)->Value() / samplerate);
 		fEqLfCut.SetFreq(1.5 * GetParam(kEqLfFreq)->Value() / samplerate);
+		AdjustBandSolo();
+		break;
+	case kEqBandSolo:
+		AdjustBandSolo();
 		break;
 	case kCompRmsThresh:
 		fCompRms.SetThresh(GetParam(kCompRmsThresh)->Value());
@@ -496,6 +525,36 @@ void SRChannel::OnParamChange(int paramIdx)
 	case kCompPeakMix:
 		fCompPeak.SetMix(GetParam(kCompPeakMix)->Value() * .01);
 		break;
+	default:
+		break;
+	}
+}
+void SRChannel::AdjustBandSolo() {
+	const double samplerate = GetSampleRate();
+	switch (GetParam(kEqBandSolo)->Int())
+	{
+	case 0: // Off
+		fEqBandSolo.SetFilter(SR::DSP::BiquadPeak, 1000. / samplerate, .707, 0., samplerate); // Dummy
+		break;
+	case 1: // HP
+		fEqBandSolo.SetFilter(SR::DSP::BiquadLowpass, fmax(GetParam(kEqHpFreq)->Value(), 10.) / samplerate, .707, 0., samplerate);
+		break;
+	case 2: // LP
+		fEqBandSolo.SetFilter(SR::DSP::BiquadHighpass, GetParam(kEqLpFreq)->Value() / samplerate, .707, 0., samplerate);
+		break;
+	case 3: // Hmf
+		fEqBandSolo.SetFilter((GetParam(kEqHmfIsShelf)->Bool()) ? SR::DSP::BiquadHighpass : SR::DSP::BiquadBandpass, GetParam(kEqHmfFreq)->Value() / samplerate, GetParam(kEqHmfQ)->Value(), GetParam(kEqHmfGain)->Value(), samplerate);
+		break;
+	case 4: // Lmf
+		fEqBandSolo.SetFilter((GetParam(kEqLmfIsShelf)->Bool()) ? SR::DSP::BiquadLowpass : SR::DSP::BiquadBandpass, GetParam(kEqLmfFreq)->Value() / samplerate, GetParam(kEqLmfQ)->Value(), GetParam(kEqLmfGain)->Value(), samplerate);
+		break;
+	case 5: // Hf
+		fEqBandSolo.SetFilter(SR::DSP::BiquadBandpass, GetParam(kEqHfFreq)->Value() / samplerate, 1., GetParam(kEqHfBoost)->Value(), samplerate);
+		break;
+	case 6: // Lf
+		fEqBandSolo.SetFilter(SR::DSP::BiquadBandpass, GetParam(kEqLfFreq)->Value() / samplerate, .12, GetParam(kEqLfBoost)->Value(), samplerate);
+		break;
+
 	default:
 		break;
 	}
