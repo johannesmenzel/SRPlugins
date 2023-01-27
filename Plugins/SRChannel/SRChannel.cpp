@@ -30,7 +30,8 @@ public:
 	}
 	void OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx) override {
 		auto* delegate = static_cast<iplug::IPluginBase*>(GetDelegate());
-		auto chosenItemIdx = pSelectedMenu->GetChosenItemIdx();
+		auto chosenItemIdx = -1;
+		if (pSelectedMenu) chosenItemIdx = pSelectedMenu->GetChosenItemIdx();
 		switch (chosenItemIdx) {
 		case 0: delegate->DumpMakePresetSrc("Preset.txt"); 
 			break;
