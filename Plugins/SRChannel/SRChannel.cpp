@@ -19,11 +19,11 @@ public:
 	{}
 
 	void Draw(IGraphics& g) override {
-		const IRECT c = mRECT.GetCentredInside(20.f);
-		g.FillRect(COLOR_WHITE, c.GetGridCell(0, 0, 5, 1));
-		g.FillRect(COLOR_WHITE, c.GetGridCell(2, 0, 5, 1));
-		g.FillRect(COLOR_WHITE, c.GetGridCell(4, 0, 5, 1));
-		g.DrawRoundRect(COLOR_WHITE, c.GetPadded(3.f), 3.f);
+		const IRECT c = mRECT.GetCentredInside(mRECT.GetLengthOfShortestSide());
+		g.DrawRoundRect(COLOR_WHITE, c, 3.f);
+		g.FillRect(COLOR_WHITE, c.GetPadded(-3.f).GetGridCell(0, 0, 5, 1));
+		g.FillRect(COLOR_WHITE, c.GetPadded(-3.f).GetGridCell(2, 0, 5, 1));
+		g.FillRect(COLOR_WHITE, c.GetPadded(-3.f).GetGridCell(4, 0, 5, 1));
 	}
 	void OnMouseDown(float x, float y, const IMouseMod& mod) override {	
 		GetUI()->CreatePopupMenu(*this, mMenu, x, y);
@@ -152,10 +152,11 @@ SRChannel::SRChannel(const InstanceInfo& info)
 
 		// Attach Controls
 		// -- Title		
-		pGraphics->AttachControl(new ITextControl(rectTitle, PLUG_MFR " " PLUG_NAME " " PLUG_VERSION_STR "-alpha", SR::Graphics::Layout::SR_DEFAULT_TEXT));
-		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectTitle.GetGridCell(0, 0, 1, 8).GetCentredInside(20.f), kBypass, "Byp", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cBypass, "Global");
-		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectTitle.GetGridCell(0, 1, 1, 8).GetCentredInside(20.f), kEqBandSolo, "Solo", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cEqBandSolo, "Global");
-		pGraphics->AttachControl(new IVBakedPresetManagerControl(rectTitle.GetGridCell(1, 2, 2, 8).FracRectHorizontal(5.f, false), SR::Graphics::Layout::SR_DEFAULT_STYLE_METER));
+		pGraphics->AttachControl(new ITextControl(rectTitle.GetGridCell(0,0,2,24).FracRectHorizontal(10.f, false), PLUG_MFR " " PLUG_NAME " " PLUG_VERSION_STR "-alpha", SR::Graphics::Layout::SR_DEFAULT_TEXT));
+		pGraphics->AttachControl(new IVBakedPresetManagerControl(rectTitle.GetGridCell(0, 10, 2, 24).FracRectHorizontal(12.f, false), SR::Graphics::Layout::SR_DEFAULT_STYLE_METER));
+		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectTitle.GetGridCell(0, 22, 2, 24).GetCentredInside(20.f), kBypass, "Byp", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cBypass, "Global");
+		pGraphics->AttachControl(new MainMenu(rectTitle.GetGridCell(0, 23, 2, 24).GetCentredInside(20.f)));
+		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectTitle.GetGridCell(1, 3, 2, 24).GetCentredInside(20.f), kEqBandSolo, "Solo", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cEqBandSolo, "Global");
 		//pGraphics->AttachControl(new IVDiskPresetManagerControl(rectTitle.GetGridCell(1, 2, 2, 8).FracRectHorizontal(6.f, false), ".", "vstpreset", false, DEFAULT_STYLE));
 		pGraphics->AttachControl(new MainMenu(rectTitle.GetGridCell(1, 7, 2, 8)));
 		// -- Gains		
