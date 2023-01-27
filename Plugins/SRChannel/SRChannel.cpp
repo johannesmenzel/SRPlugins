@@ -671,22 +671,7 @@ void SRChannel::SetFreqMeterValues()
 			if (GetParam(kEqLfBoost)->Value() != 0.0) mFreqMeterValues[i] += fEqLfBoost.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
 			if (GetParam(kEqLfCut)->Value() != 0.0) mFreqMeterValues[i] += fEqLfCut.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
 #elif FLT == 3
-			//const double lfBoostReal = fEqLfBoost[0].response(freq / samplerate).real();
-			//const double lfBoostImag = fEqLfBoost[0].response(freq / samplerate).imag();
-			//const double lfBoostMagnitude = AmpToDB(sqrt(lfBoostReal * lfBoostReal + lfBoostImag * lfBoostImag)) / FREQRESP_RANGEDB;
-			//if (GetParam(kEqLfBoost)->Value() != 0.0) mFreqMeterValues[i] += lfBoostMagnitude;
-			//const double lfCutReal = fEqLfCut[0].response(freq / samplerate).real();
-			//const double lfCutImag = fEqLfCut[0].response(freq / samplerate).imag();
-			//const double lfCutMagnitude = AmpToDB(sqrt(lfCutReal * lfCutReal + lfCutImag * lfCutImag)) / FREQRESP_RANGEDB;
-			//if (GetParam(kEqLfCut)->Value() != 0.0) mFreqMeterValues[i] += lfCutMagnitude;
-			//const double hfBoostReal = fEqHfBoost[0].response(freq / samplerate).real();
-			//const double hfBoostImag = fEqHfBoost[0].response(freq / samplerate).imag();
-			//const double hfBoostMagnitude = AmpToDB(sqrt(hfBoostReal * hfBoostReal + hfBoostImag * hfBoostImag)) / FREQRESP_RANGEDB;
-			//if (GetParam(kEqHfBoost)->Value() != 0.0) mFreqMeterValues[i] += hfBoostMagnitude;
-			//const double hfCutReal = fEqHfCut[0].response(freq / samplerate).real();
-			//const double hfCutImag = fEqHfCut[0].response(freq / samplerate).imag();
-			//const double hfCutMagnitude = AmpToDB(sqrt(hfCutReal * hfCutReal + hfCutImag * hfCutImag)) / FREQRESP_RANGEDB;
-			//if (GetParam(kEqHfCut)->Value() != 0.0) mFreqMeterValues[i] += hfCutMagnitude;
+			// Like above, but since response function gets complex_t, we just have to use abs() for magnitude or arg() for phase, then convert to dB and normalize
 			if (GetParam(kEqLfBoost)->Value() != 0.0) mFreqMeterValues[i] += AmpToDB(abs(fEqLfBoost[0].response(freq / samplerate))) / FREQRESP_RANGEDB;
 			if (GetParam(kEqLfCut)->Value() != 0.0) mFreqMeterValues[i] += AmpToDB(abs(fEqLfCut[0].response(freq / samplerate))) / FREQRESP_RANGEDB;
 			if (GetParam(kEqHfBoost)->Value() != 0.0) mFreqMeterValues[i] += AmpToDB(abs(fEqHfBoost[0].response(freq / samplerate))) / FREQRESP_RANGEDB;
