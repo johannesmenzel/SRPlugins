@@ -1,6 +1,21 @@
 #pragma once
 
+//1: SRFilters
+//2: Vinnie Falcos DspFilters
+//3: irr
+#define FLT 3
+
 #include "IPlug_include_in_plug_hdr.h"
+
+#if FLT == 1
+#include "../../Classes/DSP/SRFilters.h"
+#elif FLT == 2
+#include "DspFilters/Dsp.h"
+#elif FLT == 3
+#include "Iir.h"
+#endif // !FLT
+
+
 #include "../../Classes/DSP/SRGain.h"
 #include "../../Classes/DSP/SRSaturation.h"
 #include "../../Classes/DSP/SRDynamics.h"
@@ -237,17 +252,30 @@ private:
 	SR::DSP::SRGain fGainOutLow;
 
 	SR::DSP::SRSaturation fSatInput[2] = { };
-
 	SR::DSP::SRFilterIIR<sample, 2> fEqHp;
 	SR::DSP::SRFilterIIR<sample, 2> fEqLp;
+
+	SR::DSP::SRDeesser fEqLmf;
+	SR::DSP::SRDeesser fEqHmf;
+
+#if FLT == 1
 	SR::DSP::SRFilterIIR<sample, 2> fEqLfBoost;
 	SR::DSP::SRFilterIIR<sample, 2> fEqLfCut;
 	SR::DSP::SRFilterIIR<sample, 2> fEqHfBoost;
 	SR::DSP::SRFilterIIR<sample, 2> fEqHfCut;
-	SR::DSP::SRDeesser fEqLmf;
-	SR::DSP::SRDeesser fEqHmf;
-	SR::DSP::SRFilterIIR<sample, 2> fEqBandSolo;
+#elif FLT == 2
+	Dsp::SimpleFilter<Dsp::RBJ::LowShelf, 2> fEqLfBoost;
+	Dsp::SimpleFilter<Dsp::RBJ::LowShelf, 2> fEqLfCut;
+	Dsp::SimpleFilter<Dsp::RBJ::BandShelf, 2> fEqLfBoost;
+	Dsp::SimpleFilter<Dsp::RBJ::HighShelf, 2> fEqLfCut;
+#elif FLT == 3
+	Iir::RBJ::LowShelf fEqLfBoost[2];
+	Iir::RBJ::LowShelf fEqLfCut[2];
+	Iir::RBJ::BandShelf fEqHfBoost[2];
+	Iir::RBJ::HighShelf fEqHfCut[2];
+#endif // !FLT
 
+	SR::DSP::SRFilterIIR<sample, 2> fEqBandSolo;
 	SR::DSP::SRFilterIIR<sample, 2> fSplitHp;
 	SR::DSP::SRFilterIIR<sample, 2> fSplitLp;
 

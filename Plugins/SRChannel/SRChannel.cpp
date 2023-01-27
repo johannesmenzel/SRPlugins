@@ -288,17 +288,31 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 			fCompPeak.Process(outputs[0][s], outputs[1][s]);
 
 			// Process "passive" EQ
-			outputs[0][s] = fEqHfBoost.Process(outputs[0][s], 0);
-			outputs[1][s] = fEqHfBoost.Process(outputs[1][s], 1);
-
-			outputs[0][s] = fEqHfCut.Process(outputs[0][s], 0);
-			outputs[1][s] = fEqHfCut.Process(outputs[1][s], 1);
-
+#if FLT == 1
 			outputs[0][s] = fEqLfBoost.Process(outputs[0][s], 0);
 			outputs[1][s] = fEqLfBoost.Process(outputs[1][s], 1);
 
 			outputs[0][s] = fEqLfCut.Process(outputs[0][s], 0);
 			outputs[1][s] = fEqLfCut.Process(outputs[1][s], 1);
+
+			outputs[0][s] = fEqHfBoost.Process(outputs[0][s], 0);
+			outputs[1][s] = fEqHfBoost.Process(outputs[1][s], 1);
+
+			outputs[0][s] = fEqHfCut.Process(outputs[0][s], 0);
+			outputs[1][s] = fEqHfCut.Process(outputs[1][s], 1);
+#elif FLT == 3
+			outputs[0][s] = fEqLfBoost[0].filter(outputs[0][s]);
+			outputs[1][s] = fEqLfBoost[1].filter(outputs[1][s]);
+
+			outputs[0][s] = fEqLfCut[0].filter(outputs[0][s]);
+			outputs[1][s] = fEqLfCut[1].filter(outputs[1][s]);
+
+			outputs[0][s] = fEqHfBoost[0].filter(outputs[0][s]);
+			outputs[1][s] = fEqHfBoost[1].filter(outputs[1][s]);
+
+			outputs[0][s] = fEqHfCut[0].filter(outputs[0][s]);
+			outputs[1][s] = fEqHfCut[1].filter(outputs[1][s]);
+#endif // !FLT
 
 			// Process output gain
 			if (GetParam(kStereoMonoFreq)->Value() <= 20.) {
@@ -362,12 +376,23 @@ void SRChannel::OnReset()
 
 	fEqHp.SetFilter(SR::DSP::BiquadHighpass, GetParam(kEqHpFreq)->Value() / samplerate, 0.707, 0., samplerate);
 	fEqLp.SetFilter(SR::DSP::BiquadLowpass, GetParam(kEqLpFreq)->Value() / samplerate, 0.707, 0., samplerate);
-	fEqHfBoost.SetFilter(SR::DSP::BiquadPeak, GetParam(kEqHfFreq)->Value() / samplerate, 1., GetParam(kEqHfBoost)->Value(), samplerate);
-	fEqHfCut.SetFilter(SR::DSP::BiquadPeak, GetParam(kEqHfFreq)->Value() / samplerate, .1, -GetParam(kEqHfCut)->Value(), samplerate);
 	fEqHmf.Reset(GetParam(kEqHmfDs)->Value(), .25, 3., 50., GetParam(kEqHmfFreq)->Value() / samplerate, GetParam(kEqHmfQ)->Value(), 0., samplerate, (GetParam(kEqHmfIsShelf)->Bool()) ? SR::DSP::BiquadHighshelf : SR::DSP::BiquadPeak);
 	fEqLmf.Reset(GetParam(kEqLmfDs)->Value(), .25, 7., 200., GetParam(kEqLmfFreq)->Value() / samplerate, GetParam(kEqLmfQ)->Value(), 0., samplerate, (GetParam(kEqLmfIsShelf)->Bool()) ? SR::DSP::BiquadLowshelf : SR::DSP::BiquadPeak);
+#if FLT == 1
 	fEqLfBoost.SetFilter(SR::DSP::BiquadPeak, GetParam(kEqLfFreq)->Value() / samplerate, .12, GetParam(kEqLfBoost)->Value(), samplerate);
 	fEqLfCut.SetFilter(SR::DSP::BiquadPeak, GetParam(kEqLfFreq)->Value() / samplerate, .08, -GetParam(kEqLfCut)->Value(), samplerate);
+	fEqHfBoost.SetFilter(SR::DSP::BiquadPeak, GetParam(kEqHfFreq)->Value() / samplerate, 1., GetParam(kEqHfBoost)->Value(), samplerate);
+	fEqHfCut.SetFilter(SR::DSP::BiquadPeak, GetParam(kEqHfFreq)->Value() / samplerate, .1, -GetParam(kEqHfCut)->Value(), samplerate);
+#elif FLT == 3
+	fEqLfBoost[0].setup(samplerate, GetParam(kEqLfFreq)->Value(), GetParam(kEqLfBoost)->Value(), .12);
+	fEqLfBoost[1].setup(samplerate, GetParam(kEqLfFreq)->Value(), GetParam(kEqLfBoost)->Value(), .12);
+	fEqLfCut[0].setup(samplerate, GetParam(kEqLfFreq)->Value(), -GetParam(kEqLfCut)->Value(), .08);
+	fEqLfCut[1].setup(samplerate, GetParam(kEqLfFreq)->Value(), -GetParam(kEqLfCut)->Value(), .08);
+	fEqHfBoost[0].setup(samplerate, GetParam(kEqHfFreq)->Value(), GetParam(kEqHfBoost)->Value(), 1.);
+	fEqHfBoost[1].setup(samplerate, GetParam(kEqHfFreq)->Value(), GetParam(kEqHfBoost)->Value(), 1.);
+	fEqHfCut[0].setup(samplerate, GetParam(kEqHfFreq)->Value(), -GetParam(kEqHfCut)->Value(), .1);
+	fEqHfCut[1].setup(samplerate, GetParam(kEqHfFreq)->Value(), -GetParam(kEqHfCut)->Value(), .1);
+#endif // !FLT
 	fSplitHp.SetFilter(SR::DSP::BiquadLinkwitzHighpass, GetParam(kStereoMonoFreq)->Value() / samplerate, 0., 0., samplerate);
 	fSplitLp.SetFilter(SR::DSP::BiquadLinkwitzLowpass, GetParam(kStereoMonoFreq)->Value() / samplerate, 0., 0., samplerate);
 
@@ -457,16 +482,26 @@ void SRChannel::OnParamChange(int paramIdx)
 		AdjustBandSolo();
 		fEqLp.SetFreq(GetParam(kEqLpFreq)->Value() / samplerate);
 		break;
-	case kEqHfBoost:
-		fEqHfBoost.SetPeakGain(GetParam(kEqHfBoost)->Value());
+	case kEqLmfFreq:
+		fEqLmf.SetFrequency(GetParam(kEqLmfFreq)->Value() / samplerate);
 		AdjustBandSolo();
 		break;
-	case kEqHfCut:
-		fEqHfCut.SetPeakGain(-GetParam(kEqHfCut)->Value());
+	case kEqLmfGain:
+		fEqLmf.SetGain(GetParam(kEqLmfGain)->Value());
+		AdjustBandSolo();
 		break;
-	case kEqHfFreq:
-		fEqHfBoost.SetFreq(GetParam(kEqHfFreq)->Value() / samplerate);
-		fEqHfCut.SetFreq(fmin(1.5 * GetParam(kEqHfFreq)->Value() / samplerate, .4999));
+	case kEqLmfQ:
+		fEqLmf.SetQ(GetParam(kEqLmfQ)->Value());
+		AdjustBandSolo();
+		break;
+	case kEqLmfDs:
+		fEqLmf.SetThresh(GetParam(kEqLmfDs)->Value());
+		break;
+	case kEqLmfIsShelf:
+		if (GetParam(kEqLmfIsShelf)->Bool())
+			fEqLmf.SetType(SR::DSP::BiquadLowshelf);
+		else
+			fEqLmf.SetType(SR::DSP::BiquadPeak);
 		AdjustBandSolo();
 		break;
 	case kEqHmfFreq:
@@ -491,28 +526,7 @@ void SRChannel::OnParamChange(int paramIdx)
 			fEqHmf.SetType(SR::DSP::BiquadPeak);
 		AdjustBandSolo();
 		break;
-	case kEqLmfFreq:
-		fEqLmf.SetFrequency(GetParam(kEqLmfFreq)->Value() / samplerate);
-		AdjustBandSolo();
-		break;
-	case kEqLmfGain:
-		fEqLmf.SetGain(GetParam(kEqLmfGain)->Value());
-		AdjustBandSolo();
-		break;
-	case kEqLmfQ:
-		fEqLmf.SetQ(GetParam(kEqLmfQ)->Value());
-		AdjustBandSolo();
-		break;
-	case kEqLmfDs:
-		fEqLmf.SetThresh(GetParam(kEqLmfDs)->Value());
-		break;
-	case kEqLmfIsShelf:
-		if (GetParam(kEqLmfIsShelf)->Bool())
-			fEqLmf.SetType(SR::DSP::BiquadLowshelf);
-		else
-			fEqLmf.SetType(SR::DSP::BiquadPeak);
-		AdjustBandSolo();
-		break;
+#if FLT == 1
 	case kEqLfBoost:
 		fEqLfBoost.SetPeakGain(GetParam(kEqLfBoost)->Value());
 		AdjustBandSolo();
@@ -522,9 +536,41 @@ void SRChannel::OnParamChange(int paramIdx)
 		break;
 	case kEqLfFreq:
 		fEqLfBoost.SetFreq(GetParam(kEqLfFreq)->Value() / samplerate);
-		fEqLfCut.SetFreq(1.5 * GetParam(kEqLfFreq)->Value() / samplerate);
+		fEqLfCut.SetFreq(GetParam(kEqLfFreq)->Value() / samplerate);
 		AdjustBandSolo();
 		break;
+	case kEqHfBoost:
+		fEqHfBoost.SetPeakGain(GetParam(kEqHfBoost)->Value());
+		AdjustBandSolo();
+		break;
+	case kEqHfCut:
+		fEqHfCut.SetPeakGain(-GetParam(kEqHfCut)->Value());
+		break;
+	case kEqHfFreq:
+		fEqHfBoost.SetFreq(GetParam(kEqHfFreq)->Value() / samplerate);
+		fEqHfCut.SetFreq(GetParam(kEqHfFreq)->Value() / samplerate);
+		AdjustBandSolo();
+		break;
+#elif FLT == 3
+	case kEqLfBoost:
+	case kEqLfCut:
+	case kEqLfFreq:
+		fEqLfBoost[0].setup(samplerate, GetParam(kEqLfFreq)->Value(), GetParam(kEqLfBoost)->Value(), .12);
+		fEqLfBoost[1].setup(samplerate, GetParam(kEqLfFreq)->Value(), GetParam(kEqLfBoost)->Value(), .12);
+		fEqLfCut[0].setup(samplerate, GetParam(kEqLfFreq)->Value(), -GetParam(kEqLfCut)->Value(), .08);
+		fEqLfCut[1].setup(samplerate, GetParam(kEqLfFreq)->Value(), -GetParam(kEqLfCut)->Value(), .08);
+		AdjustBandSolo();
+		break;
+	case kEqHfBoost:
+	case kEqHfCut:
+	case kEqHfFreq:
+		fEqHfBoost[0].setup(samplerate, GetParam(kEqHfFreq)->Value(), GetParam(kEqHfBoost)->Value(), 1.);
+		fEqHfBoost[1].setup(samplerate, GetParam(kEqHfFreq)->Value(), GetParam(kEqHfBoost)->Value(), 1.);
+		fEqHfCut[0].setup(samplerate, GetParam(kEqHfFreq)->Value(), -GetParam(kEqHfCut)->Value(), .1);
+		fEqHfCut[1].setup(samplerate, GetParam(kEqHfFreq)->Value(), -GetParam(kEqHfCut)->Value(), .1);
+		AdjustBandSolo();
+		break;
+#endif // !FLT
 	case kEqBandSolo:
 		AdjustBandSolo();
 		break;
@@ -617,12 +663,32 @@ void SRChannel::SetFreqMeterValues()
 		if (!GetParam(kBypass)->Bool()) {
 			if (GetParam(kEqHpFreq)->Value() > 0.) mFreqMeterValues[i] += fEqHp.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
 			if (GetParam(kEqLpFreq)->Value() < 22000.) mFreqMeterValues[i] += fEqLp.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
-			if (GetParam(kEqHfBoost)->Value() != 0.0) mFreqMeterValues[i] += fEqHfBoost.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
-			if (GetParam(kEqHfCut)->Value() != 0.0) mFreqMeterValues[i] += fEqHfCut.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
 			mFreqMeterValues[i] += fEqHmf.fDynamicEqFilter.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
 			mFreqMeterValues[i] += fEqLmf.fDynamicEqFilter.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
+#if FLT == 1
+			if (GetParam(kEqHfBoost)->Value() != 0.0) mFreqMeterValues[i] += fEqHfBoost.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
+			if (GetParam(kEqHfCut)->Value() != 0.0) mFreqMeterValues[i] += fEqHfCut.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
 			if (GetParam(kEqLfBoost)->Value() != 0.0) mFreqMeterValues[i] += fEqLfBoost.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
 			if (GetParam(kEqLfCut)->Value() != 0.0) mFreqMeterValues[i] += fEqLfCut.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
+#elif FLT == 3
+			fEqLfBoost->response(0.);
+			const double lfBoostReal = fEqLfBoost[0].response(freq / samplerate).real();
+			const double lfBoostImag = fEqLfBoost[0].response(freq / samplerate).imag();
+			const double lfBoostMagnitude = AmpToDB(sqrt(lfBoostReal * lfBoostReal + lfBoostImag * lfBoostImag)) / FREQRESP_RANGEDB;
+			if (GetParam(kEqLfBoost)->Value() != 0.0) mFreqMeterValues[i] += lfBoostMagnitude;
+			const double lfCutReal = fEqLfCut[0].response(freq / samplerate).real();
+			const double lfCutImag = fEqLfCut[0].response(freq / samplerate).imag();
+			const double lfCutMagnitude = AmpToDB(sqrt(lfCutReal * lfCutReal + lfCutImag * lfCutImag)) / FREQRESP_RANGEDB;
+			if (GetParam(kEqLfCut)->Value() != 0.0) mFreqMeterValues[i] += lfCutMagnitude;
+			const double hfBoostReal = fEqHfBoost[0].response(freq / samplerate).real();
+			const double hfBoostImag = fEqHfBoost[0].response(freq / samplerate).imag();
+			const double hfBoostMagnitude = AmpToDB(sqrt(hfBoostReal * hfBoostReal + hfBoostImag * hfBoostImag)) / FREQRESP_RANGEDB;
+			if (GetParam(kEqHfBoost)->Value() != 0.0) mFreqMeterValues[i] += hfBoostMagnitude;
+			const double hfCutReal = fEqHfCut[0].response(freq / samplerate).real();
+			const double hfCutImag = fEqHfCut[0].response(freq / samplerate).imag();
+			const double hfCutMagnitude = AmpToDB(sqrt(hfCutReal * hfCutReal + hfCutImag * hfCutImag)) / FREQRESP_RANGEDB;
+			if (GetParam(kEqHfCut)->Value() != 0.0) mFreqMeterValues[i] += hfCutMagnitude;
+#endif // !FLT
 		}
 	}
 	if (GetUI() && mFreqMeterValues != 0) dynamic_cast<SR::Graphics::Controls::SRGraphBase*>(GetUI()->GetControlWithTag(cMeterFreqResponse))->Process(mFreqMeterValues);

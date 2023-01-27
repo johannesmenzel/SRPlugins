@@ -134,6 +134,30 @@
     <ClCompile Include="..\..\..\iPlug2\IGraphics\IGraphicsEditorDelegate.cpp">
       <Filter>IGraphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Dependencies\iir1\iir\Biquad.cpp">
+      <Filter>Dependencies\irr1\irr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Dependencies\iir1\iir\Butterworth.cpp">
+      <Filter>Dependencies\irr1\irr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Dependencies\iir1\iir\Cascade.cpp">
+      <Filter>Dependencies\irr1\irr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Dependencies\iir1\iir\ChebyshevI.cpp">
+      <Filter>Dependencies\irr1\irr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Dependencies\iir1\iir\ChebyshevII.cpp">
+      <Filter>Dependencies\irr1\irr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Dependencies\iir1\iir\Custom.cpp">
+      <Filter>Dependencies\irr1\irr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Dependencies\iir1\iir\PoleFilter.cpp">
+      <Filter>Dependencies\irr1\irr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Dependencies\iir1\iir\RBJ.cpp">
+      <Filter>Dependencies\irr1\irr</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="../config.h" />
@@ -387,6 +411,48 @@
     <ClInclude Include="..\..\..\Classes\Graphics\SRCustomSwitch.h">
       <Filter>SRClasses\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Dependencies\iir1\Iir.h">
+      <Filter>Dependencies\irr1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\Biquad.h">
+      <Filter>Dependencies\irr1\irr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\Butterworth.h">
+      <Filter>Dependencies\irr1\irr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\Cascade.h">
+      <Filter>Dependencies\irr1\irr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\ChebyshevI.h">
+      <Filter>Dependencies\irr1\irr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\ChebyshevII.h">
+      <Filter>Dependencies\irr1\irr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\Common.h">
+      <Filter>Dependencies\irr1\irr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\Custom.h">
+      <Filter>Dependencies\irr1\irr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\Layout.h">
+      <Filter>Dependencies\irr1\irr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\MathSupplement.h">
+      <Filter>Dependencies\irr1\irr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\PoleFilter.h">
+      <Filter>Dependencies\irr1\irr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\RBJ.h">
+      <Filter>Dependencies\irr1\irr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\State.h">
+      <Filter>Dependencies\irr1\irr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\Types.h">
+      <Filter>Dependencies\irr1\irr</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">
@@ -457,6 +523,15 @@
     </Filter>
     <Filter Include="SRClasses\Utils">
       <UniqueIdentifier>{bc00f832-e2ca-4b30-8d8a-d7f20a7e8fe9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies">
+      <UniqueIdentifier>{87450b90-6efd-4d8a-8f00-9b8c1d7097a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies\irr1">
+      <UniqueIdentifier>{38de5ec1-dcb3-4f35-968a-30bf0e5e991b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies\irr1\irr">
+      <UniqueIdentifier>{f79e5253-3b2a-4ce1-a8af-c6aa3999e8dd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

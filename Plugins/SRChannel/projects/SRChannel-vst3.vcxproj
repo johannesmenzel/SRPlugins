@@ -168,11 +168,12 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>$(VST3_DEFS);$(DEBUG_DEFS);$(EXTRA_DEBUG_DEFS);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(VST3_INC_PATHS);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VST3_INC_PATHS);..\..\..\Dependencies\DSPFilters\shared\DSPFilters\include\;..\..\..\Dependencies\iir1;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -265,6 +266,20 @@
     <ClInclude Include="..\..\..\Classes\Graphics\SRCustomSwitch.h" />
     <ClInclude Include="..\..\..\Classes\SRConstants.h" />
     <ClInclude Include="..\..\..\Classes\Utils\SRHelpers.h" />
+    <ClInclude Include="..\..\..\Dependencies\iir1\Iir.h" />
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\Biquad.h" />
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\Butterworth.h" />
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\Cascade.h" />
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\ChebyshevI.h" />
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\ChebyshevII.h" />
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\Common.h" />
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\Custom.h" />
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\Layout.h" />
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\MathSupplement.h" />
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\PoleFilter.h" />
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\RBJ.h" />
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\State.h" />
+    <ClInclude Include="..\..\..\Dependencies\iir1\iir\Types.h" />
     <ClInclude Include="..\..\..\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\classfactoryhelpers.h" />
     <ClInclude Include="..\..\..\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fbuffer.h" />
     <ClInclude Include="..\..\..\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fcleanup.h" />
@@ -340,6 +355,14 @@
     <ClInclude Include="..\resources\resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Dependencies\iir1\iir\Biquad.cpp" />
+    <ClCompile Include="..\..\..\Dependencies\iir1\iir\Butterworth.cpp" />
+    <ClCompile Include="..\..\..\Dependencies\iir1\iir\Cascade.cpp" />
+    <ClCompile Include="..\..\..\Dependencies\iir1\iir\ChebyshevI.cpp" />
+    <ClCompile Include="..\..\..\Dependencies\iir1\iir\ChebyshevII.cpp" />
+    <ClCompile Include="..\..\..\Dependencies\iir1\iir\Custom.cpp" />
+    <ClCompile Include="..\..\..\Dependencies\iir1\iir\PoleFilter.cpp" />
+    <ClCompile Include="..\..\..\Dependencies\iir1\iir\RBJ.cpp" />
     <ClCompile Include="..\..\..\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\baseiids.cpp" />
     <ClCompile Include="..\..\..\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fbuffer.cpp" />
     <ClCompile Include="..\..\..\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fdebug.cpp" />
