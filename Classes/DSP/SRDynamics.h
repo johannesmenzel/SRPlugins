@@ -197,7 +197,7 @@ namespace SR {
 			// Sets dynamic processors makeup gain in dB
 			virtual void SetMakeup(double makeupDb) {
 				mMakeup = SR::Utils::DBToAmp(makeupDb);
-				fMakeup.SetGain(mMakeup);
+				fMakeup.SetGainLin(mMakeup);
 			}
 
 			// Sets if dynamic processor compensates gain reduction automatically
@@ -264,7 +264,7 @@ namespace SR {
 
 			virtual void AdjustAutoMakeup() {
 				mAutoMakeup = AutoMakeup(mThreshDb, mRatio, mReferenceDb);
-				fAutoMakeup.SetGain(mAutoMakeup);
+				fAutoMakeup.SetGainLin(mAutoMakeup);
 			}
 
 			SRGain fMakeup, fAutoMakeup;
