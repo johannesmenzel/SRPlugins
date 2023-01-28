@@ -31,7 +31,7 @@ const int kNumPresets = 1;
 
 enum EParams
 {
-	// 8 Dummy params for testing
+	// 10 Dummy params for testing
 	kDummy1 = 0,
 	kDummy2,
 	kDummy3,
@@ -40,6 +40,8 @@ enum EParams
 	kDummy6,
 	kDummy7,
 	kDummy8,
+	kDummy9,
+	kDummy10,
 
 	// Level Stage
 	kGainIn,
@@ -137,7 +139,7 @@ enum EParams
 	kNumParams
 };
 enum ECtrlTags {
-	// 8 Dummy params for testing
+	// 10 Dummy params for testing
 	cDummy1 = 0,
 	cDummy2,
 	cDummy3,
@@ -146,6 +148,8 @@ enum ECtrlTags {
 	cDummy6,
 	cDummy7,
 	cDummy8,
+	cDummy9,
+	cDummy10,
 
 	// Input Stage
 	// Level Stage
@@ -246,7 +250,8 @@ enum ECtrlTags {
 
 	// -- Meter
 	cMeterVu,
-	cMeterGr,
+	cMeterGrLevel,
+	cMeterGrPeak,
 	cMeterGrLim,
 	cMeterFreqResponse,
 
@@ -322,10 +327,12 @@ private:
 	SR::DSP::SRDynamicsDetector fMeterEnvelope[4];
 
 	IPeakSender<4, 1024> mMeterSender;
-	IPeakSender<2, 1024> mMeterSenderGr;
+	IPeakSender<1, 1024> mMeterSenderGrLevel;
+	IPeakSender<1, 1024> mMeterSenderGrPeak;
 
 	SR::DSP::SRBuffer<sample, 4, 1024> mBufferVu;
-	SR::DSP::SRBuffer<sample, 2, 1024> mBufferMeterGr;
+	SR::DSP::SRBuffer<sample, 1, 1024> mBufferMeterGrLevel;
+	SR::DSP::SRBuffer<sample, 1, 1024> mBufferMeterGrPeak;
 	SR::DSP::SRBuffer<sample, 2, 1024> mBufferLowSignal;
 
 	float* mFreqMeterValues;
