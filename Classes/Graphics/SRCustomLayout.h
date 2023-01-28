@@ -31,13 +31,13 @@ namespace SR {
             // Texts
             const float SR_DEFAULT_TEXT_SIZE = 20.f;
 
-            const IText SR_DEFAULT_TEXT = IText(20.f, SR_DEFAULT_COLOR, nullptr, EAlign::Center, EVAlign::Top);
-            const IText SR_DEFAULT_TEXT_KNOB_LABEL = IText(20.f, SR_DEFAULT_COLOR, nullptr, EAlign::Center, EVAlign::Top);
-            const IText SR_DEFAULT_TEXT_KNOB_VALUE = IText(20.f, COLOR_MID_GRAY, nullptr, EAlign::Center, EVAlign::Bottom);
-            const IText SR_DEFAULT_TEXT_BUTTON_LABEL = IText(20.f, SR_DEFAULT_COLOR, nullptr, EAlign::Center, EVAlign::Bottom);
-            const IText SR_DEFAULT_TEXT_BUTTON_VALUE = IText(14.f, COLOR_MID_GRAY, nullptr, EAlign::Center, EVAlign::Bottom);;
-            const IText SR_DEFAULT_TEXT_VERSIONSTRING = IText(14.f, SR_DEFAULT_COLOR, nullptr, EAlign::Near, EVAlign::Middle);
-            const IText SR_DEFAULT_TEXT_PRESETMENU = IText(30.f, SR_DEFAULT_COLOR, nullptr, EAlign::Center, EVAlign::Middle);
+            const IText SR_DEFAULT_TEXT = IText(SR_DEFAULT_TEXT_SIZE, SR_DEFAULT_COLOR, nullptr, EAlign::Center, EVAlign::Top);
+            const IText SR_DEFAULT_TEXT_KNOB_LABEL = IText(SR_DEFAULT_TEXT_SIZE, SR_DEFAULT_COLOR, nullptr, EAlign::Center, EVAlign::Top);
+            const IText SR_DEFAULT_TEXT_KNOB_VALUE = IText(SR_DEFAULT_TEXT_SIZE * .9f, COLOR_MID_GRAY, nullptr, EAlign::Center, EVAlign::Bottom);
+            const IText SR_DEFAULT_TEXT_BUTTON_LABEL = IText(SR_DEFAULT_TEXT_SIZE, SR_DEFAULT_COLOR, nullptr, EAlign::Center, EVAlign::Bottom);
+            const IText SR_DEFAULT_TEXT_BUTTON_VALUE = IText(SR_DEFAULT_TEXT_SIZE * .7f, COLOR_MID_GRAY, nullptr, EAlign::Center, EVAlign::Bottom);;
+            const IText SR_DEFAULT_TEXT_VERSIONSTRING = IText(SR_DEFAULT_TEXT_SIZE * .7f, SR_DEFAULT_COLOR, nullptr, EAlign::Near, EVAlign::Middle);
+            const IText SR_DEFAULT_TEXT_PRESETMENU = IText(SR_DEFAULT_TEXT_SIZE * 1.5f, SR_DEFAULT_COLOR, nullptr, EAlign::Center, EVAlign::Middle);
 
             // Color Specs
             const IVColorSpec SR_DEFAULT_COLOR_SPEC = IVColorSpec(
