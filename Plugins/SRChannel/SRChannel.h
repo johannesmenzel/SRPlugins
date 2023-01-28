@@ -9,6 +9,8 @@
 // True: Process passive eq as parallel filters (Dry + Lowpass Boost + Lowpass Cut (flipped))
 // False: Use ordinary biquad filters (Shelf, Peak)
 #define PASSIVE true
+// Switch using dummy parameters for modeling or use already modeled values
+#define DUMMY false
 
 #include "IPlug_include_in_plug_hdr.h"
 
@@ -280,7 +282,8 @@ private:
 	void AdjustEqPassive();
 	void AdjustBandSolo();
 
-	double meterIn1, meterIn2, meterOut1, meterOut2;
+	double mMeterIn[2], mMeterOut[2];
+	
 
 	SR::DSP::SRGain fGainIn;
 	SR::DSP::SRGain fGainOut;
@@ -309,6 +312,7 @@ private:
 	Iir::RBJ::LowPass fEqLfCut[2];
 	Iir::RBJ::BandPass1 fEqHfBoost[2];
 	Iir::RBJ::HighPass fEqHfCut[2];
+	double mGainLfBoost, mGainLfCut, mGainHfBoost, mGainHfCut;
 #else
 	Iir::RBJ::LowShelf fEqLfBoost[2];
 	Iir::RBJ::LowShelf fEqLfCut[2];

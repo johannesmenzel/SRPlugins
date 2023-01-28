@@ -164,8 +164,8 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		// Attach Controls
 		// -- Meters
 		pGraphics->AttachControl(new IVMeterControl<4>(rectMeterVu, "In Out", SR::Graphics::Layout::SR_DEFAULT_STYLE_METER, EDirection::Vertical, { "", "", "", "" }, 0, iplug::igraphics::IVMeterControl<4>::EResponse::Log, -60.f, 12.f, { 0, -6, -12, -24, -48 }), cMeterVu, "VU");
-		pGraphics->AttachControl(new IVMeterControl<1>(rectControlsCompLevel.GetCentredInside(25.f, rectControlsCompLevel.H()).GetReducedFromTop(20.f), "", SR::Graphics::Layout::SR_DEFAULT_STYLE_METER, EDirection::Vertical, {""}, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -12.f, 0.f, {0, -3, -6, -9, -12}), cMeterGrLevel, "GR");
-		pGraphics->AttachControl(new IVMeterControl<1>(rectControlsCompPeak.GetCentredInside(25.f, rectControlsCompPeak.H()).GetReducedFromTop(20.f), "", SR::Graphics::Layout::SR_DEFAULT_STYLE_METER, EDirection::Vertical, {""}, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -4.f, 0.f, {0, -1, -2, -3, -4}), cMeterGrPeak, "GR");
+		pGraphics->AttachControl(new IVMeterControl<1>(rectControlsCompLevel.GetCentredInside(25.f, rectControlsCompLevel.H()).GetReducedFromTop(20.f), "", SR::Graphics::Layout::SR_DEFAULT_STYLE_METER, EDirection::Vertical, { "" }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -12.f, 0.f, { 0, -3, -6, -9, -12 }), cMeterGrLevel, "GR");
+		pGraphics->AttachControl(new IVMeterControl<1>(rectControlsCompPeak.GetCentredInside(25.f, rectControlsCompPeak.H()).GetReducedFromTop(20.f), "", SR::Graphics::Layout::SR_DEFAULT_STYLE_METER, EDirection::Vertical, { "" }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -4.f, 0.f, { 0, -1, -2, -3, -4 }), cMeterGrPeak, "GR");
 		// -- Set GR meter displaying the other way round
 		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrLevel))->SetBaseValue(1.);
 		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrPeak))->SetBaseValue(1.);
@@ -282,12 +282,12 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 			fGainIn.Process(outputs[0][s], outputs[1][s]);
 
 		// Run input data through envelope filter to match VU like metering, then send to respective buffer. (After input gain) 
-		fMeterEnvelope[0].process(abs(outputs[0][s]), meterIn1);
-		fMeterEnvelope[1].process(abs(outputs[1][s]), meterIn2);
+		fMeterEnvelope[0].process(abs(outputs[0][s]), mMeterIn[0]);
+		fMeterEnvelope[1].process(abs(outputs[1][s]), mMeterIn[1]);
 
 
-		mBufferVu.ProcessBuffer(meterIn1, 0, s);
-		mBufferVu.ProcessBuffer(meterIn2, 1, s);
+		mBufferVu.ProcessBuffer(mMeterIn[0], 0, s);
+		mBufferVu.ProcessBuffer(mMeterIn[1], 1, s);
 
 		if (!GetParam(kBypass)->Bool()) {
 			// Process filters
@@ -329,18 +329,20 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 			for (int c = 0; c < nChans; c++) {
 #if PASSIVE
 				// Parallel (passive) eq processing blends dry with lowpass (boost) and lowpass (cut, flipped phase)
-				// With dummy params
+#if DUMMY				
 				outputs[c][s] = outputs[c][s]
-					+ (fEqLfBoost[c].filter(outputs[c][s]) * .1 * GetParam(kEqLfBoost)->Value() * GetParam(kDummy7)->Value())
-					- (fEqLfCut[c].filter(outputs[c][s]) * .1 * GetParam(kEqLfCut)->Value() * GetParam(kDummy8)->Value())
-					+ (fEqHfBoost[c].filter(outputs[c][s]) * .1 * GetParam(kEqHfBoost)->Value() * 1.6)
-					- (fEqHfCut[c].filter(outputs[c][s]) * .1 * GetParam(kEqHfCut)->Value() * GetParam(kDummy9)->Value());
+					+ (fEqLfBoost[c].filter(outputs[c][s]) * pow(.1 * GetParam(kEqLfBoost)->Value(), 2.) * GetParam(kDummy7)->Value())
+					- (fEqLfCut[c].filter(outputs[c][s]) * sqrt(.1 * GetParam(kEqLfCut)->Value()) * GetParam(kDummy8)->Value())
+					+ (fEqHfBoost[c].filter(outputs[c][s]) * pow(.1 * GetParam(kEqHfBoost)->Value(), 2.) * GetParam(kDummy7)->Value())
+					- (fEqHfCut[c].filter(outputs[c][s]) * sqrt(.1 * GetParam(kEqHfCut)->Value()) * GetParam(kDummy9)->Value());
+#else
 				// Model after Ignite
-				//outputs[c][s] = outputs[c][s]
-					//+ (fEqLfBoost[c].filter(outputs[c][s]) * .1 * GetParam(kEqLfBoost)->Value() * 2.402)
-					//- (fEqLfCut[c].filter(outputs[c][s]) * .1 * GetParam(kEqLfCut)->Value() * .9) // Cut Gain may not exceed .9, need to scale that now
-					//+ (fEqHfBoost[c].filter(outputs[c][s]) * .1 * GetParam(kEqHfBoost)->Value() * 1.6)
-					//- (fEqHfCut[c].filter(outputs[c][s]) * .1 * GetParam(kEqHfCut)->Value() * .9); // Cut Gain may not exceed .9, need to scale that now
+				outputs[c][s] = outputs[c][s]
+					+ (fEqLfBoost[c].filter(outputs[c][s]) * mGainLfBoost)
+					- (fEqLfCut[c].filter(outputs[c][s]) * mGainLfCut) // Cut Gain may not exceed .9, need to scale that now
+					+ (fEqHfBoost[c].filter(outputs[c][s]) * mGainHfBoost)
+					- (fEqHfCut[c].filter(outputs[c][s]) * mGainHfCut); // Cut Gain may not exceed .9, need to scale that now
+#endif // !DUMMY
 #else
 				// Normal biquad calc
 				outputs[c][s] = fEqLfBoost[c].filter(outputs[c][s]);
@@ -389,10 +391,10 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 		}
 
 		// Run input data through envelope filter to match VU like metering, then send to respective buffer.
-		fMeterEnvelope[2].process(abs(outputs[0][s]), meterOut1);
-		fMeterEnvelope[3].process(abs(outputs[1][s]), meterOut2);
-		mBufferVu.ProcessBuffer(meterOut1, 2, s);
-		mBufferVu.ProcessBuffer(meterOut2, 3, s);
+		fMeterEnvelope[2].process(abs(outputs[0][s]), mMeterOut[0]);
+		fMeterEnvelope[3].process(abs(outputs[1][s]), mMeterOut[1]);
+		mBufferVu.ProcessBuffer(mMeterOut[0], 2, s);
+		mBufferVu.ProcessBuffer(mMeterOut[1], 3, s);
 	}
 	mMeterSender.ProcessBlock(mBufferVu.GetBuffer(), nFrames, cMeterVu, 4);
 	mMeterSenderGrLevel.ProcessBlock(mBufferMeterGrLevel.GetBuffer(), nFrames, cMeterGrLevel, 1);
@@ -478,11 +480,11 @@ void SRChannel::OnParamChange(int paramIdx)
 	switch (paramIdx)
 	{
 	case kGainIn:
-		fGainIn.SetGain(DBToAmp(GetParam(paramIdx)->Value()));
+		fGainIn.SetGainDb(GetParam(paramIdx)->Value());
 		break;
 	case kGainOut:
-		fGainOut.SetGain(DBToAmp(GetParam(kGainOut)->Value()));
-		fGainOutLow.SetGain(DBToAmp(GetParam(kGainOut)->Value()));
+		fGainOut.SetGainDb(GetParam(kGainOut)->Value());
+		fGainOutLow.SetGainDb(GetParam(kGainOut)->Value());
 		break;
 	case kSaturationDrive:
 		fSatInput[0].SetDrive(GetParam(kSaturationDrive)->Value());
@@ -658,27 +660,38 @@ void SRChannel::AdjustEqPassive() {
 	const double samplerate = GetSampleRate();
 	for (int c = 0; c < 2; c++) {
 #if PASSIVE
-		// Use Dummy Param
+#if DUMMY
 		fEqLfBoost[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * GetParam(kDummy4)->Value(), GetParam(kDummy1)->Value());
 		fEqLfCut[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * GetParam(kDummy5)->Value(), GetParam(kDummy2)->Value());
-		fEqHfBoost[c].setup(samplerate, GetParam(kEqHfBoostFreq)->Value(), GetParam(kDummy10)->Value()); // Q range 1.6 .. 2.2, the broader (higher) the bw, the lower the gain
+		fEqHfBoost[c].setup(samplerate, GetParam(kEqHfBoostFreq)->Value(), GetParam(kDummy10)->Value());
 		fEqHfCut[c].setup(samplerate, GetParam(kEqHfCutFreq)->Value() / GetParam(kDummy6)->Value(), GetParam(kDummy3)->Value());
-		// Modeled after Ignite
-		//fEqLfBoost[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * 18.778, .206);
-		//fEqLfCut[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * 80.202, .253);
-		//fEqHfBoost[c].setup(samplerate, GetParam(kEqHfBoostFreq)->Value(), .6 + GetParam(kEqHfBoostQ)->Value() * .0473); // Q range .6 .. 1.073 while actually it should be .767 in middle pos
-		//fEqHfCut[c].setup(samplerate, GetParam(kEqHfCutFreq)->Value() / 23.302, .183);
-#else
-		// Use Dummy Param
-		//fEqLfBoost[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * GetParam(kDummy4)->Value(), GetParam(kEqLfBoost)->Value() * GetParam(kDummy7)->Value(), GetParam(kDummy1)->Value());
-		//fEqLfCut[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * GetParam(kDummy5)->Value(), -GetParam(kEqLfCut)->Value() * GetParam(kDummy8)->Value(), GetParam(kDummy2)->Value());
-		//fEqHfBoost[c].setup(samplerate, GetParam(kEqHfBoostFreq)->Value(), GetParam(kEqHfBoost)->Value(), 1.6 + GetParam(kEqHfBoostQ)->Value() * .06); // Q range 1.6 .. 2.2, the broader (higher) the bw, the lower the gain
-		//fEqHfCut[c].setup(samplerate, GetParam(kEqHfCutFreq)->Value() / GetParam(kDummy6)->Value(), -GetParam(kEqHfCut)->Value() * GetParam(kDummy9)->Value(), GetParam(kDummy3)->Value());
-		// Modeled after Ignite Amps
+		mGainLfBoost = pow(.1 * GetParam(kEqLfBoost)->Value(), 2.) * GetParam(kDummy7)->Value();
+		mGainLfCut = sqrt(.1 * GetParam(kEqLfCut)->Value()) * GetParam(kDummy8)->Value();
+		mGainHfBoost = pow(.1 * GetParam(kEqHfBoost)->Value(), 2.) * GetParam(kDummy7)->Value();
+		mGainHfCut = sqrt(.1 * GetParam(kEqHfCut)->Value())* GetParam(kDummy9)->Value();
+#else // Modeled
+		fEqLfBoost[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * 18.778, .206); // @10 Q=.136, xF=9.437 | @5 Q=.206, xF= 18.778
+		fEqLfCut[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * 80.202, .253); // @10 Q=.252, xF=57.2 | @5 Q=.253, xF= 80.202
+		fEqHfBoost[c].setup(samplerate, GetParam(kEqHfBoostFreq)->Value(), 3.2 - GetParam(kEqHfBoostQ)->Value() * .23); // Q range .9 .. 3.2, middle position not adjusted
+		fEqHfCut[c].setup(samplerate, GetParam(kEqHfCutFreq)->Value() / 23.302, .183); // @10 Q=.151, xF=29.46 | @5 Q=.183, xF= 23.302
+		mGainLfBoost = pow(.1 * GetParam(kEqLfBoost)->Value(), 2.) * 3.751;
+		mGainLfCut = sqrt(.1 * GetParam(kEqLfCut)->Value()) * .9;
+		mGainHfBoost = pow(.1 * GetParam(kEqHfBoost)->Value(), 2.) * 3.1;
+		mGainHfCut = sqrt(.1 * GetParam(kEqHfCut)->Value()) * .9;
+#endif // !DUMMY
+
+#else // Biquad
+#if DUMMY
+		fEqLfBoost[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * GetParam(kDummy4)->Value(), GetParam(kEqLfBoost)->Value() * GetParam(kDummy7)->Value(), GetParam(kDummy1)->Value());
+		fEqLfCut[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * GetParam(kDummy5)->Value(), -GetParam(kEqLfCut)->Value() * GetParam(kDummy8)->Value(), GetParam(kDummy2)->Value());
+		fEqHfBoost[c].setup(samplerate, GetParam(kEqHfBoostFreq)->Value(), GetParam(kEqHfBoost)->Value(), 1.6 + GetParam(kEqHfBoostQ)->Value() * .06); // Q range 1.6 .. 2.2, the broader (higher) the bw, the lower the gain
+		fEqHfCut[c].setup(samplerate, GetParam(kEqHfCutFreq)->Value() / GetParam(kDummy6)->Value(), -GetParam(kEqHfCut)->Value() * GetParam(kDummy9)->Value(), GetParam(kDummy3)->Value());
+#else // Modeled
 		fEqLfBoost[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * 5.809, GetParam(kEqLfBoost)->Value() * 1.316, .564);
 		fEqLfCut[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * 12.18, -GetParam(kEqLfCut)->Value() * 1.838, .513);
 		fEqHfBoost[c].setup(samplerate, GetParam(kEqHfBoostFreq)->Value(), GetParam(kEqHfBoost)->Value() * (1. - .04 * GetParam(kEqHfBoostQ)->Value()), 1.6 + GetParam(kEqHfBoostQ)->Value() * .06); // Q range 1.6 .. 2.2, the broader (higher) the bw, the lower the gain
 		fEqHfCut[c].setup(samplerate, GetParam(kEqHfCutFreq)->Value() / 2.6, -GetParam(kEqHfCut)->Value() * 2.599, .475);
+#endif // !DUMMY
 #endif // !PASSIVE
 	}
 
