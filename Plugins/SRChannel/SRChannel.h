@@ -1,9 +1,14 @@
 #pragma once
 
-//1: SRFilters
-//2: Vinnie Falcos DspFilters
-//3: irr
+// Switch which filter library to use, if set up
+// 1: Using SRFilters
+// 2: Using DspFilters (Vinnie Falco)
+// 3: Using Iir (Bernd Porr)
 #define FLT 3
+// Switch using passive or biquad filtering
+// True: Process passive eq as parallel filters (Dry + Lowpass Boost + Lowpass Cut (flipped))
+// False: Use ordinary biquad filters (Shelf, Peak)
+#define PASSIVE false
 
 #include "IPlug_include_in_plug_hdr.h"
 
@@ -240,10 +245,12 @@ public:
 	void OnIdle() override;
 	void OnParamChange(int paramIdx) override;
 
-	void AdjustBandSolo();
+
 
 private:
 	void SetFreqMeterValues();
+	void AdjustEqPassive();
+	void AdjustBandSolo();
 
 	double meterIn1, meterIn2, meterOut1, meterOut2;
 
@@ -269,10 +276,17 @@ private:
 	Dsp::SimpleFilter<Dsp::RBJ::BandShelf, 2> fEqLfBoost;
 	Dsp::SimpleFilter<Dsp::RBJ::HighShelf, 2> fEqLfCut;
 #elif FLT == 3
+#if PASSIVE
+	Iir::RBJ::LowPass fEqLfBoost[2];
+	Iir::RBJ::LowPass fEqLfCut[2];
+	Iir::RBJ::BandPass1 fEqHfBoost[2];
+	Iir::RBJ::HighPass fEqHfCut[2];
+#else
 	Iir::RBJ::LowShelf fEqLfBoost[2];
 	Iir::RBJ::LowShelf fEqLfCut[2];
 	Iir::RBJ::BandShelf fEqHfBoost[2];
 	Iir::RBJ::HighShelf fEqHfCut[2];
+#endif / !PASSIVE
 #endif // !FLT
 
 	SR::DSP::SRFilterIIR<sample, 2> fEqBandSolo;
