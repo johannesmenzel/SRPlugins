@@ -90,15 +90,15 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kEqHmfQ)->InitDouble("HMF Q", .707, 0.1, 10., 0.01, "", 0, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.1, 10., .707, .5)));
 	GetParam(kEqHmfDs)->InitDouble("HMF DS", 0., -50., 0., .01, "dB", 0, "EQ");
 
-	GetParam(kEqLfBoost)->InitDouble("LF Boost", 0., 0., 10., .01, "", 0, "EQ");
-	GetParam(kEqLfCut)->InitDouble("LF Cut", 0., 0., 10., .01, "", 0, "EQ");
-	GetParam(kEqLfFreq)->InitDouble("LF Freq", 100., 20., 300., 10., "Hz", IParam::EFlags::kFlagStepped, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(20., 300., 100., .5)));
+	GetParam(kEqLfBoost)->InitDouble("LF Boost", 0., 0., 10., 1., "", IParam::EFlags::kFlagStepped, "EQ");
+	GetParam(kEqLfCut)->InitDouble("LF Cut", 0., 0., 10., 1., "", IParam::EFlags::kFlagStepped, "EQ");
+	GetParam(kEqLfFreq)->InitDouble("LF Freq", 100., 20., 150., 10., "Hz", IParam::EFlags::kFlagStepped, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(20., 150., 100., .5)));
 
-	GetParam(kEqHfBoost)->InitDouble("HF Boost", 0., 0., 10., .01, "", 0, "EQ");
-	GetParam(kEqHfCut)->InitDouble("HF Cut", 0., 0., 10., .01, "", 0, "EQ");
+	GetParam(kEqHfBoost)->InitDouble("HF Boost", 0., 0., 10., 1., "", IParam::EFlags::kFlagStepped, "EQ");
+	GetParam(kEqHfCut)->InitDouble("HF Cut", 0., 0., 10., 1., "", IParam::EFlags::kFlagStepped, "EQ");
 	GetParam(kEqHfBoostFreq)->InitDouble("HF Freq", 8000., 1000., 16000., 1000., "Hz", IParam::EFlags::kFlagStepped, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(1000., 16000., 8000., .5)));
 	GetParam(kEqHfCutFreq)->InitDouble("HF Freq", 10000., 5000., 20000., 5000., "Hz", IParam::EFlags::kFlagStepped, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(5000., 20000., 10000., .5)));
-	GetParam(kEqHfBoostQ)->InitDouble("HF Q", 5., 0., 10., 1., "", 0, "EQ");
+	GetParam(kEqHfBoostQ)->InitDouble("HF Q", 5., 0., 10., 1., "", IParam::EFlags::kFlagStepped, "EQ");
 
 	GetParam(kCompRmsThresh)->InitDouble("Level Thresh", 0., -40., 0., 0.1, "dB", 0, "Comp");
 	GetParam(kCompRmsRatio)->InitDouble("Level Ratio", 2.5, 1., 6., .5, ":1", IParam::EFlags::kFlagStepped, "Comp", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(1., 6., 2.5, .5)));
