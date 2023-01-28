@@ -177,16 +177,16 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectTitle.GetGridCell(1, 3, 2, 24).GetCentredInside(20.f), kEqBandSolo, "Solo", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cEqBandSolo, "Global");
 		// -- Dummy
 		pGraphics->AttachControl(new IPanelControl(rectDummy, COLOR_BLACK));
-		pGraphics->AttachControl(new IVKnobControl(rectDummy.GetGridCell(0, 0, 10, 1), kDummy1, GetParam(kDummy1)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE)).WithValueText(DEFAULT_VALUE_TEXT.WithFGColor(COLOR_WHITE))), cDummy1, "Dummy");
-		pGraphics->AttachControl(new IVKnobControl(rectDummy.GetGridCell(1, 0, 10, 1), kDummy2, GetParam(kDummy2)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE)).WithValueText(DEFAULT_VALUE_TEXT.WithFGColor(COLOR_WHITE))), cDummy2, "Dummy");
-		pGraphics->AttachControl(new IVKnobControl(rectDummy.GetGridCell(2, 0, 10, 1), kDummy3, GetParam(kDummy3)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE)).WithValueText(DEFAULT_VALUE_TEXT.WithFGColor(COLOR_WHITE))), cDummy3, "Dummy");
-		pGraphics->AttachControl(new IVKnobControl(rectDummy.GetGridCell(3, 0, 10, 1), kDummy4, GetParam(kDummy4)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE)).WithValueText(DEFAULT_VALUE_TEXT.WithFGColor(COLOR_WHITE))), cDummy4, "Dummy");
-		pGraphics->AttachControl(new IVKnobControl(rectDummy.GetGridCell(4, 0, 10, 1), kDummy5, GetParam(kDummy5)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE)).WithValueText(DEFAULT_VALUE_TEXT.WithFGColor(COLOR_WHITE))), cDummy5, "Dummy");
-		pGraphics->AttachControl(new IVKnobControl(rectDummy.GetGridCell(5, 0, 10, 1), kDummy6, GetParam(kDummy6)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE)).WithValueText(DEFAULT_VALUE_TEXT.WithFGColor(COLOR_WHITE))), cDummy6, "Dummy");
-		pGraphics->AttachControl(new IVKnobControl(rectDummy.GetGridCell(6, 0, 10, 1), kDummy7, GetParam(kDummy7)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE)).WithValueText(DEFAULT_VALUE_TEXT.WithFGColor(COLOR_WHITE))), cDummy7, "Dummy");
-		pGraphics->AttachControl(new IVKnobControl(rectDummy.GetGridCell(7, 0, 10, 1), kDummy8, GetParam(kDummy8)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE)).WithValueText(DEFAULT_VALUE_TEXT.WithFGColor(COLOR_WHITE))), cDummy8, "Dummy");
-		pGraphics->AttachControl(new IVKnobControl(rectDummy.GetGridCell(8, 0, 10, 1), kDummy9, GetParam(kDummy9)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE)).WithValueText(DEFAULT_VALUE_TEXT.WithFGColor(COLOR_WHITE))), cDummy9, "Dummy");
-		pGraphics->AttachControl(new IVKnobControl(rectDummy.GetGridCell(9, 0, 10, 1), kDummy10, GetParam(kDummy10)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE)).WithValueText(DEFAULT_VALUE_TEXT.WithFGColor(COLOR_WHITE))), cDummy10, "Dummy");
+		pGraphics->AttachControl(new IVKnobControl(rectDummy.GetGridCell(0, 0, 10, 1).GetReducedFromTop(10.f), kDummy1, GetParam(kDummy1)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE)).WithValueText(DEFAULT_VALUE_TEXT.WithFGColor(COLOR_WHITE))), cDummy1, "Dummy");
+		pGraphics->AttachControl(new IVKnobControl(rectDummy.GetGridCell(1, 0, 10, 1).GetReducedFromTop(10.f), kDummy2, GetParam(kDummy2)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE)).WithValueText(DEFAULT_VALUE_TEXT.WithFGColor(COLOR_WHITE))), cDummy2, "Dummy");
+		pGraphics->AttachControl(new IVKnobControl(rectDummy.GetGridCell(2, 0, 10, 1).GetReducedFromTop(10.f), kDummy3, GetParam(kDummy3)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE)).WithValueText(DEFAULT_VALUE_TEXT.WithFGColor(COLOR_WHITE))), cDummy3, "Dummy");
+		pGraphics->AttachControl(new IVKnobControl(rectDummy.GetGridCell(3, 0, 10, 1).GetReducedFromTop(10.f), kDummy4, GetParam(kDummy4)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE)).WithValueText(DEFAULT_VALUE_TEXT.WithFGColor(COLOR_WHITE))), cDummy4, "Dummy");
+		pGraphics->AttachControl(new IVKnobControl(rectDummy.GetGridCell(4, 0, 10, 1).GetReducedFromTop(10.f), kDummy5, GetParam(kDummy5)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE)).WithValueText(DEFAULT_VALUE_TEXT.WithFGColor(COLOR_WHITE))), cDummy5, "Dummy");
+		pGraphics->AttachControl(new IVKnobControl(rectDummy.GetGridCell(5, 0, 10, 1).GetReducedFromTop(10.f), kDummy6, GetParam(kDummy6)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE)).WithValueText(DEFAULT_VALUE_TEXT.WithFGColor(COLOR_WHITE))), cDummy6, "Dummy");
+		pGraphics->AttachControl(new IVKnobControl(rectDummy.GetGridCell(6, 0, 10, 1).GetReducedFromTop(10.f), kDummy7, GetParam(kDummy7)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE)).WithValueText(DEFAULT_VALUE_TEXT.WithFGColor(COLOR_WHITE))), cDummy7, "Dummy");
+		pGraphics->AttachControl(new IVKnobControl(rectDummy.GetGridCell(7, 0, 10, 1).GetReducedFromTop(10.f), kDummy8, GetParam(kDummy8)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE)).WithValueText(DEFAULT_VALUE_TEXT.WithFGColor(COLOR_WHITE))), cDummy8, "Dummy");
+		pGraphics->AttachControl(new IVKnobControl(rectDummy.GetGridCell(8, 0, 10, 1).GetReducedFromTop(10.f), kDummy9, GetParam(kDummy9)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE)).WithValueText(DEFAULT_VALUE_TEXT.WithFGColor(COLOR_WHITE))), cDummy9, "Dummy");
+		pGraphics->AttachControl(new IVKnobControl(rectDummy.GetGridCell(9, 0, 10, 1).GetReducedFromTop(10.f), kDummy10, GetParam(kDummy10)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE)).WithValueText(DEFAULT_VALUE_TEXT.WithFGColor(COLOR_WHITE))), cDummy10, "Dummy");
 		// -- Gains		
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsGain.GetGridCell(0, 0, 2, 1).GetReducedFromTop(20.f), kGainIn, "Input", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGainIn, "Gain");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsGain.GetGridCell(1, 0, 2, 1).GetReducedFromTop(20.f), kGainOut, "Output", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGainOut, "Gain");
@@ -751,11 +751,22 @@ void SRChannel::SetFreqMeterValues()
 			if (GetParam(kEqLfBoost)->Value() != 0.0) mFreqMeterValues[i] += fEqLfBoost.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
 			if (GetParam(kEqLfCut)->Value() != 0.0) mFreqMeterValues[i] += fEqLfCut.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
 #elif FLT == 3
+#if PASSIVE
+			// Direct plotting does't work here because of the parallel structure. So we mimik the processing: 
+			// Dry + Boost - Cut
+			mFreqMeterValues[i] += AmpToDB(1.
+				+ (mGainLfBoost * (abs(fEqLfBoost[0].response(freq / samplerate)))
+				- mGainLfCut * (abs(fEqLfCut[0].response(freq / samplerate)))
+				+ mGainHfBoost * (abs(fEqHfBoost[0].response(freq / samplerate)))
+				- mGainHfCut * (abs(fEqHfCut[0].response(freq / samplerate))))) 
+				/ FREQRESP_RANGEDB;
+#else
 			// Like above, but since response function gets complex_t, we just have to use abs() for magnitude or arg() for phase, then convert to dB and normalize
 			if (GetParam(kEqLfBoost)->Value() != 0.0) mFreqMeterValues[i] += AmpToDB(abs(fEqLfBoost[0].response(freq / samplerate))) / FREQRESP_RANGEDB;
 			if (GetParam(kEqLfCut)->Value() != 0.0) mFreqMeterValues[i] += AmpToDB(abs(fEqLfCut[0].response(freq / samplerate))) / FREQRESP_RANGEDB;
 			if (GetParam(kEqHfBoost)->Value() != 0.0) mFreqMeterValues[i] += AmpToDB(abs(fEqHfBoost[0].response(freq / samplerate))) / FREQRESP_RANGEDB;
 			if (GetParam(kEqHfCut)->Value() != 0.0) mFreqMeterValues[i] += AmpToDB(abs(fEqHfCut[0].response(freq / samplerate))) / FREQRESP_RANGEDB;
+#endif // !PASSIVE
 #endif // !FLT
 		}
 	}
