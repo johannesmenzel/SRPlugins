@@ -90,12 +90,12 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kEqHmfQ)->InitDouble("HMF Q", .707, 0.1, 10., 0.01, "", 0, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.1, 10., .707, .5)));
 	GetParam(kEqHmfDs)->InitDouble("HMF DS", 0., -50., 0., .01, "dB", 0, "EQ");
 
-	GetParam(kEqLfBoost)->InitDouble("LF Boost", 0., 0., 10., 1., "", IParam::EFlags::kFlagStepped, "EQ");
-	GetParam(kEqLfCut)->InitDouble("LF Cut", 0., 0., 10., 1., "", IParam::EFlags::kFlagStepped, "EQ");
-	GetParam(kEqLfFreq)->InitDouble("LF Freq", 100., 30., 300., 10., "Hz", IParam::EFlags::kFlagStepped, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(30., 300., 100., .5)));
+	GetParam(kEqLfBoost)->InitDouble("LF Boost", 0., 0., 10., .01, "", 0, "EQ");
+	GetParam(kEqLfCut)->InitDouble("LF Cut", 0., 0., 10., .01, "", 0, "EQ");
+	GetParam(kEqLfFreq)->InitDouble("LF Freq", 100., 20., 300., 10., "Hz", IParam::EFlags::kFlagStepped, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(20., 300., 100., .5)));
 
-	GetParam(kEqHfBoost)->InitDouble("HF Boost", 0., 0., 10., 1., "", IParam::EFlags::kFlagStepped, "EQ");
-	GetParam(kEqHfCut)->InitDouble("HF Cut", 0., 0., 10., 1., "", IParam::EFlags::kFlagStepped, "EQ");
+	GetParam(kEqHfBoost)->InitDouble("HF Boost", 0., 0., 10., .01, "", 0, "EQ");
+	GetParam(kEqHfCut)->InitDouble("HF Cut", 0., 0., 10., .01, "", 0, "EQ");
 	GetParam(kEqHfBoostFreq)->InitDouble("HF Freq", 8000., 1000., 16000., 1000., "Hz", IParam::EFlags::kFlagStepped, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(1000., 16000., 8000., .5)));
 	GetParam(kEqHfCutFreq)->InitDouble("HF Freq", 10000., 5000., 20000., 5000., "Hz", IParam::EFlags::kFlagStepped, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(5000., 20000., 10000., .5)));
 	GetParam(kEqHfBoostQ)->InitDouble("HF Q", 5., 0., 10., 1., "", 0, "EQ");
@@ -121,16 +121,16 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kEqBandSolo)->InitEnum("Band Solo", 0, { "Off", "HP", "LP", "Hmf", "Lmf", "Hf", "Lf" }, 0, "EQ");
 
 	// DUMMY_INIT GetParam(kDummy1)->InitDouble("1", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
-	GetParam(kDummy1)->InitDouble("LBQ", .707, 0.01, 10., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.01, 10., .707, .5)));
-	GetParam(kDummy2)->InitDouble("LCQ", .707, 0.01, 10., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.01, 10., .707, .5)));
-	GetParam(kDummy3)->InitDouble("HCQ", .707, 0.01, 10., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.01, 10., .707, .5)));
-	GetParam(kDummy4)->InitDouble("LBxF", 1., 0.1, 200., 0.001, "x", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.1, 200., 1., .5)));
-	GetParam(kDummy5)->InitDouble("LCxF", 1., 0.1, 200., 0.001, "x", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.1, 200., 1., .5)));
-	GetParam(kDummy6)->InitDouble("HCxF", 1., 0.1, 200., 0.001, "x", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.1, 200., 1., .5)));
-	GetParam(kDummy7)->InitDouble("LBxG", 1., 0.1, 3., 0.001, "x", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0.1, 3., 1., .5)));
-	GetParam(kDummy8)->InitDouble("LCxG", 1., 0.1, 3., 0.001, "x", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0.1, 3., 1., .5)));
-	GetParam(kDummy9)->InitDouble("HCxG", 1., 0.1, 3., 0.001, "x", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0.1, 3., 1., .5)));
-	GetParam(kDummy10)->InitDouble("10", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
+	GetParam(kDummy1)->InitDouble("LBQ", .206, 0.01, 10., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.01, 10., .707, .5)));
+	GetParam(kDummy2)->InitDouble("LCQ", .253, 0.01, 10., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.01, 10., .707, .5)));
+	GetParam(kDummy3)->InitDouble("HCQ", .183, 0.01, 10., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.01, 10., .707, .5)));
+	GetParam(kDummy4)->InitDouble("LBxF", 18.778, 0.1, 200., 0.001, "x", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.1, 200., 1., .5)));
+	GetParam(kDummy5)->InitDouble("LCxF", 80.202, 0.1, 200., 0.001, "x", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.1, 200., 1., .5)));
+	GetParam(kDummy6)->InitDouble("HCxF", 23.302, 0.1, 200., 0.001, "x", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.1, 200., 1., .5)));
+	GetParam(kDummy7)->InitDouble("LBxG", 3.751, 0.1, 5., 0.001, "x", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0.1, 5., 1., .5)));
+	GetParam(kDummy8)->InitDouble("LCxG", .9, 0.1, 5., 0.001, "x", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0.1, 5., 1., .5)));
+	GetParam(kDummy9)->InitDouble("HCxG", .9, 0.1, 5., 0.001, "x", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0.1, 5., 1., .5)));
+	GetParam(kDummy10)->InitDouble("HBQ", .707, 0.01, 10., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.01, 10., .707, .5)));
 
 	OnReset();
 
@@ -329,11 +329,18 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 			for (int c = 0; c < nChans; c++) {
 #if PASSIVE
 				// Parallel (passive) eq processing blends dry with lowpass (boost) and lowpass (cut, flipped phase)
+				// With dummy params
 				outputs[c][s] = outputs[c][s]
-					+ (fEqLfBoost[c].filter(outputs[c][s]) * GetParam(kEqLfBoost)->Value() * .18)
-					- (fEqLfCut[c].filter(outputs[c][s]) * GetParam(kEqLfCut)->Value() * .13)
-					+ (fEqHfBoost[c].filter(outputs[c][s]) * GetParam(kEqHfBoost)->Value() * .18)
-					- (fEqHfCut[c].filter(outputs[c][s]) * GetParam(kEqHfCut)->Value() * .13);
+					+ (fEqLfBoost[c].filter(outputs[c][s]) * .1 * GetParam(kEqLfBoost)->Value() * GetParam(kDummy7)->Value())
+					- (fEqLfCut[c].filter(outputs[c][s]) * .1 * GetParam(kEqLfCut)->Value() * GetParam(kDummy8)->Value())
+					+ (fEqHfBoost[c].filter(outputs[c][s]) * .1 * GetParam(kEqHfBoost)->Value() * 1.6)
+					- (fEqHfCut[c].filter(outputs[c][s]) * .1 * GetParam(kEqHfCut)->Value() * GetParam(kDummy9)->Value());
+				// Model after Ignite
+				//outputs[c][s] = outputs[c][s]
+					//+ (fEqLfBoost[c].filter(outputs[c][s]) * .1 * GetParam(kEqLfBoost)->Value() * 2.402)
+					//- (fEqLfCut[c].filter(outputs[c][s]) * .1 * GetParam(kEqLfCut)->Value() * .9) // Cut Gain may not exceed .9, need to scale that now
+					//+ (fEqHfBoost[c].filter(outputs[c][s]) * .1 * GetParam(kEqHfBoost)->Value() * 1.6)
+					//- (fEqHfCut[c].filter(outputs[c][s]) * .1 * GetParam(kEqHfCut)->Value() * .9); // Cut Gain may not exceed .9, need to scale that now
 #else
 				// Normal biquad calc
 				outputs[c][s] = fEqLfBoost[c].filter(outputs[c][s]);
@@ -651,12 +658,18 @@ void SRChannel::AdjustEqPassive() {
 	const double samplerate = GetSampleRate();
 	for (int c = 0; c < 2; c++) {
 #if PASSIVE
-		fEqLfBoost[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * 120., 0.015629);
-		fEqLfCut[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * 80., 0.266667);
-		fEqHfBoost[c].setup(samplerate, GetParam(kEqHfFreq)->Value(), HFBOOSTQ);
-		fEqHfCut[c].setup(samplerate, GetParam(kEqHfFreq)->Value() / 80., 0.266667);
+		// Use Dummy Param
+		fEqLfBoost[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * GetParam(kDummy4)->Value(), GetParam(kDummy1)->Value());
+		fEqLfCut[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * GetParam(kDummy5)->Value(), GetParam(kDummy2)->Value());
+		fEqHfBoost[c].setup(samplerate, GetParam(kEqHfBoostFreq)->Value(), GetParam(kDummy10)->Value()); // Q range 1.6 .. 2.2, the broader (higher) the bw, the lower the gain
+		fEqHfCut[c].setup(samplerate, GetParam(kEqHfCutFreq)->Value() / GetParam(kDummy6)->Value(), GetParam(kDummy3)->Value());
+		// Modeled after Ignite
+		//fEqLfBoost[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * 18.778, .206);
+		//fEqLfCut[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * 80.202, .253);
+		//fEqHfBoost[c].setup(samplerate, GetParam(kEqHfBoostFreq)->Value(), .6 + GetParam(kEqHfBoostQ)->Value() * .0473); // Q range .6 .. 1.073 while actually it should be .767 in middle pos
+		//fEqHfCut[c].setup(samplerate, GetParam(kEqHfCutFreq)->Value() / 23.302, .183);
 #else
-		// Use Dummy Var
+		// Use Dummy Param
 		//fEqLfBoost[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * GetParam(kDummy4)->Value(), GetParam(kEqLfBoost)->Value() * GetParam(kDummy7)->Value(), GetParam(kDummy1)->Value());
 		//fEqLfCut[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * GetParam(kDummy5)->Value(), -GetParam(kEqLfCut)->Value() * GetParam(kDummy8)->Value(), GetParam(kDummy2)->Value());
 		//fEqHfBoost[c].setup(samplerate, GetParam(kEqHfBoostFreq)->Value(), GetParam(kEqHfBoost)->Value(), 1.6 + GetParam(kEqHfBoostQ)->Value() * .06); // Q range 1.6 .. 2.2, the broader (higher) the bw, the lower the gain

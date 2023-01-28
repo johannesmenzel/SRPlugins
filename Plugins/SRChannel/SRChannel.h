@@ -8,7 +8,7 @@
 // Switch using passive or biquad filtering
 // True: Process passive eq as parallel filters (Dry + Lowpass Boost + Lowpass Cut (flipped))
 // False: Use ordinary biquad filters (Shelf, Peak)
-#define PASSIVE false
+#define PASSIVE true
 
 #include "IPlug_include_in_plug_hdr.h"
 
