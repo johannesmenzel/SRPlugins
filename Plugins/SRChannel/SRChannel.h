@@ -27,12 +27,22 @@
 #include "../../Classes/DSP/SRBuffer.h"
 #include "IControls.h"
 
-const int kNumPresets = 3;
+const int kNumPresets = 1;
 
 enum EParams
 {
+	// 8 Dummy params for testing
+	kDummy1 = 0,
+	kDummy2,
+	kDummy3,
+	kDummy4,
+	kDummy5,
+	kDummy6,
+	kDummy7,
+	kDummy8,
+
 	// Level Stage
-	kGainIn = 0,
+	kGainIn,
 	kGainOut,
 
 	// Sat Stage
@@ -46,12 +56,12 @@ enum EParams
 	kEqHpFreq,
 	kEqLpFreq,
 
-	// -- EQ
-	kEqHfBoost,
-	kEqHfCut,
-	kEqHfFreq,
-	kEqHfDs,
-	kEqHfIsBell,
+	// -- Parametric EQ
+	kEqLmfGain,
+	kEqLmfFreq,
+	kEqLmfQ,
+	kEqLmfDs,
+	kEqLmfIsShelf,
 
 	kEqHmfGain,
 	kEqHmfFreq,
@@ -59,17 +69,18 @@ enum EParams
 	kEqHmfDs,
 	kEqHmfIsShelf,
 
-	kEqLmfGain,
-	kEqLmfFreq,
-	kEqLmfQ,
-	kEqLmfDs,
-	kEqLmfIsShelf,
-
+	// -- Passive EQ
 	kEqLfBoost,
 	kEqLfCut,
 	kEqLfFreq,
-	kEqLfDs,
 	kEqLfIsBell,
+
+	kEqHfBoost,
+	kEqHfCut,
+	kEqHfBoostFreq,
+	kEqHfBoostQ,
+	kEqHfCutFreq,
+	kEqHfIsBell,
 
 	kEqBandSolo,
 	kEqAmount,
@@ -126,10 +137,19 @@ enum EParams
 	kNumParams
 };
 enum ECtrlTags {
+	// 8 Dummy params for testing
+	cDummy1 = 0,
+	cDummy2,
+	cDummy3,
+	cDummy4,
+	cDummy5,
+	cDummy6,
+	cDummy7,
+	cDummy8,
 
 	// Input Stage
 	// Level Stage
-	cGainIn = 0,
+	cGainIn,
 	cGainOut,
 
 	// Sat Stage
@@ -143,12 +163,12 @@ enum ECtrlTags {
 	cEqHpFreq,
 	cEqLpFreq,
 
-	// -- EQ
-	cEqHfBoost,
-	cEqHfCut,
-	cEqHfFreq,
-	cEqHfDs,
-	cEqHfIsBell,
+	// -- Parametric EQ
+	cEqLmfGain,
+	cEqLmfFreq,
+	cEqLmfQ,
+	cEqLmfDs,
+	cEqLmfIsShelf,
 
 	cEqHmfGain,
 	cEqHmfFreq,
@@ -156,18 +176,20 @@ enum ECtrlTags {
 	cEqHmfDs,
 	cEqHmfIsShelf,
 
-	cEqLmfGain,
-	cEqLmfFreq,
-	cEqLmfQ,
-	cEqLmfDs,
-	cEqLmfIsShelf,
-
+	// -- Passive EQ
 	cEqLfBoost,
 	cEqLfCut,
 	cEqLfFreq,
-	cEqLfDs,
 	cEqLfIsBell,
+	
+	cEqHfBoost,
+	cEqHfCut,
+	cEqHfBoostFreq,
+	cEqHfBoostQ,
+	cEqHfCutFreq,
+	cEqHfIsBell,
 
+	// -- Global EQ
 	cEqBandSolo,
 	cEqAmount,
 
@@ -218,6 +240,7 @@ enum ECtrlTags {
 	cCompBypass,
 	cOutputBypass,
 	cBypass,
+
 
 	// UI Controls
 

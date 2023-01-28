@@ -99,12 +99,12 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kEqLfBoost)->InitDouble("LF Boost", 0., 0., 10., 1., "", IParam::EFlags::kFlagStepped, "EQ");
 	GetParam(kEqLfCut)->InitDouble("LF Cut", 0., 0., 10., 1., "", IParam::EFlags::kFlagStepped, "EQ");
 	GetParam(kEqLfFreq)->InitDouble("LF Freq", 100., 30., 300., 10., "Hz", IParam::EFlags::kFlagStepped, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(30., 300., 100., .5)));
-	GetParam(kEqLfDs)->InitDouble("LF DS", 0., -20., 0., .01, "dB", 0, "EQ");
 
 	GetParam(kEqHfBoost)->InitDouble("HF Boost", 0., 0., 10., 1., "", IParam::EFlags::kFlagStepped, "EQ");
 	GetParam(kEqHfCut)->InitDouble("HF Cut", 0., 0., 10., 1., "", IParam::EFlags::kFlagStepped, "EQ");
-	GetParam(kEqHfFreq)->InitDouble("HF Freq", 8000., 3000., 16000., 1000., "Hz", IParam::EFlags::kFlagStepped, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(3000., 16000., 8000., .5)));
-	GetParam(kEqHfDs)->InitDouble("HF DS", 0., -20., 0., .01, "dB", 0, "EQ");
+	GetParam(kEqHfBoostFreq)->InitDouble("HF Freq", 8000., 1000., 16000., 1000., "Hz", IParam::EFlags::kFlagStepped, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(1000., 16000., 8000., .5)));
+	GetParam(kEqHfCutFreq)->InitDouble("HF Freq", 10000., 5000., 20000., 5000., "Hz", IParam::EFlags::kFlagStepped, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(5000., 20000., 10000., .5)));
+	GetParam(kEqHfBoostQ)->InitDouble("HF Q", .707, 0.1, 10., 0.01, "", 0, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.1, 10., .707, .5)));
 
 	GetParam(kCompRmsThresh)->InitDouble("Level Thresh", 0., -40., 0., 0.1, "dB", 0, "Comp");
 	GetParam(kCompRmsRatio)->InitDouble("Level Ratio", 2.5, 1., 6., .5, ":1", IParam::EFlags::kFlagStepped, "Comp", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(1., 6., 2.5, .5)));
@@ -126,12 +126,20 @@ SRChannel::SRChannel(const InstanceInfo& info)
 
 	GetParam(kEqBandSolo)->InitEnum("Band Solo", 0, { "Off", "HP", "LP", "Hmf", "Lmf", "Hf", "Lf" }, 0, "EQ");
 
+	// DUMMY_INIT GetParam(kDummy1)->InitDouble("1", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
+	GetParam(kDummy1)->InitDouble("1", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
+	GetParam(kDummy2)->InitDouble("2", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
+	GetParam(kDummy3)->InitDouble("3", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
+	GetParam(kDummy4)->InitDouble("4", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
+	GetParam(kDummy5)->InitDouble("5", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
+	GetParam(kDummy6)->InitDouble("6", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
+	GetParam(kDummy7)->InitDouble("7", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
+	GetParam(kDummy8)->InitDouble("8", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
+
 	OnReset();
 
 	MakeDefaultPreset("Init", 1);
-	MakePreset("VC De-ess", 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 22000.000000, 0.000000, 0.000000, 8000.000000, 0.000000, 0.000000, 0.000000, 8192.059190, 4.432813, -26.370989, false, 0.000000, 1000.000000, 0.707000, 0.000000, false, 0.000000, 0.000000, 100.000000, 0.000000, 0.000000, 0, 0.000000, 0.000000, 2.500000, 20.000000, 300.000000, 0.000000, 0.000000, 100.000000, 0.000000, 0.000000, 0.000000, 8.000000, 4.000000, 120.000000, 0.000000, 0.000000, 100.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 100.000000, 100.000000, 0.000000, 20.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, false);
-	MakePreset("MS Mastering", 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 30.000000, 21000.000000, 0.000000, 0.000000, 8000.000000, 0.000000, 0.000000, 2.000000, 11165.008820, 0.707000, -26.612924, true, 2.000000, 123.792685, 0.707000, -21.290339, true, 0.000000, 0.000000, 100.000000, 0.000000, 0.000000, 0, 0.000000, -20.812508, 2.000000, 10.434966, 120.000000, 0.000000, 1.237500, 100.000000, 0.000000, 0.000000, -14.203114, 8.000000, 2.281333, 80.000000, 0.000000, 0.450000, 100.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 110.000000, 0.000000, 0.000000, 100.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, false);
-
+	// Insert other Presets from Dump if needed
 
 #if IPLUG_EDITOR // http://bit.ly/2S64BDd
 	mMakeGraphicsFunc = [&]() {
@@ -158,13 +166,21 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		const IRECT rectControlsGain = rectControls.GetGridCell(4, 7, 6, 8).FracRectVertical(2.f, true).GetPadded(-5.f);
 
 		// Attach Controls
-		// -- Title		
-		pGraphics->AttachControl(new ITextControl(rectTitle.GetGridCell(0, 0, 2, 24).FracRectHorizontal(10.f, false), PLUG_MFR " " PLUG_NAME " " PLUG_VERSION_STR "-alpha", SR::Graphics::Layout::SR_DEFAULT_TEXT));
-		pGraphics->AttachControl(new IVBakedPresetManagerControl(rectTitle.GetGridCell(0, 10, 2, 24).FracRectHorizontal(12.f, false), SR::Graphics::Layout::SR_DEFAULT_STYLE_METER));
+		// -- Title
+		//pGraphics->AttachControl(new ITextControl(rectTitle.GetGridCell(0, 0, 2, 24).FracRectHorizontal(10.f, false), PLUG_MFR " " PLUG_NAME " " PLUG_VERSION_STR "-alpha", SR::Graphics::Layout::SR_DEFAULT_TEXT));
+		//pGraphics->AttachControl(new IVBakedPresetManagerControl(rectTitle.GetGridCell(0, 10, 2, 24).FracRectHorizontal(12.f, false), SR::Graphics::Layout::SR_DEFAULT_STYLE_METER));
 		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectTitle.GetGridCell(0, 22, 2, 24).GetCentredInside(20.f), kBypass, "Byp", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cBypass, "Global");
 		pGraphics->AttachControl(new MainMenu(rectTitle.GetGridCell(0, 23, 2, 24).GetCentredInside(20.f)));
 		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectTitle.GetGridCell(1, 3, 2, 24).GetCentredInside(20.f), kEqBandSolo, "Solo", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cEqBandSolo, "Global");
-		//pGraphics->AttachControl(new IVDiskPresetManagerControl(rectTitle.GetGridCell(1, 2, 2, 8).FracRectHorizontal(6.f, false), ".", "vstpreset", false, DEFAULT_STYLE));
+		// -- Dummy
+		pGraphics->AttachControl(new IVKnobControl(rectTitle.GetFromLeft(480.f).GetGridCell(0, 0, 1, 8), kDummy1, GetParam(kDummy1)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE))), cDummy1, "Dummy");
+		pGraphics->AttachControl(new IVKnobControl(rectTitle.GetFromLeft(480.f).GetGridCell(0, 1, 1, 8), kDummy2, GetParam(kDummy2)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE))), cDummy2, "Dummy");
+		pGraphics->AttachControl(new IVKnobControl(rectTitle.GetFromLeft(480.f).GetGridCell(0, 2, 1, 8), kDummy3, GetParam(kDummy3)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE))), cDummy3, "Dummy");
+		pGraphics->AttachControl(new IVKnobControl(rectTitle.GetFromLeft(480.f).GetGridCell(0, 3, 1, 8), kDummy4, GetParam(kDummy4)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE))), cDummy4, "Dummy");
+		pGraphics->AttachControl(new IVKnobControl(rectTitle.GetFromLeft(480.f).GetGridCell(0, 4, 1, 8), kDummy5, GetParam(kDummy5)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE))), cDummy5, "Dummy");
+		pGraphics->AttachControl(new IVKnobControl(rectTitle.GetFromLeft(480.f).GetGridCell(0, 5, 1, 8), kDummy6, GetParam(kDummy6)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE))), cDummy6, "Dummy");
+		pGraphics->AttachControl(new IVKnobControl(rectTitle.GetFromLeft(480.f).GetGridCell(0, 6, 1, 8), kDummy7, GetParam(kDummy7)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE))), cDummy7, "Dummy");
+		pGraphics->AttachControl(new IVKnobControl(rectTitle.GetFromLeft(480.f).GetGridCell(0, 7, 1, 8), kDummy8, GetParam(kDummy8)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE))), cDummy8, "Dummy");
 		// -- Gains		
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsGain.GetGridCell(0, 0, 2, 1).GetReducedFromTop(20.f), kGainIn, "Input", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGainIn, "Gain");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsGain.GetGridCell(1, 0, 2, 1).GetReducedFromTop(20.f), kGainOut, "Output", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGainOut, "Gain");
@@ -182,9 +198,9 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqPassive.GetGridCell(0, 2, 2, 4).GetReducedFromTop(20.f), kEqHfBoost, "Boost", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHfBoost, "Passive EQ");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqPassive.GetGridCell(0, 3, 2, 4).GetReducedFromTop(20.f), kEqHfCut, "Cut", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHfCut, "Passive EQ");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqPassive.GetGridCell(1, 0, 2, 4).GetReducedFromTop(20.f), kEqLfFreq, "Freq", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLfFreq, "Passive EQ");
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqPassive.GetGridCell(1, 1, 2, 4).GetReducedFromTop(20.f), kEqLfDs, "DS", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLfDs, "Passive EQ");
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqPassive.GetGridCell(1, 2, 2, 4).GetReducedFromTop(20.f), kEqHfFreq, "Freq", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHfFreq, "Passive EQ");
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqPassive.GetGridCell(1, 3, 2, 4).GetReducedFromTop(20.f), kEqHfDs, "DS", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHfDs, "Passive EQ");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqPassive.GetGridCell(1, 1, 2, 4).GetReducedFromTop(20.f), kEqHfBoostQ, "BW", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHfBoostQ, "Passive EQ");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqPassive.GetGridCell(1, 2, 2, 4).GetReducedFromTop(20.f), kEqHfBoostFreq, "B Freq", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHfBoostFreq, "Passive EQ");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqPassive.GetGridCell(1, 3, 2, 4).GetReducedFromTop(20.f), kEqHfCutFreq, "C Freq", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHfCutFreq, "Passive EQ");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqParametric.GetGridCell(0, 0, 2, 4).GetReducedFromTop(20.f), kEqLmfGain, "Gain", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLmfGain, "Parametric EQ");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqParametric.GetGridCell(0, 1, 2, 4).GetReducedFromTop(20.f), kEqLmfQ, "Q", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLmfQ, "Parametric EQ");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqParametric.GetGridCell(0, 2, 2, 4).GetReducedFromTop(20.f), kEqHmfGain, "Gain", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHmfGain, "Parametric EQ");
@@ -220,18 +236,19 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		// -- Set GR meter displaying the other way round
 		dynamic_cast<IVMeterControl<2>*>(pGraphics->GetControlWithTag(cMeterGr))->SetBaseValue(1.);
 
+
+
 		// Disable Parameters with no function
-		for (int ctrlTag = 0; ctrlTag < kNumCtrlTags; ctrlTag++) {
-			switch (ctrlTag)
-			{
-			case cEqHfDs:
-			case cEqLfDs:
-				pGraphics->GetControlWithTag(ctrlTag)->SetDisabled(true);
-				break;
-			default:
-				break;
-			}
-		}
+		//for (int ctrlTag = 0; ctrlTag < kNumCtrlTags; ctrlTag++) {
+		//	switch (ctrlTag)
+		//	{
+		//	//case [INSERT CONTROL TAG(S) HERE]:
+		//	//	pGraphics->GetControlWithTag(ctrlTag)->SetDisabled(true);
+		//	//	break;
+		//	default:
+		//		break;
+		//	}
+		//	}
 		pGraphics->AttachControl(new IVGroupControl(rectControlsGain, "Gain", 0.f, SR::Graphics::Layout::SR_DEFAULT_STYLE));
 		pGraphics->AttachControl(new IVGroupControl(rectControlsFilter, "Filter", 0.f, SR::Graphics::Layout::SR_DEFAULT_STYLE));
 		pGraphics->AttachControl(new IVGroupControl(rectControlsSat, "Sat", 0.f, SR::Graphics::Layout::SR_DEFAULT_STYLE));
@@ -560,12 +577,11 @@ void SRChannel::OnParamChange(int paramIdx)
 	case kEqLfBoost:
 	case kEqLfCut:
 	case kEqLfFreq:
-		AdjustEqPassive();
-		AdjustBandSolo();
-		break;
 	case kEqHfBoost:
 	case kEqHfCut:
-	case kEqHfFreq:
+	case kEqHfBoostFreq:
+	case kEqHfCutFreq:
+	case kEqHfBoostQ:
 		AdjustEqPassive();
 		AdjustBandSolo();
 		break;
@@ -611,6 +627,16 @@ void SRChannel::OnParamChange(int paramIdx)
 	case kCompPeakMix:
 		fCompPeak.SetMix(GetParam(kCompPeakMix)->Value() * .01);
 		break;
+
+	case kDummy1: break;
+	case kDummy2: break;
+	case kDummy3: break;
+	case kDummy4: break;
+	case kDummy5: break;
+	case kDummy6: break;
+	case kDummy7: break;
+	case kDummy8: break;
+
 	default:
 		break;
 	}
@@ -627,8 +653,8 @@ void SRChannel::AdjustEqPassive() {
 #else
 		fEqLfBoost[c].setup(samplerate, GetParam(kEqLfFreq)->Value(), GetParam(kEqLfBoost)->Value(), LFBOOSTQ + GetParam(kEqLfBoost)->Value() * .1 * LFBOOSTQ);
 		fEqLfCut[c].setup(samplerate, GetParam(kEqLfFreq)->Value(), -GetParam(kEqLfCut)->Value(), LFCUTQ + GetParam(kEqLfCut)->Value() * .1 * LFCUTQ);
-		fEqHfBoost[c].setup(samplerate, GetParam(kEqHfFreq)->Value(), GetParam(kEqHfBoost)->Value(), HFBOOSTQ);
-		fEqHfCut[c].setup(samplerate, GetParam(kEqHfFreq)->Value(), -GetParam(kEqHfCut)->Value(), HFCUTQ + GetParam(kEqHfCut)->Value() * .1 * HFCUTQ);
+		fEqHfBoost[c].setup(samplerate, GetParam(kEqHfBoostFreq)->Value(), GetParam(kEqHfBoost)->Value(), GetParam(kEqHfBoostQ)->Value());
+		fEqHfCut[c].setup(samplerate, GetParam(kEqHfCutFreq)->Value(), -GetParam(kEqHfCut)->Value(), HFCUTQ + GetParam(kEqHfCut)->Value() * .1 * HFCUTQ);
 #endif // !PASSIVE
 	}
 
@@ -653,7 +679,7 @@ void SRChannel::AdjustBandSolo() {
 		fEqBandSolo.SetFilter((GetParam(kEqLmfIsShelf)->Bool()) ? SR::DSP::BiquadLowpass : SR::DSP::BiquadBandpass, GetParam(kEqLmfFreq)->Value() / samplerate, GetParam(kEqLmfQ)->Value(), GetParam(kEqLmfGain)->Value(), samplerate);
 		break;
 	case 5: // Hf
-		fEqBandSolo.SetFilter(SR::DSP::BiquadBandpass, GetParam(kEqHfFreq)->Value() / samplerate, 1., GetParam(kEqHfBoost)->Value(), samplerate);
+		fEqBandSolo.SetFilter(SR::DSP::BiquadBandpass, GetParam(kEqHfBoostFreq)->Value() / samplerate, 1., GetParam(kEqHfBoost)->Value(), samplerate);
 		break;
 	case 6: // Lf
 		fEqBandSolo.SetFilter(SR::DSP::BiquadBandpass, GetParam(kEqLfFreq)->Value() / samplerate, .12, GetParam(kEqLfBoost)->Value(), samplerate);
