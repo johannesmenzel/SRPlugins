@@ -11,12 +11,6 @@
 #define VU_ATTACK 4.
 #define VU_RELEASE 750.
 
-// Dummy constants
-#define LFBOOSTQ .02
-#define LFCUTQ .04
-#define HFBOOSTQ 1.
-#define HFCUTQ .04
-
 class MainMenu : public IControl
 {
 public:
