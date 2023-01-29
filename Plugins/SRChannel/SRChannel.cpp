@@ -132,6 +132,18 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kDummy9)->InitDouble("HCxG", .9, 0.1, 5., 0.001, "x", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0.1, 5., 1., .5)));
 	GetParam(kDummy10)->InitDouble("HBQ", .707, 0.01, 10., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.01, 10., .707, .5)));
 
+	// Set display texts
+	//GetParam(kStereoPan)->SetDisplayText(GetParam(kStereoPan)->GetDefault(), "Center");
+	//GetParam(kStereoPan)->SetDisplayText(GetParam(kStereoPan)->GetMin(), "Left");
+	//GetParam(kStereoPan)->SetDisplayText(GetParam(kStereoPan)->GetMax(), "Right");
+	//GetParam(kStereoWidth)->SetDisplayText(GetParam(kStereoWidth)->GetMin(), "Mono");
+	//GetParam(kStereoWidth)->SetDisplayText(GetParam(kStereoWidth)->GetDefault(), "Stereo");
+	//GetParam(kStereoWidthLow)->SetDisplayText(GetParam(kStereoWidthLow)->GetMin(), "Mono");
+	//GetParam(kStereoWidthLow)->SetDisplayText(GetParam(kStereoWidthLow)->GetDefault(), "Stereo");
+	//GetParam(kStereoMonoFreq)->SetDisplayText(GetParam(kStereoMonoFreq)->GetMin(), "Off");
+	//GetParam(kEqHpFreq)->SetDisplayText(GetParam(kEqHpFreq)->GetMin(), "Off");
+	//GetParam(kEqLpFreq)->SetDisplayText(GetParam(kEqLpFreq)->GetMax(), "Off");
+
 	OnReset();
 
 	MakeDefaultPreset("Init", 1);
@@ -146,6 +158,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		pGraphics->AttachCornerResizer(EUIResizerMode::Scale, false);
 		pGraphics->AttachPanelBackground(SR::Graphics::Layout::SR_DEFAULT_COLOR_CUSTOM_PANEL_BG);
 		pGraphics->LoadFont("Roboto-Regular", ROBOTO_FN);
+		//pGraphics->EnableTooltips(true);
 		const IRECT b = pGraphics->GetBounds();
 		const IRECT rectTitle = b.GetPadded(-50.f, 0.f, -50.f, -700.f);
 		const IRECT rectDummy = b.GetFromLeft(50.f);
@@ -196,6 +209,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		// -- Filters
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsFilter.GetGridCell(0, 0, 2, 1).GetReducedFromTop(20.f), kEqLpFreq, "LP", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLpFreq, "Filter");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsFilter.GetGridCell(1, 0, 2, 1).GetReducedFromTop(20.f), kEqHpFreq, "HP", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHpFreq, "Filter");
+		
 		// -- Freqency Response Meter
 		pGraphics->AttachControl(new SR::Graphics::Controls::SRGraphBase(rectControlsFreqResponse.GetReducedFromTop(20.f), FREQRESP_NUMVALUES, mFreqMeterValues, .5f, SR::Graphics::Layout::SR_DEFAULT_STYLE), cMeterFreqResponse, "Response");
 		// -- EQ
@@ -237,7 +251,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsStereo.GetGridCell(2, 0, 4, 1).GetReducedFromTop(20.f), kStereoWidthLow, "Bass Width", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoWidthLow, "Stereo");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsStereo.GetGridCell(3, 0, 4, 1).GetReducedFromTop(20.f), kStereoMonoFreq, "Split FQ", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoMonoFreq, "Stereo");
 
-
+		// TODO: Set tooltips
 
 		// Disable Parameters with no function
 		for (int ctrlTag = 0; ctrlTag < kNumCtrlTags; ctrlTag++) {
@@ -409,8 +423,9 @@ void SRChannel::OnReset()
 	// ToDo: Match all above ToDos in OnParamChange and think of procedure to prevent double code
 	const double samplerate = GetSampleRate();
 
-	fGainIn.InitGain(100, SR::DSP::SRGain::kSinusodial);
-	fGainOut.InitGain(100, SR::DSP::SRGain::kSinusodial);
+	// TODO: Must gain bet in OnReset?
+	//fGainIn.InitGain(100, SR::DSP::SRGain::kSinusodial);
+	//fGainOut.InitGain(100, SR::DSP::SRGain::kSinusodial, (GetParam(kStereoPan)->Value() + 100.) / 200., true, GetParam(kStereoWidth)->Value() * .01);
 
 	fSatInput[0].SetSaturation(SR::DSP::SRSaturation::kSoftSat, GetParam(kSaturationDrive)->Value(), GetParam(kSaturationAmount)->Value(), 1., true, 0., 1., samplerate);
 	fSatInput[1].SetSaturation(SR::DSP::SRSaturation::kSoftSat, GetParam(kSaturationDrive)->Value(), GetParam(kSaturationAmount)->Value(), 1., true, 0., 1., samplerate);
@@ -427,6 +442,7 @@ void SRChannel::OnReset()
 #elif FLT == 3
 	AdjustEqPassive();
 #endif // !FLT
+	// TODO: Should it really have Q=0?
 	fSplitHp.SetFilter(SR::DSP::BiquadLinkwitzHighpass, GetParam(kStereoMonoFreq)->Value() / samplerate, 0., 0., samplerate);
 	fSplitLp.SetFilter(SR::DSP::BiquadLinkwitzLowpass, GetParam(kStereoMonoFreq)->Value() / samplerate, 0., 0., samplerate);
 
