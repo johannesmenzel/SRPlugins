@@ -45,6 +45,7 @@ private:
 	IPopupMenu mMenu{ "Menu", {"Dump Preset TXT"/*, "...", "..."*/} };
 };
 
+// Plugin class, init parameters, variables and GUI here
 SRChannel::SRChannel(const InstanceInfo& info)
 	: Plugin(info, MakeConfig(kNumParams, kNumPresets))
 	, fGainIn(100)
@@ -62,8 +63,8 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	, fCompRms()
 	, fCompPeak()
 	, fMeterEnvelope()
+	//, mFreqMeterValues(FREQRESP_NUMVALUES, 1.)
 	, mFreqMeterValues(new float[FREQRESP_NUMVALUES])
-
 {
 
 	GetParam(kGainIn)->InitDouble("Input", 0., -120., 12., 0.01, "dB", 0, "Gain", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(-120., 12., 0., .5)));
@@ -149,6 +150,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	MakeDefaultPreset("Init", 1);
 	// Insert other Presets from Dump if needed
 
+	// Make graphics content here
 #if IPLUG_EDITOR // http://bit.ly/2S64BDd
 	mMakeGraphicsFunc = [&]() {
 		return MakeGraphics(*this, PLUG_WIDTH, PLUG_HEIGHT, PLUG_FPS, GetScaleForScreen(PLUG_WIDTH, PLUG_HEIGHT));
@@ -206,10 +208,9 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		// -- Saturation
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsSat.GetGridCell(0, 0, 4, 1).GetReducedFromTop(20.f), kSaturationAmount, "Amount", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cSaturationAmount, "Sat");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsSat.GetGridCell(1, 0, 4, 1).GetReducedFromTop(20.f), kSaturationDrive, "Drive", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cSaturationDrive, "Sat");
-		// -- Filters
+		// -- Filters (HP/LP)
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsFilter.GetGridCell(0, 0, 2, 1).GetReducedFromTop(20.f), kEqLpFreq, "LP", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLpFreq, "Filter");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsFilter.GetGridCell(1, 0, 2, 1).GetReducedFromTop(20.f), kEqHpFreq, "HP", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHpFreq, "Filter");
-		
 		// -- Freqency Response Meter
 		pGraphics->AttachControl(new SR::Graphics::Controls::SRGraphBase(rectControlsFreqResponse.GetReducedFromTop(20.f), FREQRESP_NUMVALUES, mFreqMeterValues, .5f, SR::Graphics::Layout::SR_DEFAULT_STYLE), cMeterFreqResponse, "Response");
 		// -- EQ
@@ -231,21 +232,21 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqParametric.GetGridCell(1, 3, 2, 4).GetReducedFromTop(20.f), kEqHmfDs, "DS", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHmfDs, "Parametric EQ");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectControlsEqParametric.GetGridCell(0, 0, 1, 2).GetCentredInside(20.f), kEqLmfIsShelf, "Shelf", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cEqLmfIsShelf, "Parametric EQ");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectControlsEqParametric.GetGridCell(0, 1, 1, 2).GetCentredInside(20.f), kEqHmfIsShelf, "Shelf", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cEqHmfIsShelf, "Parametric EQ");
-		// -- Compressors
+		// -- Level Compressor
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsCompLevel.GetGridCell(0, 0, 3, 2).GetReducedFromTop(20.f), kCompRmsThresh, "Thresh", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsThresh, "Comp Level");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsCompLevel.GetGridCell(0, 1, 3, 2).GetReducedFromTop(20.f), kCompRmsRatio, "Ratio", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsRatio, "Comp Level");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsCompLevel.GetGridCell(1, 0, 3, 2).GetReducedFromTop(20.f), kCompRmsAttack, "Attack", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsAttack, "Comp Level");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsCompLevel.GetGridCell(1, 1, 3, 2).GetReducedFromTop(20.f), kCompRmsRelease, "Release", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsRelease, "Comp Level");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsCompLevel.GetGridCell(2, 0, 3, 2).GetReducedFromTop(20.f), kCompRmsMakeup, "Makeup", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsMakeup, "Comp Level");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsCompLevel.GetGridCell(2, 1, 3, 2).GetReducedFromTop(20.f), kCompRmsMix, "Mix", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsMix, "Comp Level");
-
+		// -- Peak Compressor
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsCompPeak.GetGridCell(0, 0, 3, 2).GetReducedFromTop(20.f), kCompPeakThresh, "Thresh", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakThresh, "Comp Peak");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsCompPeak.GetGridCell(0, 1, 3, 2).GetReducedFromTop(20.f), kCompPeakRatio, "Ratio", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakRatio, "Comp Peak");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsCompPeak.GetGridCell(1, 0, 3, 2).GetReducedFromTop(20.f), kCompPeakAttack, "Attack", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakAttack, "Comp Peak");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsCompPeak.GetGridCell(1, 1, 3, 2).GetReducedFromTop(20.f), kCompPeakRelease, "Release", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakRelease, "Comp Peak");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsCompPeak.GetGridCell(2, 0, 3, 2).GetReducedFromTop(20.f), kCompPeakMakeup, "Makeup", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakMakeup, "Comp Peak");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsCompPeak.GetGridCell(2, 1, 3, 2).GetReducedFromTop(20.f), kCompPeakMix, "Mix", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompPeakMix, "Comp Peak");
-		// -- Stereo Controls
+		// -- Stereo controls
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsStereo.GetGridCell(0, 0, 4, 1).GetReducedFromTop(20.f), kStereoPan, "Pan", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoPan, "Stereo");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsStereo.GetGridCell(1, 0, 4, 1).GetReducedFromTop(20.f), kStereoWidth, "Width", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoWidth, "Stereo");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsStereo.GetGridCell(2, 0, 4, 1).GetReducedFromTop(20.f), kStereoWidthLow, "Bass Width", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoWidthLow, "Stereo");
@@ -253,28 +254,30 @@ SRChannel::SRChannel(const InstanceInfo& info)
 
 		// TODO: Set tooltips
 
-		// Disable Parameters with no function
+		// -- Temporally disable parameters with no function
 		for (int ctrlTag = 0; ctrlTag < kNumCtrlTags; ctrlTag++) {
 			switch (ctrlTag)
 			{
 #if !DUMMY
-				case kDummy1:
-				case kDummy2:
-				case kDummy3:
-				case kDummy4:
-				case kDummy5:
-				case kDummy6:
-				case kDummy7:
-				case kDummy8:
-				case kDummy9:
-				case kDummy10:
-					pGraphics->GetControlWithTag(ctrlTag)->SetDisabled(true);
-					break;
-#endif
-				default:
+			case kDummy1:
+			case kDummy2:
+			case kDummy3:
+			case kDummy4:
+			case kDummy5:
+			case kDummy6:
+			case kDummy7:
+			case kDummy8:
+			case kDummy9:
+			case kDummy10:
+				pGraphics->GetControlWithTag(ctrlTag)->SetDisabled(true);
+				break;
+#endif // !DUMMY
+			default:
 				break;
 			}
 		}
+
+		// -- Control groups
 		pGraphics->AttachControl(new IVGroupControl(rectControlsGain, "Gain", 0.f, SR::Graphics::Layout::SR_DEFAULT_STYLE));
 		pGraphics->AttachControl(new IVGroupControl(rectControlsFilter, "Filter", 0.f, SR::Graphics::Layout::SR_DEFAULT_STYLE));
 		pGraphics->AttachControl(new IVGroupControl(rectControlsSat, "Sat", 0.f, SR::Graphics::Layout::SR_DEFAULT_STYLE));
@@ -288,6 +291,13 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	};
 #endif
 }
+//SRChannel::~SRChannel()
+//{
+//	for (int i = 0; i < FREQRESP_NUMVALUES; i++) {
+//		delete[i] mFreqMeterValues;
+//	}
+//	delete[] mFreqMeterValues;
+//}
 
 #if IPLUG_DSP
 void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
@@ -311,8 +321,8 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 		fMeterEnvelope[1].process(abs(outputs[1][s]), mMeterIn[1]);
 
 
-		mBufferVu.ProcessBuffer(mMeterIn[0], 0, s);
-		mBufferVu.ProcessBuffer(mMeterIn[1], 1, s);
+		mBufferMeterPeak.ProcessBuffer(mMeterIn[0], 0, s);
+		mBufferMeterPeak.ProcessBuffer(mMeterIn[1], 1, s);
 
 		if (!GetParam(kBypass)->Bool()) {
 			// Process filters
@@ -408,13 +418,14 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 		// Run input data through envelope filter to match VU like metering, then send to respective buffer.
 		fMeterEnvelope[2].process(abs(outputs[0][s]), mMeterOut[0]);
 		fMeterEnvelope[3].process(abs(outputs[1][s]), mMeterOut[1]);
-		mBufferVu.ProcessBuffer(mMeterOut[0], 2, s);
-		mBufferVu.ProcessBuffer(mMeterOut[1], 3, s);
+		mBufferMeterPeak.ProcessBuffer(mMeterOut[0], 2, s);
+		mBufferMeterPeak.ProcessBuffer(mMeterOut[1], 3, s);
 	}
-	mMeterSender.ProcessBlock(mBufferVu.GetBuffer(), nFrames, cMeterVu, 4);
+	mMeterSender.ProcessBlock(mBufferMeterPeak.GetBuffer(), nFrames, cMeterVu, 4);
 	mMeterSenderGrLevel.ProcessBlock(mBufferMeterGrLevel.GetBuffer(), nFrames, cMeterGrLevel, 1);
 	mMeterSenderGrPeak.ProcessBlock(mBufferMeterGrPeak.GetBuffer(), nFrames, cMeterGrPeak, 1);
 }
+
 
 void SRChannel::OnReset()
 {
@@ -484,6 +495,7 @@ void SRChannel::OnReset()
 	}
 }
 
+
 void SRChannel::OnIdle()
 {
 	mMeterSender.TransmitData(*this);
@@ -491,6 +503,8 @@ void SRChannel::OnIdle()
 	mMeterSenderGrPeak.TransmitData(*this);
 	SetFreqMeterValues();
 }
+
+
 void SRChannel::OnParamChange(int paramIdx)
 {
 	const double samplerate = GetSampleRate();
@@ -673,6 +687,8 @@ void SRChannel::OnParamChange(int paramIdx)
 	}
 }
 
+
+// Adjust all passive filters at once, call from passive eq related OnParamChange()
 void SRChannel::AdjustEqPassive() {
 	const double samplerate = GetSampleRate();
 	for (int c = 0; c < 2; c++) {
@@ -696,7 +712,7 @@ void SRChannel::AdjustEqPassive() {
 		// @10 Q=.136, xF=9.437 | @5 Q=.206, xF= 18.778 | @1 Q=.374, xF=48.8
 		fEqLfBoost[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * (48.8 - sqrt(.1 * GetParam(kEqLfBoost)->Value()) * 39.4), .374 - sqrt(.1 * GetParam(kEqLfBoost)->Value()) * .238);
 		// @10 Q=.252, xF=57.2 | @5 Q=.253, xF= 80.202 | @1 Q=.341, xF=172
-		fEqLfCut[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * (172. - sqrt(.1 * GetParam(kEqLfCut)->Value()) * 115.), .341 - sqrt(.1 * GetParam(kEqLfCut)->Value()) * .090); 
+		fEqLfCut[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * (172. - sqrt(.1 * GetParam(kEqLfCut)->Value()) * 115.), .341 - sqrt(.1 * GetParam(kEqLfCut)->Value()) * .090);
 		// Q range .9 .. 3.2, middle position not adjusted
 		fEqHfBoost[c].setup(samplerate, GetParam(kEqHfBoostFreq)->Value(), 3.2 - GetParam(kEqHfBoostQ)->Value() * .23);
 		// @10 Q=.151, xF=29.46 | @5 Q=.183, xF= 23.302
@@ -719,6 +735,8 @@ void SRChannel::AdjustEqPassive() {
 	}
 
 }
+
+// Right now called on all eq related OnParamChange(). The function adjusts the solo filter to the one which is chosen by kEqBandSolo(Int)
 void SRChannel::AdjustBandSolo() {
 	const double samplerate = GetSampleRate();
 	switch (GetParam(kEqBandSolo)->Int())
@@ -749,6 +767,9 @@ void SRChannel::AdjustBandSolo() {
 		break;
 	}
 }
+
+// Plugin member function, gets response (mag) of every filter and stores it in member function mFreqMeterValues[NUMVALUES]
+// Can typically be called on known parameter changes, but here in OnIdle() because of the deessers dynamic response
 void SRChannel::SetFreqMeterValues()
 {
 	const double samplerate = GetSampleRate();
@@ -774,9 +795,12 @@ void SRChannel::SetFreqMeterValues()
 			if (GetParam(kEqLfBoost)->Value() != 0.0) mFreqMeterValues[i] += fEqLfBoost.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
 			if (GetParam(kEqLfCut)->Value() != 0.0) mFreqMeterValues[i] += fEqLfCut.GetFrequencyResponse(freq / samplerate, FREQRESP_RANGEDB, false);
 #elif FLT == 3
+			/* Like above, but since response function gets complex_t, we just have to use abs() for magnitude or arg() for phase,
+			then convert to dB and normalize */
 #if PASSIVE
-			// Direct plotting does't work here because of the parallel structure. So we mimik the processing: 
-			// Dry + Boost - Cut
+			/* Direct plotting does't work here because of the parallel structure.
+			So we mimik the processing for the entire thing:
+			Dry (linear unity = 1.) + boost responses - cut responses */
 			mFreqMeterValues[i] += AmpToDB(1.
 				+ (mGainLfBoost * (abs(fEqLfBoost[0].response(freq / samplerate)))
 					- mGainLfCut * (abs(fEqLfCut[0].response(freq / samplerate)))
@@ -784,7 +808,6 @@ void SRChannel::SetFreqMeterValues()
 					- mGainHfCut * (abs(fEqHfCut[0].response(freq / samplerate)))))
 				/ FREQRESP_RANGEDB;
 #else
-			// Like above, but since response function gets complex_t, we just have to use abs() for magnitude or arg() for phase, then convert to dB and normalize
 			if (GetParam(kEqLfBoost)->Value() != 0.0) mFreqMeterValues[i] += AmpToDB(abs(fEqLfBoost[0].response(freq / samplerate))) / FREQRESP_RANGEDB;
 			if (GetParam(kEqLfCut)->Value() != 0.0) mFreqMeterValues[i] += AmpToDB(abs(fEqLfCut[0].response(freq / samplerate))) / FREQRESP_RANGEDB;
 			if (GetParam(kEqHfBoost)->Value() != 0.0) mFreqMeterValues[i] += AmpToDB(abs(fEqHfBoost[0].response(freq / samplerate))) / FREQRESP_RANGEDB;
@@ -795,4 +818,4 @@ void SRChannel::SetFreqMeterValues()
 	}
 	if (GetUI() && mFreqMeterValues != 0) dynamic_cast<SR::Graphics::Controls::SRGraphBase*>(GetUI()->GetControlWithTag(cMeterFreqResponse))->Process(mFreqMeterValues);
 }
-#endif
+#endif // !IPLUGDSP

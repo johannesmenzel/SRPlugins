@@ -12,8 +12,9 @@
 // Switch using dummy parameters for modeling or use already modeled values
 #define DUMMY false
 
-#include "IPlug_include_in_plug_hdr.h"
 
+#include "IPlug_include_in_plug_hdr.h"
+#include "IControls.h"
 #if FLT == 1
 #include "../../Classes/DSP/SRFilters.h"
 #elif FLT == 2
@@ -21,13 +22,10 @@
 #elif FLT == 3
 #include "Iir.h"
 #endif // !FLT
-
-
 #include "../../Classes/DSP/SRGain.h"
 #include "../../Classes/DSP/SRSaturation.h"
 #include "../../Classes/DSP/SRDynamics.h"
 #include "../../Classes/DSP/SRBuffer.h"
-#include "IControls.h"
 
 const int kNumPresets = 1;
 
@@ -268,6 +266,7 @@ class SRChannel final : public Plugin
 {
 public:
 	SRChannel(const InstanceInfo& info);
+	//~SRChannel(); // Actually we must delete the dynamically allocated mFreqMeterValues, but causes heap error
 
 #if IPLUG_DSP // http://bit.ly/2S64BDd
 	void ProcessBlock(sample** inputs, sample** outputs, int nFrames) override;
@@ -275,16 +274,14 @@ public:
 	void OnIdle() override;
 	void OnParamChange(int paramIdx) override;
 
-
-
 private:
 	void SetFreqMeterValues();
 	void AdjustEqPassive();
 	void AdjustBandSolo();
 
+	// Statically allocated stereo pairs
 	double mMeterIn[2], mMeterOut[2];
 	
-
 	SR::DSP::SRGain fGainIn;
 	SR::DSP::SRGain fGainOut;
 	SR::DSP::SRGain fGainOutLow;
@@ -301,18 +298,22 @@ private:
 	SR::DSP::SRFilterIIR<sample, 2> fEqLfCut;
 	SR::DSP::SRFilterIIR<sample, 2> fEqHfBoost;
 	SR::DSP::SRFilterIIR<sample, 2> fEqHfCut;
+
 #elif FLT == 2
 	Dsp::SimpleFilter<Dsp::RBJ::LowShelf, 2> fEqLfBoost;
 	Dsp::SimpleFilter<Dsp::RBJ::LowShelf, 2> fEqLfCut;
 	Dsp::SimpleFilter<Dsp::RBJ::BandShelf, 2> fEqLfBoost;
 	Dsp::SimpleFilter<Dsp::RBJ::HighShelf, 2> fEqLfCut;
 #elif FLT == 3
+
 #if PASSIVE
+	// Statically allocated stereo pairs
 	Iir::RBJ::LowPass fEqLfBoost[2];
 	Iir::RBJ::LowPass fEqLfCut[2];
 	Iir::RBJ::BandPass1 fEqHfBoost[2];
 	Iir::RBJ::HighPass fEqHfCut[2];
 	double mGainLfBoost, mGainLfCut, mGainHfBoost, mGainHfCut;
+
 #else
 	Iir::RBJ::LowShelf fEqLfBoost[2];
 	Iir::RBJ::LowShelf fEqLfCut[2];
@@ -334,12 +335,15 @@ private:
 	IPeakSender<1, 1024> mMeterSenderGrLevel;
 	IPeakSender<1, 1024> mMeterSenderGrPeak;
 
-	SR::DSP::SRBuffer<sample, 4, 1024> mBufferVu;
+	// TODO: Add VU on top of Peak Meter
+	SR::DSP::SRBuffer<sample, 4, 1024> mBufferMeterPeak;
 	SR::DSP::SRBuffer<sample, 1, 1024> mBufferMeterGrLevel;
 	SR::DSP::SRBuffer<sample, 1, 1024> mBufferMeterGrPeak;
-	SR::DSP::SRBuffer<sample, 2, 1024> mBufferLowSignal;
+	SR::DSP::SRBuffer<sample, 2, 1024> mBufferLowSignal; // Eval if needed, maybe a double var is sufficient
 
+	// Dynamically allocated values, must be deleted in ~
 	float* mFreqMeterValues;
+	//std::vector<float> mFreqMeterValues = {}
 
 #endif
 };
