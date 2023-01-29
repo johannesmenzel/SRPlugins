@@ -92,7 +92,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 
 	GetParam(kEqLfBoost)->InitDouble("LF Boost", 0., 0., 10., 1., "", IParam::EFlags::kFlagStepped, "EQ");
 	GetParam(kEqLfCut)->InitDouble("LF Cut", 0., 0., 10., 1., "", IParam::EFlags::kFlagStepped, "EQ");
-	GetParam(kEqLfFreq)->InitDouble("LF Freq", 100., 20., 150., 10., "Hz", IParam::EFlags::kFlagStepped, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(20., 150., 100., .5)));
+	GetParam(kEqLfFreq)->InitDouble("LF Freq", 60., 20., 100., 10., "Hz", IParam::EFlags::kFlagStepped, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(20., 100., 60., .5)));
 
 	GetParam(kEqHfBoost)->InitDouble("HF Boost", 0., 0., 10., 1., "", IParam::EFlags::kFlagStepped, "EQ");
 	GetParam(kEqHfCut)->InitDouble("HF Cut", 0., 0., 10., 1., "", IParam::EFlags::kFlagStepped, "EQ");
@@ -673,6 +673,7 @@ void SRChannel::AdjustEqPassive() {
 #if PASSIVE
 #if DUMMY
 		// TODO: Evaluate why pow and sqrt, but it works quite well. It has 1 boost step offset anyway
+		// TODO: Improve gain dependent frequencies and Qs
 		mGainLfBoost = pow(.1 * GetParam(kEqLfBoost)->Value(), 2.) * GetParam(kDummy7)->Value();
 		mGainLfCut = sqrt(.1 * GetParam(kEqLfCut)->Value()) * GetParam(kDummy8)->Value();
 		mGainHfBoost = pow(.1 * GetParam(kEqHfBoost)->Value(), 2.) * GetParam(kDummy7)->Value();
@@ -681,15 +682,19 @@ void SRChannel::AdjustEqPassive() {
 		fEqLfCut[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * GetParam(kDummy5)->Value(), GetParam(kDummy2)->Value());
 		fEqHfBoost[c].setup(samplerate, GetParam(kEqHfBoostFreq)->Value(), GetParam(kDummy10)->Value());
 		fEqHfCut[c].setup(samplerate, GetParam(kEqHfCutFreq)->Value() / GetParam(kDummy6)->Value(), GetParam(kDummy3)->Value());
-#else // Modeled
+#else // Modelled
 		mGainLfBoost = pow(.1 * GetParam(kEqLfBoost)->Value(), 2.) * 3.751;
 		mGainLfCut = sqrt(.1 * GetParam(kEqLfCut)->Value()) * .9;
 		mGainHfBoost = pow(.1 * GetParam(kEqHfBoost)->Value(), 2.) * 3.1;
 		mGainHfCut = sqrt(.1 * GetParam(kEqHfCut)->Value()) * .9;
-		fEqLfBoost[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * 18.778, .206); // @10 Q=.136, xF=9.437 | @5 Q=.206, xF= 18.778
-		fEqLfCut[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * 80.202, .253); // @10 Q=.252, xF=57.2 | @5 Q=.253, xF= 80.202
-		fEqHfBoost[c].setup(samplerate, GetParam(kEqHfBoostFreq)->Value(), 3.2 - GetParam(kEqHfBoostQ)->Value() * .23); // Q range .9 .. 3.2, middle position not adjusted
-		fEqHfCut[c].setup(samplerate, GetParam(kEqHfCutFreq)->Value() / 23.302, .183); // @10 Q=.151, xF=29.46 | @5 Q=.183, xF= 23.302
+		// @10 Q=.136, xF=9.437 | @5 Q=.206, xF= 18.778 | @1 Q=.374, xF=48.8
+		fEqLfBoost[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * (48.8 - sqrt(.1 * GetParam(kEqLfBoost)->Value()) * 39.4), .374 - sqrt(.1 * GetParam(kEqLfBoost)->Value()) * .238);
+		// @10 Q=.252, xF=57.2 | @5 Q=.253, xF= 80.202 | @1 Q=.341, xF=172
+		fEqLfCut[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * (172. - sqrt(.1 * GetParam(kEqLfCut)->Value()) * 115.), .341 - sqrt(.1 * GetParam(kEqLfCut)->Value()) * .090); 
+		// Q range .9 .. 3.2, middle position not adjusted
+		fEqHfBoost[c].setup(samplerate, GetParam(kEqHfBoostFreq)->Value(), 3.2 - GetParam(kEqHfBoostQ)->Value() * .23);
+		// @10 Q=.151, xF=29.46 | @5 Q=.183, xF= 23.302
+		fEqHfCut[c].setup(samplerate, GetParam(kEqHfCutFreq)->Value() / 23.302, .183);
 #endif // !DUMMY
 
 #else // Biquad
