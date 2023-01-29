@@ -240,16 +240,27 @@ SRChannel::SRChannel(const InstanceInfo& info)
 
 
 		// Disable Parameters with no function
-		//for (int ctrlTag = 0; ctrlTag < kNumCtrlTags; ctrlTag++) {
-		//	switch (ctrlTag)
-		//	{
-		//	//case [INSERT CONTROL TAG(S) HERE]:
-		//	//	pGraphics->GetControlWithTag(ctrlTag)->SetDisabled(true);
-		//	//	break;
-		//	default:
-		//		break;
-		//	}
-		//	}
+		for (int ctrlTag = 0; ctrlTag < kNumCtrlTags; ctrlTag++) {
+			switch (ctrlTag)
+			{
+#if !DUMMY
+				case kDummy1:
+				case kDummy2:
+				case kDummy3:
+				case kDummy4:
+				case kDummy5:
+				case kDummy6:
+				case kDummy7:
+				case kDummy8:
+				case kDummy9:
+				case kDummy10:
+					pGraphics->GetControlWithTag(ctrlTag)->SetDisabled(true);
+					break;
+#endif
+				default:
+				break;
+			}
+		}
 		pGraphics->AttachControl(new IVGroupControl(rectControlsGain, "Gain", 0.f, SR::Graphics::Layout::SR_DEFAULT_STYLE));
 		pGraphics->AttachControl(new IVGroupControl(rectControlsFilter, "Filter", 0.f, SR::Graphics::Layout::SR_DEFAULT_STYLE));
 		pGraphics->AttachControl(new IVGroupControl(rectControlsSat, "Sat", 0.f, SR::Graphics::Layout::SR_DEFAULT_STYLE));
@@ -661,23 +672,24 @@ void SRChannel::AdjustEqPassive() {
 	for (int c = 0; c < 2; c++) {
 #if PASSIVE
 #if DUMMY
+		// TODO: Evaluate why pow and sqrt, but it works quite well. It has 1 boost step offset anyway
+		mGainLfBoost = pow(.1 * GetParam(kEqLfBoost)->Value(), 2.) * GetParam(kDummy7)->Value();
+		mGainLfCut = sqrt(.1 * GetParam(kEqLfCut)->Value()) * GetParam(kDummy8)->Value();
+		mGainHfBoost = pow(.1 * GetParam(kEqHfBoost)->Value(), 2.) * GetParam(kDummy7)->Value();
+		mGainHfCut = sqrt(.1 * GetParam(kEqHfCut)->Value()) * GetParam(kDummy9)->Value();
 		fEqLfBoost[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * GetParam(kDummy4)->Value(), GetParam(kDummy1)->Value());
 		fEqLfCut[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * GetParam(kDummy5)->Value(), GetParam(kDummy2)->Value());
 		fEqHfBoost[c].setup(samplerate, GetParam(kEqHfBoostFreq)->Value(), GetParam(kDummy10)->Value());
 		fEqHfCut[c].setup(samplerate, GetParam(kEqHfCutFreq)->Value() / GetParam(kDummy6)->Value(), GetParam(kDummy3)->Value());
-		mGainLfBoost = pow(.1 * GetParam(kEqLfBoost)->Value(), 2.) * GetParam(kDummy7)->Value();
-		mGainLfCut = sqrt(.1 * GetParam(kEqLfCut)->Value()) * GetParam(kDummy8)->Value();
-		mGainHfBoost = pow(.1 * GetParam(kEqHfBoost)->Value(), 2.) * GetParam(kDummy7)->Value();
-		mGainHfCut = sqrt(.1 * GetParam(kEqHfCut)->Value())* GetParam(kDummy9)->Value();
 #else // Modeled
-		fEqLfBoost[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * 18.778, .206); // @10 Q=.136, xF=9.437 | @5 Q=.206, xF= 18.778
-		fEqLfCut[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * 80.202, .253); // @10 Q=.252, xF=57.2 | @5 Q=.253, xF= 80.202
-		fEqHfBoost[c].setup(samplerate, GetParam(kEqHfBoostFreq)->Value(), 3.2 - GetParam(kEqHfBoostQ)->Value() * .23); // Q range .9 .. 3.2, middle position not adjusted
-		fEqHfCut[c].setup(samplerate, GetParam(kEqHfCutFreq)->Value() / 23.302, .183); // @10 Q=.151, xF=29.46 | @5 Q=.183, xF= 23.302
 		mGainLfBoost = pow(.1 * GetParam(kEqLfBoost)->Value(), 2.) * 3.751;
 		mGainLfCut = sqrt(.1 * GetParam(kEqLfCut)->Value()) * .9;
 		mGainHfBoost = pow(.1 * GetParam(kEqHfBoost)->Value(), 2.) * 3.1;
 		mGainHfCut = sqrt(.1 * GetParam(kEqHfCut)->Value()) * .9;
+		fEqLfBoost[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * 18.778, .206); // @10 Q=.136, xF=9.437 | @5 Q=.206, xF= 18.778
+		fEqLfCut[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * 80.202, .253); // @10 Q=.252, xF=57.2 | @5 Q=.253, xF= 80.202
+		fEqHfBoost[c].setup(samplerate, GetParam(kEqHfBoostFreq)->Value(), 3.2 - GetParam(kEqHfBoostQ)->Value() * .23); // Q range .9 .. 3.2, middle position not adjusted
+		fEqHfCut[c].setup(samplerate, GetParam(kEqHfCutFreq)->Value() / 23.302, .183); // @10 Q=.151, xF=29.46 | @5 Q=.183, xF= 23.302
 #endif // !DUMMY
 
 #else // Biquad
@@ -756,9 +768,9 @@ void SRChannel::SetFreqMeterValues()
 			// Dry + Boost - Cut
 			mFreqMeterValues[i] += AmpToDB(1.
 				+ (mGainLfBoost * (abs(fEqLfBoost[0].response(freq / samplerate)))
-				- mGainLfCut * (abs(fEqLfCut[0].response(freq / samplerate)))
-				+ mGainHfBoost * (abs(fEqHfBoost[0].response(freq / samplerate)))
-				- mGainHfCut * (abs(fEqHfCut[0].response(freq / samplerate))))) 
+					- mGainLfCut * (abs(fEqLfCut[0].response(freq / samplerate)))
+					+ mGainHfBoost * (abs(fEqHfBoost[0].response(freq / samplerate)))
+					- mGainHfCut * (abs(fEqHfCut[0].response(freq / samplerate)))))
 				/ FREQRESP_RANGEDB;
 #else
 			// Like above, but since response function gets complex_t, we just have to use abs() for magnitude or arg() for phase, then convert to dB and normalize

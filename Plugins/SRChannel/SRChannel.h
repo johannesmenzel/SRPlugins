@@ -10,7 +10,7 @@
 // False: Use ordinary biquad filters (Shelf, Peak)
 #define PASSIVE true
 // Switch using dummy parameters for modeling or use already modeled values
-#define DUMMY false
+#define DUMMY true
 
 #include "IPlug_include_in_plug_hdr.h"
 
