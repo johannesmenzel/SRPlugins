@@ -338,22 +338,12 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 			outputs[1][s] = fEqHfCut.Process(outputs[1][s], 1);
 #elif FLT == 3
 			for (int c = 0; c < nChans; c++) {
-#if PASSIVE
-				// Parallel (passive) eq processing blends dry with lowpass (boost) and lowpass (cut, flipped phase)
-#if DUMMY				
-				outputs[c][s] = outputs[c][s]
-					+ (fEqLfBoost[c].filter(outputs[c][s]) * pow(.1 * GetParam(kEqLfBoost)->Value(), 2.) * GetParam(kDummy7)->Value())
-					- (fEqLfCut[c].filter(outputs[c][s]) * sqrt(.1 * GetParam(kEqLfCut)->Value()) * GetParam(kDummy8)->Value())
-					+ (fEqHfBoost[c].filter(outputs[c][s]) * pow(.1 * GetParam(kEqHfBoost)->Value(), 2.) * GetParam(kDummy7)->Value())
-					- (fEqHfCut[c].filter(outputs[c][s]) * sqrt(.1 * GetParam(kEqHfCut)->Value()) * GetParam(kDummy9)->Value());
-#else
-				// Model after Ignite
+#if PASSIVE // Parallel (passive) eq processing blends dry with lowpass (boost) and lowpass (cut, flipped phase)
 				outputs[c][s] = outputs[c][s]
 					+ (fEqLfBoost[c].filter(outputs[c][s]) * mGainLfBoost)
 					- (fEqLfCut[c].filter(outputs[c][s]) * mGainLfCut) // Cut Gain may not exceed .9, need to scale that now
 					+ (fEqHfBoost[c].filter(outputs[c][s]) * mGainHfBoost)
 					- (fEqHfCut[c].filter(outputs[c][s]) * mGainHfCut); // Cut Gain may not exceed .9, need to scale that now
-#endif // !DUMMY
 #else
 				// Normal biquad calc
 				outputs[c][s] = fEqLfBoost[c].filter(outputs[c][s]);
