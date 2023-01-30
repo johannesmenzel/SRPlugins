@@ -77,10 +77,7 @@ namespace SR {
 
 				void Process(float* values) {
 					for (int i = 0; i < mNumValues; i++)
-						mValues.at(i) = values[i];
-					for (int i = 0; i < mNumValues; i++) {
-						mValues[i] = Clip<float>(mValues[i], -1.f, 1.f);
-					}
+						mValues.at(i) = Clip<float>(values[i], -1.f, 1.f);
 					OnResize();
 				};
 
