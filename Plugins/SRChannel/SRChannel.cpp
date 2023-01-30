@@ -419,11 +419,9 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 		mBufferMeterPeak.ProcessBuffer(mMeterOut[0], 2, s);
 		mBufferMeterPeak.ProcessBuffer(mMeterOut[1], 3, s);
 	}
-	if (GetUI()) {
 		mMeterSender.ProcessBlock(mBufferMeterPeak.GetBuffer(), nFrames, cMeterVu);
 		mMeterSenderGrLevel.ProcessBlock(mBufferMeterGrLevel.GetBuffer(), nFrames, cMeterGrLevel);
 		mMeterSenderGrPeak.ProcessBlock(mBufferMeterGrPeak.GetBuffer(), nFrames, cMeterGrPeak);
-	}
 }
 
 
