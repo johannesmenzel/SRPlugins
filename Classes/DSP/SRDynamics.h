@@ -111,17 +111,20 @@ namespace SR {
 			//-------------------------------------------------------------
 			// Attack/release envelope
 			//-------------------------------------------------------------
-			SRDynamicsDetector(double mAttackMs = 10.0, double mReleaseMs = 100.0, double sampleRate = 44100.0)
-				: mEnvelopeAttack(mAttackMs, sampleRate)
-				, mEnvelopeRelease(mReleaseMs, sampleRate)
-			{
-			}
+			SRDynamicsDetector(double attackMs = 10.0, double releaseMs = 100.0, double sampleRate = 44100.0)
+				: mEnvelopeAttack(attackMs, sampleRate)
+				, mEnvelopeRelease(releaseMs, sampleRate)	{}
 			virtual ~SRDynamicsDetector() {}
 
 			virtual double GetAttack(void) const { return mEnvelopeAttack.getTc(); }
 			virtual double GetRelease(void) const { return mEnvelopeRelease.getTc(); }
 			virtual double GetSampleRate(void) const { return mEnvelopeAttack.getSampleRate(); }
 
+			virtual void Reset(double attackMs, double releaseMs, double sampleRate) {
+				SetAttack(attackMs);
+				SetRelease(releaseMs);
+				SetSampleRate(sampleRate);
+			}
 			virtual void SetAttack(double ms) { mEnvelopeAttack.setTc(ms); }
 			virtual void SetRelease(double ms) { mEnvelopeRelease.setTc(ms); }
 			virtual void SetSampleRate(double sampleRate) {
