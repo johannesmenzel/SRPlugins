@@ -120,7 +120,7 @@ namespace SR {
 			virtual double GetRelease(void) const { return mEnvelopeRelease.getTc(); }
 			virtual double GetSampleRate(void) const { return mEnvelopeAttack.getSampleRate(); }
 
-			virtual void Reset(double attackMs, double releaseMs, double sampleRate) {
+			virtual void ResetDetector(double attackMs, double releaseMs, double sampleRate) {
 				SetAttack(attackMs);
 				SetRelease(releaseMs);
 				SetSampleRate(sampleRate);
