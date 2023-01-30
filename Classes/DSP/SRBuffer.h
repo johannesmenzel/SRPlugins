@@ -1,8 +1,8 @@
 /*
 How is the buffer implemented?
-1 - std::vector
-2 - Ptrlist
-3 - T**
+1 - std::vector of WDL_Typedbuf (high cpu and dropouts)
+2 - WDL_PtrList/WDL_Typedbuf (Works now, but some dropouts, further investigation in IPlugInstrument_DSP.h example)
+3 - T** (Works best, but not resizeable (May be problematic when blocksize exceeds MAXNUMFRAMES, same for channels
 */
 #define BUFFERIMPL 3
 
@@ -20,325 +20,267 @@ How is the buffer implemented?
 #endif
 
 namespace SR {
-  namespace DSP {
+	namespace DSP {
 
-    // Buffer in progress with PtrList of WDL_Typedbuf, vectors or simple T**
-    template<typename T = double, int MAXNUMCHANNELS = 1, int MAXNUMFRAMES = DEFAULT_BLOCK_SIZE>
-    class SRBuffer {
-    public:
+		template<typename T = double, int MAXNUMCHANNELS = 1, int MAXNUMFRAMES = DEFAULT_BLOCK_SIZE>
+		// Buffer in progress with PtrList of WDL_Typedbuf, vectors or simple T**
+		class SRBuffer {
+		public:
 
-      // Construct class
-      SRBuffer(int nChannels = MAXNUMCHANNELS, int nFrames = MAXNUMFRAMES)
-        : mNumChannels(nChannels)
-        , mNumFrames(nFrames)
+			// Construct class
+			SRBuffer(int nChannels = MAXNUMCHANNELS, int nFrames = MAXNUMFRAMES)
+				: mNumChannels(nChannels)
+				, mNumFrames(nFrames)
 #if BUFFERIMPL == 3 // T**
-        , mBuffer(new T*[nChannels])
+				, mBuffer(new T* [nChannels])
 #endif
-      {
+			{
 #if BUFFERIMPL == 1 // vec
-        mBuffer.reserve(MAXNUMCHANNELS);
-        mBuffer.resize(mNumChannels);
-        for (int c = 0; c < mNumChannels; c++) {
-          mBuffer[c].Resize(mNumFrames);
-        }
+				mBuffer.reserve(MAXNUMCHANNELS);
+				mBuffer.resize(mNumChannels);
+				for (int c = 0; c < mNumChannels; c++) {
+					mBuffer[c].Resize(mNumFrames);
+				}
 #elif BUFFERIMPL == 2 // ptr
-        for (int c = 0; c < MAXNUMCHANNELS; c++) {
-          mBuffer.Add(new WDL_TypedBuf<T>);
-          mBuffer.Get(c)->Resize(mNumFrames);
-        }
+				ResetBuffer(nChannels, nFrames);
 #elif BUFFERIMPL == 3 // T**
-        for (int c = 0; c < mNumChannels; c++) {
-          mBuffer[c] = new T[mNumFrames];
-        }
+				for (int c = 0; c < mNumChannels; c++) {
+					mBuffer[c] = new T[mNumFrames];
+				}
 #endif
-      }
+			}
 
-      // Destruct class
-      ~SRBuffer() {
+			// Destruct class
+			~SRBuffer() {
 #if BUFFERIMPL == 1 // vec
-        mBuffer.clear();
+				mBuffer.clear();
 #elif BUFFERIMPL == 2 //ptr
-        //for (int c = 0; c < MAXNUMCHANNELS; c++) {
-        //  mBuffer.Delete(c);
-        //}
-        mBuffer.Empty();
+				mBuffer.Empty();
 #elif BUFFERIMPL == 3 // T**
-        for (int c = 0; c < MAXNUMCHANNELS; c++) {
-          delete[] mBuffer[c];
-        }
-        delete[] mBuffer;
+				for (int c = 0; c < mNumChannels; c++) {
+					delete[] mBuffer[c];
+				}
+				delete[] mBuffer;
 #endif
-      }
+			}
 
-      // Set blocksize
-      void SetNumFrames(int nFrames = MAXNUMFRAMES) {
-        mNumFrames = nFrames;
-        for (int c = 0; c < mNumChannels; c++) {
+			// Set or Reset buffer with specified channel count and block size
+			void ResetBuffer(int nChannels = MAXNUMCHANNELS, int nFrames = MAXNUMFRAMES) {
+				assert(nChannels <= MAXNUMCHANNELS);
 #if BUFFERIMPL == 1 // vec
-          mBuffer[c].Resize(mNumFrames, true);
+				for (int c = 0; c < nChannels; c++) {
+					mBuffer[c].Resize(nFrames, true);
+				}
+				//ClearBuffer();
 #elif BUFFERIMPL == 2 // ptr
-          mBuffer.Get(c)->Resize(mNumFrames, true);
+				mBufferData.Resize(nFrames * nChannels);
+				mBuffer.Empty();
+				for (int c = 0; c < nChannels; c++) {
+					mBuffer.Add(mBufferData.Get() + (nFrames * c));
+				}
 #elif BUFFERIMPL == 3 // T**
-          if (nFrames != mNumFrames)
-            ResetBuffer(mNumChannels, nFrames);
-#endif
-        }
-      }
+				// TODO: Maybe very slow to do this on every OnReset()
+				// maybe we just keep it at MAX-Sizes, but then we must make sure that with BUFFER.Get() you just get what you need (blocksize/ch-count)
 
-      // Set number of channels
-      void SetNumChannels(int nChannels) {
+				// delete dynamic 2D array
+				for (int c = 0; c < mNumChannels; c++) {
+					if (mBuffer[c]) delete[] mBuffer[c];
+				}
+				if (mBuffer) delete[] mBuffer;
+
+				// create new 2D array;
+				mBuffer = new T * [nChannels];
+				for (int c = 0; c < nChannels; c++) {
+					mBuffer[c] = new T[nFrames];
+				}
+#endif //
+				mNumChannels = nChannels;
+				mNumFrames = nFrames;
+			}
+
+
+			// Clear buffer (set data to all zeros)
+			void ClearBuffer() {
 #if BUFFERIMPL == 1 // vec
-        // TODO
+				mBuffer.clear();
 #elif BUFFERIMPL == 2 // ptr
-        // TODO
+				memset(mBufferData.Get(), 0, mBufferData.GetSize);
+				mBuffer.Empty();
 #elif BUFFERIMPL == 3 // T**
-        if (nChannels != mNumChannels)
-          ResetBuffer(nChannels, mNumFrames);
+				memset(mBuffer, 0, mNumChannels * mNumFrames * sizeof(T));
+				// TODO
 #endif
-      }
+			}
 
-      // Set or Reset buffer with specified channel count and block size
-      void ResetBuffer(int nChannels = MAXNUMCHANNELS, int nFrames = MAXNUMFRAMES) {
-        assert(nChannels <= MAXNUMCHANNELS);
-        mNumChannels = nChannels;
+
+			// Process single sample of data
+			void ProcessBuffer(T in, int channel, int sample) {
 #if BUFFERIMPL == 1 // vec
-        for (int c = 0; c < mNumChannels; c++) {
-          mBuffer[c].Resize(mNumFrames, true);
-        }
-        SetNumFrames(nFrames);
-        //ClearBuffer();
+				mBuffer[channel].Get()[sample] = in;
 #elif BUFFERIMPL == 2 // ptr
-        //// delete dynamic 2D array
-        //for (int c = 0; c < mNumChannels; c++) {
-        //  if (mBuffer.Get(c)) {
-        //    //delete[] mBuffer.Get(c);
-        //    mBuffer.Delete(c);
-        //  }
-        //}
-        ////if (mBuffer) mBuffer.Empty();
-
-        //// change channel and frames count
-        //mNumChannels = nChannels;
-        //mNumFrames = nFrames;
-        //ClearBuffer();
-
-        //// create new 2D array;
-        //for (int c = 0; c < mNumChannels; c++) {
-        //  mBuffer.Add(new WDL_TypedBuf<T>);
-        //  mBuffer.Get(c)->Resize(mNumFrames);
-        //}
-
-        for (int c = 0; c < MAXNUMCHANNELS; c++) {
-          mBuffer.Get(c)->Resize(mNumFrames, true);
-        }
-        ClearBuffer();
+				mBuffer.GetList()[channel][sample] = in;
 #elif BUFFERIMPL == 3 // T**
-        // delete dynamic 2D array
-        for (int c = 0; c < mNumChannels; c++) {
-          if (mBuffer[c]) delete[] mBuffer[c];
-        }
-        if (mBuffer) delete[] mBuffer;
-
-        // change channel and frames count
-        mNumChannels = nChannels;
-        mNumFrames = nFrames;
-
-        // create new 2D array;
-        mBuffer = new T*[mNumChannels];
-        for (int c = 0; c < mNumChannels; c++) {
-          mBuffer[c] = new T[mNumFrames];
-        }
+				mBuffer[channel][sample] = in;
 #endif
-      }
+			}
 
 
-      // Clear buffer (set data to all zeros)
-      void ClearBuffer() {
+			// Process one channel of data
+			void ProcessBuffer(T* in, int channel) {
 #if BUFFERIMPL == 1 // vec
-        mBuffer.clear();
-#elif BUFFERIMPL == 2 // ptr
-        //memset(mBuffer.GetList(), 0, MAXNUMCHANNELS * mNumFrames * sizeof(T));
-        for (int c = 0; c < MAXNUMCHANNELS; c++) {
-          memset(mBuffer.Get(c), 0, mNumFrames * sizeof(T));
-        }
-#elif BUFFERIMPL == 3 // T**
-        memset(mBuffer, 0, mNumChannels * mNumFrames * sizeof(T));
-        // TODO
-#endif
-      }
-
-
-      // Process single sample of data
-      void ProcessBuffer(T in, int channel, int sample) {
-#if BUFFERIMPL == 1 // vec
-        mBuffer[channel].Get()[sample] = in;
-#elif BUFFERIMPL == 2 // ptr
-        mBuffer.Get(channel)->Get()[sample] = in;
-#elif BUFFERIMPL == 3 // T**
-        mBuffer[channel][sample] = in;
-#endif
-      }
-
-
-      // Process one channel of data
-      void ProcessBuffer(T* in, int channel) {
-#if BUFFERIMPL == 1 // vec
-        mBuffer[channel].Get() = in;
+				mBuffer[channel].Get() = in;
 #elif BUFFERIMPL == 2
-        mBuffer.Get(channel) = in;
+				mBuffer.GetList()[channel] = in;
 #elif BUFFERIMPL == 3 // T**
-        mBuffer[channel] = in;
+				mBuffer[channel] = in;
 #endif
-      }
+			}
 
 
-      // Process all channels of data at once
-      void ProcessBuffer(T** in) {
+			// Process all channels of data at once
+			void ProcessBuffer(T** in) {
 #if BUFFERIMPL == 1 // vec
-        for (int c = 0; c < mNumChannels; c++) {
-          mBuffer[c].Get() = in[c];
-        }
+				for (int c = 0; c < mNumChannels; c++) {
+					mBuffer[c].Get() = in[c];
+				}
 #elif BUFFERIMPL == 2 // ptr
-        mBuffer.GetList() = in;
+				mBuffer.GetList() = in;
 #elif BUFFERIMPL == 3 // T**
-        mBuffer = in;
+				mBuffer = in;
 #endif
-      }
+			}
 
 
-      // Get sample from channel from buffer
-      T GetBuffer(int channel, int sample) {
+			// Get sample from channel from buffer
+			T GetBuffer(int channel, int sample) {
 #if BUFFERIMPL == 1 // vector
-        return mBuffer[channel].Get()[sample];
+				return mBuffer[channel].Get()[sample];
 #elif BUFFERIMPL == 2 // ptrlist
-        return mBuffer.Get(channel)[sample];
+				return mBuffer.GetList()[channel][sample];
 #elif BUFFERIMPL == 3 // T**
-        return mBuffer[channel][sample];
+				return mBuffer[channel][sample];
 #endif
-      }
+			}
 
 
-      // Get channel from buffer
-      T* GetBuffer(int channel) {
+			// Get channel from buffer
+			T* GetBuffer(int channel) {
 #if BUFFERIMPL == 1 // vector
-        return mBuffer[channel].Get();
+				return mBuffer[channel].Get();
 #elif BUFFERIMPL == 2 // ptrlist
-        return mBuffer.Get(channel);
+				return mBuffer.GetList()[channel];
 #elif BUFFERIMPL == 3 // T**
-        return mBuffer[channel];
+				return mBuffer[channel];
 #endif
 
-      }
+			}
 
 
-      // Get entire buffer
-      T** GetBuffer() {
+			// Get entire buffer
+			T** GetBuffer() {
 #if BUFFERIMPL == 1 // vector
-        T** buffer = new T*[mNumChannels];
-        for (int c = 0; c < mNumChannels; c++) {
-          buffer[c] = mBuffer[c].Get();
-        }
-        return buffer;
+				T** buffer = new T * [mNumChannels];
+				for (int c = 0; c < mNumChannels; c++) {
+					buffer[c] = mBuffer[c].Get();
+				}
+				return buffer;
 #elif BUFFERIMPL == 2 // ptrlist
-        //T** buffer = new T*[mNumChannels];
-        //for (int c = 0; c < mNumChannels; c++) {
-        //  buffer[c] = mBuffer.Get(c);
-        //}
-        //return buffer;
-        // or?
-        return (T**)mBuffer.GetList();
+				return mBuffer.GetList();
 #elif BUFFERIMPL == 3 // T**
-        return mBuffer;
+				return mBuffer;
 #endif
-      }
+			}
 
-      // Sum all data of all channels
-      T SumBuffer() {
-        T sum = (T)0.0;
-        for (int c = 0; c < mNumChannels; c++) {
-          sum += SumBuffer(c);
-        }
-        return sum;
-      }
+			// Sum all data of all channels
+			T SumBuffer() {
+				T sum = (T)0.0;
+				for (int c = 0; c < mNumChannels; c++) {
+					sum += SumBuffer(c);
+				}
+				return sum;
+			}
 
-      // Sum all data of all channels
-      T SumBufferAbs() {
-        T sum = (T)0.0;
-        for (int c = 0; c < mNumChannels; c++) {
-          sum += SumBufferAbs(c);
-        }
-        return sum;
-        }
+			// Sum all data of all channels
+			T SumBufferAbs() {
+				T sum = (T)0.0;
+				for (int c = 0; c < mNumChannels; c++) {
+					sum += SumBufferAbs(c);
+				}
+				return sum;
+			}
 
-      // Sum data of specified channel
-      T SumBuffer(int channel) {
-        T sum = (T)0.0;
-        for (int s = 0; s < mNumFrames; s++) {
+			// Sum data of specified channel
+			T SumBuffer(int channel) {
+				T sum = (T)0.0;
+				for (int s = 0; s < mNumFrames; s++) {
 #if BUFFERIMPL == 1 // vector
-          sum += (T)mBuffer[channel].Get()[s];
+					sum += (T)mBuffer[channel].Get()[s];
 #elif BUFFERIMPL == 2 // ptr
-          sum += (T)mBuffer.Get(channel)->Get()[s];
+					sum += (T)mBuffer.GetList()[channel][s];
 #elif BUFFERIMPL == 3 // T**
-          sum += (T)mBuffer[channel][s];
+					sum += (T)mBuffer[channel][s];
 #endif
-        }
-        return sum;
-      }
+				}
+				return sum;
+			}
 
-      // Sum abs data of specified channel
-      T SumBufferAbs(int channel) {
-        T sum = (T)0.0;
-        for (int s = 0; s < mNumFrames; s++) {
+			// Sum abs data of specified channel
+			T SumBufferAbs(int channel) {
+				T sum = (T)0.0;
+				for (int s = 0; s < mNumFrames; s++) {
 #if BUFFERIMPL == 1 // vector
-          sum += std::fabs((T)mBuffer[channel].Get()[s]);
+					sum += std::fabs((T)mBuffer[channel].Get()[s]);
 #elif BUFFERIMPL == 2 // ptr
-          sum += std::fabs((T)mBuffer.Get(channel)->Get()[s]);
+					sum += std::fabs((T)mBuffer.GetList()[channel][s]);
 #elif BUFFERIMPL == 3 // T**
-          sum += std::fabs((T)mBuffer[channel][s]);
+					sum += std::fabs((T)mBuffer[channel][s]);
 #endif
-        }
-        return sum;
-      }
+				}
+				return sum;
+			}
 
-      // Calculate average of all data over all channels
-      T AverageBuffer() { return SumBuffer() / (mNumFrames * mNumChannels); }
+			// Calculate average of all data over all channels
+			T AverageBuffer() { return SumBuffer() / (mNumFrames * mNumChannels); }
 
-      // Calculate average of data of specified channel
-      T AverageBuffer(int channel) { return SumBuffer(channel) / (T)mNumFrames; }
+			// Calculate average of data of specified channel
+			T AverageBuffer(int channel) { return SumBuffer(channel) / (T)mNumFrames; }
 
 
-      // Calculate average of all abs data over all channels
-      T AverageBufferAbs() { return SumBufferAbs() / (mNumFrames * mNumChannels); }
+			// Calculate average of all abs data over all channels
+			T AverageBufferAbs() { return SumBufferAbs() / (mNumFrames * mNumChannels); }
 
-      // Calculate average of abs data of specified channel
-      T AverageBufferAbs(int channel) { return SumBufferAbs(channel) / (T)mNumFrames; }
+			// Calculate average of abs data of specified channel
+			T AverageBufferAbs(int channel) { return SumBufferAbs(channel) / (T)mNumFrames; }
 
-      T GetMax(int channel) {
-        T max = (T)0.0;
-        for (int s = 0; s < mNumFrames; s++) {
-#if BUFFERIMPL == 3 // T**
-          max = std::max(max, (T)mBuffer[channel][s]);
+			T GetMax(int channel) {
+				T max = (T)0.0;
+				for (int s = 0; s < mNumFrames; s++) {
+#if BUFFERIMPL == 2 // WDL
+					max = std::max(max, (T)mBuffer.GetList()[channel][s]);
+#elif BUFFERIMPL == 3 // T**
+					max = std::max(max, (T)mBuffer[channel][s]);
 #endif
-        }
-        return max;
-      }
+				}
+				return max;
+			}
 
 
-      T GetMin() {}
+			T GetMin() {}
 
-    private:
-      unsigned int mNumFrames;
-      unsigned int mNumChannels;
+		private:
+			unsigned int mNumFrames;
+			unsigned int mNumChannels;
 #if BUFFERIMPL == 1 // vector
-      std::vector<WDL_TypedBuf<T>> mBuffer;
+			std::vector<WDL_TypedBuf<T>> mBuffer;
 #elif BUFFERIMPL == 2 // ptrlist
-      WDL_PtrList<WDL_TypedBuf<T>> mBuffer;
+			WDL_TypedBuf<T> mBufferData;
+			WDL_PtrList<T> mBuffer;
 #elif BUFFERIMPL == 3 // T**
-      T **mBuffer;
+			T** mBuffer;
 #endif
-    };
+		};
 
-    // End of namespaces:
-  }
+		// End of namespaces:
+	}
 }
 #endif //SRBUFFER_H
