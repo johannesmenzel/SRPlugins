@@ -29,6 +29,8 @@ namespace SR {
         : mTargetValue(value)
         , mCurrentValue(value)
         , mNumSmoothSamples(numSmoothSamples)
+        , mNumSmoothSamplesLeft(0)
+        , mValueChangePerSample(0.0)
       {
       }
 
