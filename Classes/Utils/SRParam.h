@@ -38,7 +38,7 @@ namespace SR {
       {
       }
 
-      // Setters
+      // Set target value to smooth to
       void Set(double value) {
         if (mTargetValue != value) {
           mTargetValue = value;
@@ -47,21 +47,26 @@ namespace SR {
         }
       }
 
+      // Set value ignoring ramp
       void SetStrict(double value) {
         mCurrentValue = mTargetValue = value;
         mNumSmoothSamplesLeft = 0;
         mValueChangePerSample = 0.0;
       }
 
+      // Set number of samples for smoothing
       void SetNumSmoothSamples(int numSmoothSamples) {
         mNumSmoothSamples = numSmoothSamples;
       }
 
-      // Getters
+      // Get current state
       double Get() { return mCurrentValue; }
+      // Get ramp size in samples
       int GetNumSmoothSamples() { return mNumSmoothSamples; }
+      // Get number of samples until target is hit
       int GetNumSmoothSamplesLeft() { return mNumSmoothSamplesLeft; }
 
+      // Process smoother, call once per cycle
       inline void Process() {
         if (mNumSmoothSamplesLeft > 0) {
           mCurrentValue += mValueChangePerSample;
