@@ -286,6 +286,7 @@ private:
 	SR::DSP::SRGain fGainOutLow;
 
 	SR::DSP::SRSaturation fSatInput[2] = { };
+
 	SR::DSP::SRFilterIIR<sample, 2> fEqHp;
 	SR::DSP::SRFilterIIR<sample, 2> fEqLp;
 
@@ -311,6 +312,8 @@ private:
 	Iir::RBJ::LowPass fEqLfCut[2];
 	Iir::RBJ::BandPass1 fEqHfBoost[2];
 	Iir::RBJ::HighPass fEqHfCut[2];
+	// Must be double vals for now, because must be calculated on parallel eq process.
+	// Better having SRGain with param smooth, even better these filters had passband gain (with param smooth)
 	double mGainLfBoost, mGainLfCut, mGainHfBoost, mGainHfCut;
 
 #else

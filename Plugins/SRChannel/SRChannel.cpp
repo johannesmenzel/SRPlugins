@@ -48,7 +48,7 @@ private:
 SRChannel::SRChannel(const InstanceInfo& info)
 	: Plugin(info, MakeConfig(kNumParams, kNumPresets))
 	, fGainIn(100)
-	, fGainOut(100)
+	, fGainOut(100, SR::DSP::SRGain::kSinusodial)
 	, fGainOutLow(100)
 	, fEqHp()
 	, fEqLp()
@@ -435,7 +435,6 @@ void SRChannel::OnReset()
 	// TODO: Must gain bet in OnReset?
 	//fGainIn.InitGain(100, SR::DSP::SRGain::kSinusodial);
 	//fGainOut.InitGain(100, SR::DSP::SRGain::kSinusodial, (GetParam(kStereoPan)->Value() + 100.) / 200., true, GetParam(kStereoWidth)->Value() * .01);
-
 
 	fSatInput[0].SetSaturation(SR::DSP::SRSaturation::kSoftSat, GetParam(kSaturationDrive)->Value(), GetParam(kSaturationAmount)->Value(), 1., true, 0., 1., samplerate);
 	fSatInput[1].SetSaturation(SR::DSP::SRSaturation::kSoftSat, GetParam(kSaturationDrive)->Value(), GetParam(kSaturationAmount)->Value(), 1., true, 0., 1., samplerate);
