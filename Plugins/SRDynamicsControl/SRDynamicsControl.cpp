@@ -263,10 +263,10 @@ void SRDynamicsControl::OnParamChange(int paramIdx)
 	switch (paramIdx)
 	{
 	case kInGain: 
-		fInGain.SetGain(DBToAmp(GetParam(paramIdx)->Value())); 
+		fInGain.SetGainLin(DBToAmp(GetParam(paramIdx)->Value())); 
 		break;
 	case kOutGain: 
-		fOutGain.SetGain(DBToAmp(GetParam(paramIdx)->Value())); 
+		fOutGain.SetGainLin(DBToAmp(GetParam(paramIdx)->Value())); 
 		break;
 	case kThresh:
 	case kRatio:

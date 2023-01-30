@@ -1,6 +1,5 @@
 #include "SRChannel.h"
 #include "IPlug_include_in_plug_src.h"
-#include "IControls.h"
 #include "../../Classes/Graphics/SRCustomKnob.h"
 #include "../../Classes/Graphics/SRCustomSwitch.h"
 #include "../../Classes/Graphics/SRCustomLayout.h"
@@ -63,7 +62,6 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	, fCompRms()
 	, fCompPeak()
 	, fMeterEnvelope()
-	//, mFreqMeterValues(FREQRESP_NUMVALUES, 1.)
 	, mFreqMeterValues(new float[FREQRESP_NUMVALUES])
 {
 
@@ -157,6 +155,9 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	};
 
 	mLayoutFunc = [&](IGraphics* pGraphics) {
+
+		if (pGraphics->NControls()) { return; }
+
 		pGraphics->AttachCornerResizer(EUIResizerMode::Scale, false);
 		pGraphics->AttachPanelBackground(SR::Graphics::Layout::SR_DEFAULT_COLOR_CUSTOM_PANEL_BG);
 		pGraphics->LoadFont("Roboto-Regular", ROBOTO_FN);
@@ -175,6 +176,8 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		const IRECT rectControlsCompPeak = rectControls.GetGridCell(3, 5, 6, 8).FracRectVertical(3.f, true).FracRectHorizontal(2.f).GetPadded(-5.f);
 		const IRECT rectControlsStereo = rectControls.GetGridCell(0, 7, 6, 8).FracRectVertical(4.f, true).GetPadded(-5.f);
 		const IRECT rectControlsGain = rectControls.GetGridCell(4, 7, 6, 8).FracRectVertical(2.f, true).GetPadded(-5.f);
+
+
 
 		// Attach Controls
 		// -- Meters
@@ -293,9 +296,6 @@ SRChannel::SRChannel(const InstanceInfo& info)
 }
 //SRChannel::~SRChannel()
 //{
-//	for (int i = 0; i < FREQRESP_NUMVALUES; i++) {
-//		delete[i] mFreqMeterValues;
-//	}
 //	delete[] mFreqMeterValues;
 //}
 
@@ -303,7 +303,6 @@ SRChannel::SRChannel(const InstanceInfo& info)
 void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 {
 	const int nChans = NOutChansConnected();
-
 
 	for (int s = 0; s < nFrames; s++) {
 
@@ -319,7 +318,6 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 		// Run input data through envelope filter to match VU like metering, then send to respective buffer. (After input gain) 
 		fMeterEnvelope[0].process(abs(outputs[0][s]), mMeterIn[0]);
 		fMeterEnvelope[1].process(abs(outputs[1][s]), mMeterIn[1]);
-
 
 		mBufferMeterPeak.ProcessBuffer(mMeterIn[0], 0, s);
 		mBufferMeterPeak.ProcessBuffer(mMeterIn[1], 1, s);
@@ -421,9 +419,11 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 		mBufferMeterPeak.ProcessBuffer(mMeterOut[0], 2, s);
 		mBufferMeterPeak.ProcessBuffer(mMeterOut[1], 3, s);
 	}
-	mMeterSender.ProcessBlock(mBufferMeterPeak.GetBuffer(), nFrames, cMeterVu, 4);
-	mMeterSenderGrLevel.ProcessBlock(mBufferMeterGrLevel.GetBuffer(), nFrames, cMeterGrLevel, 1);
-	mMeterSenderGrPeak.ProcessBlock(mBufferMeterGrPeak.GetBuffer(), nFrames, cMeterGrPeak, 1);
+	if (GetUI()) {
+		mMeterSender.ProcessBlock(mBufferMeterPeak.GetBuffer(), nFrames, cMeterVu);
+		mMeterSenderGrLevel.ProcessBlock(mBufferMeterGrLevel.GetBuffer(), nFrames, cMeterGrLevel);
+		mMeterSenderGrPeak.ProcessBlock(mBufferMeterGrPeak.GetBuffer(), nFrames, cMeterGrPeak);
+	}
 }
 
 
@@ -437,6 +437,7 @@ void SRChannel::OnReset()
 	// TODO: Must gain bet in OnReset?
 	//fGainIn.InitGain(100, SR::DSP::SRGain::kSinusodial);
 	//fGainOut.InitGain(100, SR::DSP::SRGain::kSinusodial, (GetParam(kStereoPan)->Value() + 100.) / 200., true, GetParam(kStereoWidth)->Value() * .01);
+
 
 	fSatInput[0].SetSaturation(SR::DSP::SRSaturation::kSoftSat, GetParam(kSaturationDrive)->Value(), GetParam(kSaturationAmount)->Value(), 1., true, 0., 1., samplerate);
 	fSatInput[1].SetSaturation(SR::DSP::SRSaturation::kSoftSat, GetParam(kSaturationDrive)->Value(), GetParam(kSaturationAmount)->Value(), 1., true, 0., 1., samplerate);
@@ -498,10 +499,12 @@ void SRChannel::OnReset()
 
 void SRChannel::OnIdle()
 {
-	mMeterSender.TransmitData(*this);
-	mMeterSenderGrLevel.TransmitData(*this);
-	mMeterSenderGrPeak.TransmitData(*this);
-	SetFreqMeterValues();
+	if (GetUI()) {
+		mMeterSender.TransmitData(*this);
+		mMeterSenderGrLevel.TransmitData(*this);
+		mMeterSenderGrPeak.TransmitData(*this);
+		SetFreqMeterValues();
+	}
 }
 
 
@@ -732,7 +735,7 @@ void SRChannel::AdjustEqPassive() {
 		fEqHfCut[c].setup(samplerate, GetParam(kEqHfCutFreq)->Value() / 2.6, -GetParam(kEqHfCut)->Value() * 2.599, .475);
 #endif // !DUMMY
 #endif // !PASSIVE
-	}
+}
 
 }
 
@@ -816,6 +819,6 @@ void SRChannel::SetFreqMeterValues()
 #endif // !FLT
 		}
 	}
-	if (GetUI() && mFreqMeterValues != 0) dynamic_cast<SR::Graphics::Controls::SRGraphBase*>(GetUI()->GetControlWithTag(cMeterFreqResponse))->Process(mFreqMeterValues);
+	if (GetUI()) dynamic_cast<SR::Graphics::Controls::SRGraphBase*>(GetUI()->GetControlWithTag(cMeterFreqResponse))->Process(mFreqMeterValues);
 }
 #endif // !IPLUGDSP

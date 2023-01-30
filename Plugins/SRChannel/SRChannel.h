@@ -15,13 +15,12 @@
 
 #include "IPlug_include_in_plug_hdr.h"
 #include "IControls.h"
-#if FLT == 1
-#include "../../Classes/DSP/SRFilters.h"
-#elif FLT == 2
+#if FLT == 2
 #include "DspFilters/Dsp.h"
 #elif FLT == 3
 #include "Iir.h"
 #endif // !FLT
+#include "../../Classes/DSP/SRFilters.h"
 #include "../../Classes/DSP/SRGain.h"
 #include "../../Classes/DSP/SRSaturation.h"
 #include "../../Classes/DSP/SRDynamics.h"
@@ -343,7 +342,6 @@ private:
 
 	// Dynamically allocated values, must be deleted in ~
 	float* mFreqMeterValues;
-	//std::vector<float> mFreqMeterValues = {}
 
 #endif
 };

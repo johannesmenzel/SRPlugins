@@ -26,19 +26,19 @@ namespace SR {
 				SRGraphBase(IRECT bounds, int numValues, float* values, float baseline = .5f, const IVStyle& style = DEFAULT_STYLE)
 					: IControl(bounds, -1)
 					, IVectorBase(style)
-					, mValues(values)
 					, mBaseline(baseline)
 					, mNumValues(numValues)
-					, mX(new float[numValues])
-					, mY(new float[numValues])
+					, mValues(numValues, .0)
+					, mX(numValues, .0)
+					, mY(numValues, .0)
 				{
 					AttachIControl(this, ""); // TODO: Should hand label
 				}
 
 				~SRGraphBase() {
-					delete[] mX;
-					delete[] mY;
-					delete[] mValues;
+					//delete[] mX;
+					//delete[] mY;
+					//delete[] mValues;
 				}
 
 				void Draw(IGraphics& g) override {
@@ -76,7 +76,8 @@ namespace SR {
 				}
 
 				void Process(float* values) {
-					mValues = values;
+					for (int i = 0; i < mNumValues; i++)
+						mValues.at(i) = values[i];
 					for (int i = 0; i < mNumValues; i++) {
 						mValues[i] = Clip<float>(mValues[i], -1.f, 1.f);
 					}
@@ -87,11 +88,14 @@ namespace SR {
 
 			private:
 				//WDL_String mDisp;
-				float* mValues;
 				int mNumValues;
 				float mBaseline;
-				float* mX;
-				float* mY;
+				std::vector<float> mValues;
+				std::vector<float> mX;
+				std::vector<float> mY;
+				//float* mValues;
+				//float* mX;
+				//float* mY;
 			};
 
 
