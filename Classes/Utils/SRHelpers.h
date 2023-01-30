@@ -23,7 +23,7 @@ namespace SR {
       return strcpy(charValue, stringValue.c_str());
     }
 
-    inline double SetShapeCentered(double cMinValue, double cMaxValue, double cCenteredValue, double cControlPosition) {
+    inline double SetShapeCentered(double cMinValue, double cMaxValue, double cCenteredValue, double cControlPosition = .5) {
       return log((cCenteredValue - cMinValue) / (cMaxValue - cMinValue)) / log(cControlPosition);
     }
 
