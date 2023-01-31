@@ -314,7 +314,8 @@ private:
 	Iir::RBJ::HighPass fEqHfCut[2];
 	// Must be double vals for now, because must be calculated on parallel eq process.
 	// Better having SRGain with param smooth, even better these filters had passband gain (with param smooth)
-	double mGainLfBoost, mGainLfCut, mGainHfBoost, mGainHfCut;
+	SR::DSP::SRParamSmoothRamp fGainLfBoost, fGainLfCut, fGainHfBoost, fGainHfCut;
+	//double mGainLfBoost, mGainLfCut, mGainHfBoost, mGainHfCut;
 
 #else
 	Iir::RBJ::LowShelf fEqLfBoost[2];

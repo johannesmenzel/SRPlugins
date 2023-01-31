@@ -50,6 +50,10 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	, fGainIn(100)
 	, fGainOut(100)
 	, fGainOutLow(100)
+	, fGainLfBoost(100)
+	, fGainLfCut(100)
+	, fGainHfBoost(100)
+	, fGainHfCut(100)
 	, fEqHp()
 	, fEqLp()
 	, fEqLfBoost()
@@ -363,10 +367,14 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 			for (int c = 0; c < nChans; c++) {
 #if PASSIVE // Parallel (passive) eq processing blends dry with lowpass (boost) and lowpass (cut, flipped phase)
 				outputs[c][s] = outputs[c][s]
-					+ (fEqLfBoost[c].filter(outputs[c][s]) * mGainLfBoost)
-					- (fEqLfCut[c].filter(outputs[c][s]) * mGainLfCut) // Cut Gain may not exceed .9, need to scale that now
-					+ (fEqHfBoost[c].filter(outputs[c][s]) * mGainHfBoost)
-					- (fEqHfCut[c].filter(outputs[c][s]) * mGainHfCut); // Cut Gain may not exceed .9, need to scale that now
+					+ (fEqLfBoost[c].filter(outputs[c][s]) * fGainLfBoost.Get())
+					- (fEqLfCut[c].filter(outputs[c][s]) * fGainLfCut.Get()) // Cut Gain may not exceed .9, need to scale that now
+					+ (fEqHfBoost[c].filter(outputs[c][s]) * fGainHfBoost.Get())
+					- (fEqHfCut[c].filter(outputs[c][s]) * fGainHfCut.Get()); // Cut Gain may not exceed .9, need to scale that now
+				fGainLfBoost.Process();
+				fGainLfCut.Process();
+				fGainHfBoost.Process();
+				fGainHfCut.Process();
 #else
 				// Normal biquad calc
 				outputs[c][s] = fEqLfBoost[c].filter(outputs[c][s]);
@@ -704,10 +712,10 @@ void SRChannel::AdjustEqPassive() {
 		fEqHfBoost[c].setup(samplerate, GetParam(kEqHfBoostFreq)->Value(), GetParam(kDummy10)->Value());
 		fEqHfCut[c].setup(samplerate, GetParam(kEqHfCutFreq)->Value() / GetParam(kDummy6)->Value(), GetParam(kDummy3)->Value());
 #else // Modelled
-		mGainLfBoost = pow(.1 * GetParam(kEqLfBoost)->Value(), 2.) * 3.751;
-		mGainLfCut = sqrt(.1 * GetParam(kEqLfCut)->Value()) * .9;
-		mGainHfBoost = pow(.1 * GetParam(kEqHfBoost)->Value(), 2.) * 3.1;
-		mGainHfCut = sqrt(.1 * GetParam(kEqHfCut)->Value()) * .9;
+		fGainLfBoost.Set(pow(.1 * GetParam(kEqLfBoost)->Value(), 2.) * 3.751);
+		fGainLfCut.Set(sqrt(.1 * GetParam(kEqLfCut)->Value()) * .9);
+		fGainHfBoost.Set(pow(.1 * GetParam(kEqHfBoost)->Value(), 2.) * 3.1);
+		fGainHfCut.Set(sqrt(.1 * GetParam(kEqHfCut)->Value()) * .9);
 		// @10 Q=.136, xF=9.437 | @5 Q=.206, xF= 18.778 | @1 Q=.374, xF=48.8
 		fEqLfBoost[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * (48.8 - sqrt(.1 * GetParam(kEqLfBoost)->Value()) * 39.4), .374 - sqrt(.1 * GetParam(kEqLfBoost)->Value()) * .238);
 		// @10 Q=.252, xF=57.2 | @5 Q=.253, xF= 80.202 | @1 Q=.341, xF=172
@@ -801,10 +809,10 @@ void SRChannel::SetFreqMeterValues()
 			So we mimik the processing for the entire thing:
 			Dry (linear unity = 1.) + boost responses - cut responses */
 			mFreqMeterValues[i] += AmpToDB(1.
-				+ (mGainLfBoost * (abs(fEqLfBoost[0].response(freq / samplerate)))
-					- mGainLfCut * (abs(fEqLfCut[0].response(freq / samplerate)))
-					+ mGainHfBoost * (abs(fEqHfBoost[0].response(freq / samplerate)))
-					- mGainHfCut * (abs(fEqHfCut[0].response(freq / samplerate)))))
+				+ (fGainLfBoost.Get() * (abs(fEqLfBoost[0].response(freq / samplerate)))
+					- fGainLfCut.Get() * (abs(fEqLfCut[0].response(freq / samplerate)))
+					+ fGainHfBoost.Get() * (abs(fEqHfBoost[0].response(freq / samplerate)))
+					- fGainHfCut.Get() * (abs(fEqHfCut[0].response(freq / samplerate)))))
 				/ FREQRESP_RANGEDB;
 #else
 			if (GetParam(kEqLfBoost)->Value() != 0.0) mFreqMeterValues[i] += AmpToDB(abs(fEqLfBoost[0].response(freq / samplerate))) / FREQRESP_RANGEDB;
