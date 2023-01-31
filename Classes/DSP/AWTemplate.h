@@ -5,8 +5,10 @@ Steps:
 2. Replace all occurances of PLUGIN with actual plugin name
 */
 
-#include <string>
-#include <set>
+/* ========================================
+ *  airwindows PLUGIN
+ *  Copyright (c) airwindows, Airwindows uses the MIT license
+ * ======================================== */
 
 namespace SR {
 	namespace DSP {
