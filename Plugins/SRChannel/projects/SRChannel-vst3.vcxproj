@@ -255,6 +255,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="../config.h" />
+    <ClInclude Include="..\..\..\Classes\DSP\AWTemplate.h" />
     <ClInclude Include="..\..\..\Classes\DSP\SRBuffer.h" />
     <ClInclude Include="..\..\..\Classes\DSP\SRDynamics.h" />
     <ClInclude Include="..\..\..\Classes\DSP\SRFilters.h" />
