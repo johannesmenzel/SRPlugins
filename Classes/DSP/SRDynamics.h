@@ -67,7 +67,7 @@ namespace SR {
 				assert(sampleRate > 0.0);
 				assert(ms > 0.0);
 				mSampleRate = sampleRate;
-				mTimeConstantMs = std::max(ms, 1. / mSampleRate);
+				mTimeConstantMs = ms;
 				setCoef();
 			}
 
@@ -78,7 +78,7 @@ namespace SR {
 
 			virtual void setTc(double ms) {
 				assert(ms > 0.0);
-				mTimeConstantMs = std::max(ms, 1. / mSampleRate);
+				mTimeConstantMs = ms;
 				setCoef();
 			}
 
