@@ -121,7 +121,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kEqHmfIsShelf)->InitBool("Hmf Shelf", false, "Hmf Shelf", 0, "EQ", "PEAK", "HS");
 	GetParam(kEqLmfIsShelf)->InitBool("Lmf Shelf", false, "Lmf Shelf", 0, "EQ", "PEAK", "LS");
 
-	GetParam(kEqBandSolo)->InitEnum("Band Solo", 0, { "Off", "HP", "LP", "Lf", "Lmf" , "Hmf", "Hf"}, 0, "EQ");
+	GetParam(kEqBandSolo)->InitEnum("Band Solo", 0, { "Off", "HP", "LP", "Lf", "Lmf" , "Hmf", "Hf" }, 0, "EQ");
 
 	// DUMMY_INIT GetParam(kDummy1)->InitDouble("1", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
 	GetParam(kDummy1)->InitDouble("1", 0.5, 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
@@ -305,33 +305,41 @@ SRChannel::SRChannel(const InstanceInfo& info)
 //}
 
 #if IPLUG_DSP
-void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
-{
+void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames) {
 	const int nChans = NOutChansConnected();
 
+	// Copy inputs to outputs
 	for (int s = 0; s < nFrames; s++) {
-
-		// Store input in output data, perform processing here later
 		for (int c = 0; c < nChans; c++) {
 			outputs[c][s] = inputs[c][s];
 		}
 	}
-	fSatTube2.ProcessBlock(outputs, outputs, nFrames);
-	for (int s = 0; s < nFrames; s++) {
 
-		// Process input gain
-		if (!GetParam(kBypass)->Bool())
+	// Process input gain
+	if (!GetParam(kBypass)->Bool()) {
+		for (int s = 0; s < nFrames; s++) {
 			fGainIn.Process(outputs[0][s], outputs[1][s]);
+		}
+	}
 
-		// Run input data through envelope filter to match VU like metering, then send to respective buffer. (After input gain) 
+	// Fill input meter
+	// Run input data through envelope filter to match VU like metering, then send to respective buffer. (After input gain) 
+	for (int s = 0; s < nFrames; s++) {
 		fMeterEnvelope[0].process(abs(outputs[0][s]), mMeterIn[0]);
 		fMeterEnvelope[1].process(abs(outputs[1][s]), mMeterIn[1]);
 
 		mBufferMeterPeak.ProcessBuffer(mMeterIn[0], 0, s);
 		mBufferMeterPeak.ProcessBuffer(mMeterIn[1], 1, s);
+	}
 
-		if (!GetParam(kBypass)->Bool()) {
-			// Process filters
+	// Apply dummy input saturation
+	if (!GetParam(kBypass)->Bool()) {
+		fSatTube2.ProcessBlock(outputs, outputs, nFrames);
+	}
+
+	// Process filters
+	if (!GetParam(kBypass)->Bool()) {
+		for (int s = 0; s < nFrames; s++) {
 			if (GetParam(kEqHpFreq)->Value() > 0.) {
 				outputs[0][s] = fEqHp.Process(outputs[0][s], 0);
 				outputs[1][s] = fEqHp.Process(outputs[1][s], 1);
@@ -340,23 +348,37 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 				outputs[0][s] = fEqLp.Process(outputs[0][s], 0);
 				outputs[1][s] = fEqLp.Process(outputs[1][s], 1);
 			}
-
-			// Process parametric dynamic eq
+		}
+	}
+	// Process parametric dynamic eq
+	if (!GetParam(kBypass)->Bool()) {
+		for (int s = 0; s < nFrames; s++) {
 			fEqHmf.Process(outputs[0][s], outputs[1][s]);
 			fEqLmf.Process(outputs[0][s], outputs[1][s]);
+		}
+	}
 
-			// Process saturation
+	// Process saturation
+	if (!GetParam(kBypass)->Bool()) {
+		for (int s = 0; s < nFrames; s++) {
 			outputs[0][s] = fSatInput[0].Process(outputs[0][s]);
 			outputs[1][s] = fSatInput[0].Process(outputs[1][s]);
+		}
+	}
 
-			// Process compressors
+	// Process compressors
+	if (!GetParam(kBypass)->Bool()) {
+		for (int s = 0; s < nFrames; s++) {
 			fCompRms.Process(outputs[0][s], outputs[1][s]);
 			fCompPeak.Process(outputs[0][s], outputs[1][s]);
+		}
+	}
 
-			// Process "passive" EQ
-
+	// Process passive EQ
+	if (!GetParam(kBypass)->Bool()) {
+		for (int s = 0; s < nFrames; s++) {
 			for (int c = 0; c < nChans; c++) {
-			// Parallel (passive) eq processing blends dry with lowpass (boost) and lowpass (cut, flipped phase)
+				// Parallel (passive) eq processing blends dry with lowpass (boost) and lowpass (cut, flipped phase)
 				outputs[c][s] = outputs[c][s]
 					+ (fEqLfBoost[c].filter(outputs[c][s]) * fGainLfBoost.Get())
 					- (fEqLfCut[c].filter(outputs[c][s]) * fGainLfCut.Get()) // Cut Gain may not exceed .9, need to scale that now
@@ -366,10 +388,13 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 				fGainLfCut.Process();
 				fGainHfBoost.Process();
 				fGainHfCut.Process();
-
 			}
+		}
+	}
 
-			// Process output gain
+	// Process output gain
+	if (!GetParam(kBypass)->Bool()) {
+		for (int s = 0; s < nFrames; s++) {
 			if (GetParam(kStereoMonoFreq)->Value() <= 20.) {
 				fGainOut.Process(outputs[0][s], outputs[1][s]);
 			}
@@ -388,14 +413,21 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 				outputs[0][s] -= mBufferLowSignal.GetBuffer(0, s);
 				outputs[1][s] -= mBufferLowSignal.GetBuffer(1, s);
 			}
+		}
+	}
 
-			if (GetParam(kEqBandSolo)->Int()) {
+	// Process band solo
+	if (!GetParam(kBypass)->Bool()) {
+		if (GetParam(kEqBandSolo)->Int()) {
+			for (int s = 0; s < nFrames; s++) {
 				outputs[0][s] = fEqBandSolo.Process(outputs[0][s], 0);
 				outputs[1][s] = fEqBandSolo.Process(outputs[1][s], 1);
 			}
 		}
+	}
 
-		// Store current gain reduction in respective buffer
+	// Store current gain reduction in respective buffer
+	for (int s = 0; s < nFrames; s++) {
 		if (!GetParam(kBypass)->Bool()) {
 			mBufferMeterGrLevel.ProcessBuffer(fCompRms.GetGrLin(), 0, s);
 			mBufferMeterGrPeak.ProcessBuffer(fCompPeak.GetGrLin(), 0, s);
@@ -405,16 +437,20 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 			mBufferMeterGrLevel.ProcessBuffer(1., 0, s);
 			mBufferMeterGrPeak.ProcessBuffer(1., 0, s);
 		}
+	}
 
-		// Run input data through envelope filter to match VU like metering, then send to respective buffer.
+	// Run input data through envelope filter to match VU like metering, then send to respective buffer.
+	for (int s = 0; s < nFrames; s++) {
 		fMeterEnvelope[2].process(abs(outputs[0][s]), mMeterOut[0]);
 		fMeterEnvelope[3].process(abs(outputs[1][s]), mMeterOut[1]);
 		mBufferMeterPeak.ProcessBuffer(mMeterOut[0], 2, s);
 		mBufferMeterPeak.ProcessBuffer(mMeterOut[1], 3, s);
 	}
-		mMeterSender.ProcessBlock(mBufferMeterPeak.GetBuffer(), nFrames, cMeterVu);
-		mMeterSenderGrLevel.ProcessBlock(mBufferMeterGrLevel.GetBuffer(), nFrames, cMeterGrLevel);
-		mMeterSenderGrPeak.ProcessBlock(mBufferMeterGrPeak.GetBuffer(), nFrames, cMeterGrPeak);
+
+	// Send entire meter data to MeterSenders
+	mMeterSender.ProcessBlock(mBufferMeterPeak.GetBuffer(), nFrames, cMeterVu);
+	mMeterSenderGrLevel.ProcessBlock(mBufferMeterGrLevel.GetBuffer(), nFrames, cMeterGrLevel);
+	mMeterSenderGrPeak.ProcessBlock(mBufferMeterGrPeak.GetBuffer(), nFrames, cMeterGrPeak);
 }
 
 
@@ -663,7 +699,7 @@ void SRChannel::AdjustEqPassive() {
 		fEqHfBoost[c].setup(samplerate, GetParam(kEqHfBoostFreq)->Value(), 3.2 - GetParam(kEqHfBoostQ)->Value() * .23);
 		// @10 Q=.151, xF=29.46 | @5 Q=.183, xF= 23.302
 		fEqHfCut[c].setup(samplerate, GetParam(kEqHfCutFreq)->Value() / 23.302, .183);
-}
+	}
 
 }
 
