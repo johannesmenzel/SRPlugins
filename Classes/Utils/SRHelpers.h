@@ -17,14 +17,20 @@ namespace SR {
 
     // double to char conversion
     // DOESNT WORK
-    inline char* setCharFromDouble(double doubleValue) {
-      std::string stringValue = std::to_string(doubleValue);
-      char *charValue = new char[stringValue.length() + 1];
-      return strcpy(charValue, stringValue.c_str());
-    }
+    //inline char* setCharFromDouble(double doubleValue) {
+    //  std::string stringValue = std::to_string(doubleValue);
+    //  char *charValue = new char[stringValue.length() + 1];
+    //  return strcpy(charValue, stringValue.c_str());
+    //}
 
-    inline double SetShapeCentered(double cMinValue, double cMaxValue, double cCenteredValue, double cControlPosition = .5) {
-      return log((cCenteredValue - cMinValue) / (cMaxValue - cMinValue)) / log(cControlPosition);
+    /** Get value for IPlug2 IParam::ShapePowCurve(shape)
+    * @param minValue Pass parameters min value
+    * @param maxValue Pass parameters max value
+    * @param centeredValue Pass value you want to have in the middle of your control
+    * @param controlPosition Pass position of centered value if it shouldn't be in the middle (0. .. 1.)
+    */
+    double SetShapeCentered(double minValue, double maxValue, double centeredValue, double controlPosition = .5) {
+      return log((centeredValue - minValue) / (maxValue - minValue)) / log(controlPosition);
     }
 
     // DSP
@@ -32,12 +38,14 @@ namespace SR {
 
 
 
-    // tanh
+    // Fast tanh algorithm for real time audio (source unknown)
     inline double fast_tanh(double x) {
       x = exp(x + x);
       return (x - 1) / (x + 1);
     }
 
+    // Fast tanh algorithm for real time audio
+    // See https://www.kvraudio.com/forum/viewtopic.php?t=388650&sid=c02be30a126707583d5c3da4febe2de4
     inline double vox_fasttanh2(const double x)
     {
       const double ax = fabs(x);
