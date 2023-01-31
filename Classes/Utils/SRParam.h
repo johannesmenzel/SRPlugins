@@ -10,8 +10,8 @@ namespace SR {
   namespace DSP {
 
     /*
-    Class acting as a parameter value smoother.
-    Works with linear paramter changes.
+    Class acting as a parameter value ramp smoother.
+    Works with linear parameter changes towards a target value and does not utilize a one pole lowpass.
     */
     class SRParamSmooth {
     public:
@@ -86,7 +86,13 @@ namespace SR {
       int mNumSmoothSamplesLeft;
       double mValueChangePerSample;
     };
-
+    /* This class used to be a good idea. Since GetParam(paramIdx)->Value() exists, double values are not stored as members anymore 
+    and parameter smoothing just works inside DSP classes it may be abandoned.
+    Might be reused for a bigger struct storing all values including default values */
+    /*
+    class SRParam
+    {
+    public:
     using Values = std::variant<double, float, int, bool>;
     enum EType {
       kDouble = 0,
@@ -96,9 +102,7 @@ namespace SR {
       kNoninit,
       kNumTypes
     };
-    class SRParam
-    {
-    public:
+
       SRParam(int numSmoothSamples = 0)
         : mNumSmoothSamples(numSmoothSamples)
         , mNumParams(0)
@@ -247,6 +251,6 @@ namespace SR {
       int mNumSmoothSamples;
       WDL_PtrList<Param> mParams;
     };
-
+    */ 
   }
 }
