@@ -9,6 +9,9 @@ Steps:
  *  airwindows PLUGIN
  *  Copyright (c) airwindows, Airwindows uses the MIT license
  * ======================================== */
+#include <set>
+#include <string>
+#include <math.h>
 
 namespace SR {
 	namespace DSP {
