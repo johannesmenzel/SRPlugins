@@ -16,16 +16,7 @@ namespace SR {
     class SRParamSmoothRamp {
     public:
       // Constructors & Destructors
-      SRParamSmoothRamp()
-        : mCurrentValue(1.0)
-        , mTargetValue(1.0)
-        , mNumSmoothSamples(0)
-        , mNumSmoothSamplesLeft(0)
-        , mValueChangePerSample(0.0)
-      {
-      }
-
-      SRParamSmoothRamp(double value, int numSmoothSamples)
+      SRParamSmoothRamp(int numSmoothSamples = 0, double value = 1.)
         : mTargetValue(value)
         , mCurrentValue(value)
         , mNumSmoothSamples(numSmoothSamples)
