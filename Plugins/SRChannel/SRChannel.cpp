@@ -731,10 +731,6 @@ void SRChannel::SetFreqMeterValues()
 					+ fGainHfBoost.Get() * (abs(fEqHfBoost[0].response(freq / samplerate)))
 					- fGainHfCut.Get() * (abs(fEqHfCut[0].response(freq / samplerate)))))
 				/ FREQRESP_RANGEDB;
-			if (GetParam(kEqLfBoost)->Value() != 0.0) mFreqMeterValues[i] += AmpToDB(abs(fEqLfBoost[0].response(freq / samplerate))) / FREQRESP_RANGEDB;
-			if (GetParam(kEqLfCut)->Value() != 0.0) mFreqMeterValues[i] += AmpToDB(abs(fEqLfCut[0].response(freq / samplerate))) / FREQRESP_RANGEDB;
-			if (GetParam(kEqHfBoost)->Value() != 0.0) mFreqMeterValues[i] += AmpToDB(abs(fEqHfBoost[0].response(freq / samplerate))) / FREQRESP_RANGEDB;
-			if (GetParam(kEqHfCut)->Value() != 0.0) mFreqMeterValues[i] += AmpToDB(abs(fEqHfCut[0].response(freq / samplerate))) / FREQRESP_RANGEDB;
 		}
 	}
 	if (GetUI()) dynamic_cast<SR::Graphics::Controls::SRGraphBase*>(GetUI()->GetControlWithTag(cMeterFreqResponse))->Process(mFreqMeterValues);
