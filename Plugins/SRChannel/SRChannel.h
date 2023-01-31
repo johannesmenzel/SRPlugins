@@ -24,6 +24,7 @@
 #include "../../Classes/DSP/SRSaturation.h"
 #include "../../Classes/DSP/SRDynamics.h"
 #include "../../Classes/DSP/SRBuffer.h"
+#include "../../Classes/DSP/AWTube2.h"
 
 const int kNumPresets = 1;
 
@@ -285,6 +286,7 @@ private:
 	SR::DSP::SRGain fGainOutLow;
 
 	SR::DSP::SRSaturation fSatInput[2] = { };
+	SR::DSP::Airwindows::Tube2 fSatTube2;
 
 	SR::DSP::SRFilterIIR<sample, 2> fEqHp;
 	SR::DSP::SRFilterIIR<sample, 2> fEqLp;

@@ -462,6 +462,9 @@
     <ClInclude Include="..\..\..\Classes\DSP\AWTemplate.h">
       <Filter>SRClasses\DSP</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Classes\DSP\AWTube2.h">
+      <Filter>SRClasses\DSP</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">

@@ -124,8 +124,8 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kEqBandSolo)->InitEnum("Band Solo", 0, { "Off", "HP", "LP", "Lf", "Lmf" , "Hmf", "Hf"}, 0, "EQ");
 
 	// DUMMY_INIT GetParam(kDummy1)->InitDouble("1", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
-	GetParam(kDummy1)->InitDouble("1", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
-	GetParam(kDummy2)->InitDouble("2", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
+	GetParam(kDummy1)->InitDouble("1", 0.5, 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
+	GetParam(kDummy2)->InitDouble("2", 0.5, 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
 	GetParam(kDummy3)->InitDouble("3", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
 	GetParam(kDummy4)->InitDouble("4", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
 	GetParam(kDummy5)->InitDouble("5", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
@@ -315,6 +315,9 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 		for (int c = 0; c < nChans; c++) {
 			outputs[c][s] = inputs[c][s];
 		}
+	}
+	fSatTube2.ProcessBlock(outputs, outputs, nFrames);
+	for (int s = 0; s < nFrames; s++) {
 
 		// Process input gain
 		if (!GetParam(kBypass)->Bool())
@@ -428,6 +431,7 @@ void SRChannel::OnReset()
 	fGainOutLow.InitGain(100);
 	fSatInput[0].SetSaturation(SR::DSP::SRSaturation::kSoftSat, GetParam(kSaturationDrive)->Value(), GetParam(kSaturationAmount)->Value(), 1., true, 0., 1., samplerate);
 	fSatInput[1].SetSaturation(SR::DSP::SRSaturation::kSoftSat, GetParam(kSaturationDrive)->Value(), GetParam(kSaturationAmount)->Value(), 1., true, 0., 1., samplerate);
+	fSatTube2.Reset(samplerate);
 
 	fEqHp.SetFilter(SR::DSP::BiquadHighpass, GetParam(kEqHpFreq)->Value() / samplerate, 0.707, 0., samplerate);
 	fEqLp.SetFilter(SR::DSP::BiquadLowpass, GetParam(kEqLpFreq)->Value() / samplerate, 0.707, 0., samplerate);
@@ -626,8 +630,8 @@ void SRChannel::OnParamChange(int paramIdx)
 		fCompPeak.SetMix(GetParam(kCompPeakMix)->Value() * .01);
 		break;
 
-	case kDummy1: break;
-	case kDummy2: break;
+	case kDummy1: fSatTube2.SetParameterNormalized(SR::DSP::Airwindows::Tube2::kParamA, GetParam(kDummy1)->Value()); break;
+	case kDummy2: fSatTube2.SetParameterNormalized(SR::DSP::Airwindows::Tube2::kParamB, GetParam(kDummy2)->Value()); break;
 	case kDummy3: break;
 	case kDummy4: break;
 	case kDummy5: break;
