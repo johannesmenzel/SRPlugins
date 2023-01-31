@@ -453,6 +453,9 @@
     <ClInclude Include="..\..\..\Dependencies\iir1\iir\Types.h">
       <Filter>Dependencies\irr1\irr</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Classes\Utils\SRParam.h">
+      <Filter>SRClasses\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">

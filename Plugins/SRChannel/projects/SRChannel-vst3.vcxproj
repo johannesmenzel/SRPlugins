@@ -266,6 +266,7 @@
     <ClInclude Include="..\..\..\Classes\Graphics\SRCustomSwitch.h" />
     <ClInclude Include="..\..\..\Classes\SRConstants.h" />
     <ClInclude Include="..\..\..\Classes\Utils\SRHelpers.h" />
+    <ClInclude Include="..\..\..\Classes\Utils\SRParam.h" />
     <ClInclude Include="..\..\..\Dependencies\iir1\Iir.h" />
     <ClInclude Include="..\..\..\Dependencies\iir1\iir\Biquad.h" />
     <ClInclude Include="..\..\..\Dependencies\iir1\iir\Butterworth.h" />
