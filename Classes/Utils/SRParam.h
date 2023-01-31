@@ -13,10 +13,10 @@ namespace SR {
     Class acting as a parameter value ramp smoother.
     Works with linear parameter changes towards a target value and does not utilize a one pole lowpass.
     */
-    class SRParamSmooth {
+    class SRParamSmoothRamp {
     public:
       // Constructors & Destructors
-      SRParamSmooth()
+      SRParamSmoothRamp()
         : mCurrentValue(1.0)
         , mTargetValue(1.0)
         , mNumSmoothSamples(0)
@@ -25,7 +25,7 @@ namespace SR {
       {
       }
 
-      SRParamSmooth(double value, int numSmoothSamples)
+      SRParamSmoothRamp(double value, int numSmoothSamples)
         : mTargetValue(value)
         , mCurrentValue(value)
         , mNumSmoothSamples(numSmoothSamples)
@@ -34,7 +34,7 @@ namespace SR {
       {
       }
 
-      ~SRParamSmooth()
+      ~SRParamSmoothRamp()
       {
       }
 

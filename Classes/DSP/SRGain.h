@@ -73,14 +73,13 @@ namespace SR
 			}
 			~SRGain() {}
 
-			void InitGain(
-				int pRampNumSamples = 0,
-				PanType pType = kLinear,
-				double pPanNormalized = 0.5,
-				bool pLinearMiddlePosition = true,
-				double pWidthNormalized = 1.0,
-				bool pBypassed = false
-			) {
+			void InitGain(int pRampNumSamples = 0
+				, PanType pType = kLinear
+				, double pPanNormalized = 0.5
+				, bool pLinearMiddlePosition = true
+				, double pWidthNormalized = 1.0
+				, bool pBypassed = false) 
+			{
 				mGainLin = 1.0;
 				mRampNumSamples = (pRampNumSamples < 1) ? 1 : pRampNumSamples;
 				mBypassed = pBypassed;
@@ -88,10 +87,10 @@ namespace SR
 				mPanNormalized = pPanNormalized;
 				mWidthNormalized = pWidthNormalized;
 				mLinearMiddlePosition = pLinearMiddlePosition;
-				mGainEnv[0].SetStrict(mGainLin);
-				mGainEnv[1].SetStrict(mGainLin);
-				mGainEnv[0].SetNumSmoothSamples(mRampNumSamples);
-				mGainEnv[1].SetNumSmoothSamples(mRampNumSamples);
+				mGainRamp[0].SetStrict(mGainLin);
+				mGainRamp[1].SetStrict(mGainLin);
+				mGainRamp[0].SetNumSmoothSamples(mRampNumSamples);
+				mGainRamp[1].SetNumSmoothSamples(mRampNumSamples);
 				update();
 			}
 
@@ -124,7 +123,7 @@ namespace SR
 			// Get gain with dB value
 			double GetGainDb() { return SR::Utils::AmpToDB(mGainLin); } // Get current gain value (decibels)
 			// Get current linear gain voltage at channel [0] or [1]
-			double GetCurrentGainLin(int channel) { return mGainEnv[channel].Get(); }
+			double GetCurrentGainLin(int channel) { return mGainRamp[channel].Get(); }
 			// Get algorithm for panning
 			PanType GetPanType() { return mPanType; }
 			// Get normalized panning position 0 .. 1, while .5 is middle position
@@ -188,8 +187,8 @@ namespace SR
 					}
 				}
 
-				mGainEnv[0].Set(gain1);
-				mGainEnv[1].Set(gain2);
+				mGainRamp[0].Set(gain1);
+				mGainRamp[1].Set(gain2);
 			}
 
 			// Gain members
@@ -205,7 +204,7 @@ namespace SR
 			double mMidCoeff, mSideCoeff;
 
 			// Global members
-			SRParamSmooth mGainEnv[2]; // Holds gain smoothing functionality
+			SRParamSmoothRamp mGainRamp[2]; // Holds gain smoothing functionality
 			int mRampNumSamples; // Enter lenght of gain ramp in samples
 			bool mBypassed; // bool is gain bypassed
 		};
@@ -216,8 +215,8 @@ namespace SR
 		{
 			if (!mBypassed) {
 				// Update values when smoothing
-				mGainEnv[0].Process();
-				mGainEnv[1].Process();
+				mGainRamp[0].Process();
+				mGainRamp[1].Process();
 
 				// width per sample
 				double mid = (in1 + in2) * mMidCoeff;
@@ -228,8 +227,8 @@ namespace SR
 				in2 = mid + side;
 
 				// Apply final gain
-				in1 *= mGainEnv[0].Get();
-				in2 *= mGainEnv[1].Get();
+				in1 *= mGainRamp[0].Get();
+				in2 *= mGainRamp[1].Get();
 			}
 		}
 
