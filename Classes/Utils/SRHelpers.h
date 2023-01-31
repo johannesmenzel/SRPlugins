@@ -11,7 +11,7 @@ namespace SR {
     // CONVERSION
     // ----------
 
-    // Decibel - Linear conversion
+    // Decibel - Linear conversion for classes that doesn't include IPlug
     static inline double DBToAmp(double dB) { return exp(0.11512925464970 * dB); }
     static inline double AmpToDB(double amp) { return 8.685889638065036553 * log(fabs(amp)); }
 
