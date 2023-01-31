@@ -162,7 +162,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		pGraphics->AttachCornerResizer(EUIResizerMode::Scale, false);
 		pGraphics->AttachPanelBackground(SR::Graphics::Layout::SR_DEFAULT_COLOR_CUSTOM_PANEL_BG);
 		pGraphics->LoadFont("Roboto-Regular", ROBOTO_FN);
-		//pGraphics->EnableTooltips(true);
+		pGraphics->EnableTooltips(true);
 		const IRECT b = pGraphics->GetBounds();
 		const IRECT rectTitle = b.GetPadded(-50.f, 0.f, -50.f, -700.f);
 		const IRECT rectDummy = b.GetFromLeft(50.f);
@@ -191,9 +191,9 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		// -- Title
 		pGraphics->AttachControl(new ITextControl(rectTitle.GetGridCell(0, 0, 2, 24).FracRectHorizontal(10.f, false), PLUG_MFR " " PLUG_NAME " " PLUG_VERSION_STR "-alpha", SR::Graphics::Layout::SR_DEFAULT_TEXT));
 		pGraphics->AttachControl(new IVBakedPresetManagerControl(rectTitle.GetGridCell(0, 10, 2, 24).FracRectHorizontal(12.f, false), SR::Graphics::Layout::SR_DEFAULT_STYLE_METER));
-		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectTitle.GetGridCell(0, 22, 2, 24).GetCentredInside(20.f), kBypass, "Byp", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cBypass, "Global");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectTitle.GetGridCell(0, 22, 2, 24).GetCentredInside(20.f), kBypass, "Byp", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cBypass, "Global")->SetTooltip("Bypass plugin");
 		pGraphics->AttachControl(new MainMenu(rectTitle.GetGridCell(0, 23, 2, 24).GetCentredInside(20.f)));
-		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectTitle.GetGridCell(1, 3, 2, 24).GetCentredInside(20.f), kEqBandSolo, "Solo", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cEqBandSolo, "Global");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectTitle.GetGridCell(1, 3, 2, 24).GetCentredInside(20.f), kEqBandSolo, "Solo", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cEqBandSolo, "Global")->SetTooltip("Toggle EQs band solo filters");
 		// -- Dummy
 		pGraphics->AttachControl(new IPanelControl(rectDummy, COLOR_BLACK));
 		pGraphics->AttachControl(new IVKnobControl(rectDummy.GetGridCell(0, 0, 10, 1).GetReducedFromTop(10.f), kDummy1, GetParam(kDummy1)->GetName(), DEFAULT_STYLE.WithLabelText(DEFAULT_LABEL_TEXT.WithFGColor(COLOR_WHITE)).WithValueText(DEFAULT_VALUE_TEXT.WithFGColor(COLOR_WHITE))), cDummy1, "Dummy");
@@ -234,8 +234,8 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqParametric.GetGridCell(1, 1, 2, 4).GetReducedFromTop(20.f), kEqLmfDs, "DS", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLmfDs, "Parametric EQ");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqParametric.GetGridCell(1, 2, 2, 4).GetReducedFromTop(20.f), kEqHmfFreq, "Freq", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHmfFreq, "Parametric EQ");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsEqParametric.GetGridCell(1, 3, 2, 4).GetReducedFromTop(20.f), kEqHmfDs, "DS", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHmfDs, "Parametric EQ");
-		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectControlsEqParametric.GetGridCell(0, 0, 1, 2).GetCentredInside(20.f), kEqLmfIsShelf, "Shelf", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cEqLmfIsShelf, "Parametric EQ");
-		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectControlsEqParametric.GetGridCell(0, 1, 1, 2).GetCentredInside(20.f), kEqHmfIsShelf, "Shelf", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cEqHmfIsShelf, "Parametric EQ");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectControlsEqParametric.GetGridCell(0, 0, 1, 2).GetCentredInside(20.f), kEqLmfIsShelf, "Shelf", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cEqLmfIsShelf, "Parametric EQ")->SetTooltip("Toggle filter peak/shelf");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Switch(rectControlsEqParametric.GetGridCell(0, 1, 1, 2).GetCentredInside(20.f), kEqHmfIsShelf, "Shelf", SR::Graphics::Layout::SR_DEFAULT_STYLE_BUTTON, true), cEqHmfIsShelf, "Parametric EQ")->SetTooltip("Toggle filter peak/shelf");
 		// -- Level Compressor
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsCompLevel.GetGridCell(0, 0, 3, 2).GetReducedFromTop(20.f), kCompRmsThresh, "Thresh", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsThresh, "Comp Level");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsCompLevel.GetGridCell(0, 1, 3, 2).GetReducedFromTop(20.f), kCompRmsRatio, "Ratio", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cCompRmsRatio, "Comp Level");
@@ -253,8 +253,8 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		// -- Stereo controls
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsStereo.GetGridCell(0, 0, 4, 1).GetReducedFromTop(20.f), kStereoPan, "Pan", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoPan, "Stereo");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsStereo.GetGridCell(1, 0, 4, 1).GetReducedFromTop(20.f), kStereoWidth, "Width", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoWidth, "Stereo");
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsStereo.GetGridCell(2, 0, 4, 1).GetReducedFromTop(20.f), kStereoWidthLow, "Bass Width", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoWidthLow, "Stereo");
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsStereo.GetGridCell(3, 0, 4, 1).GetReducedFromTop(20.f), kStereoMonoFreq, "Split FQ", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoMonoFreq, "Stereo");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsStereo.GetGridCell(2, 0, 4, 1).GetReducedFromTop(20.f), kStereoWidthLow, "Bass Width", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoWidthLow, "Stereo")->SetTooltip("Width of bass material");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsStereo.GetGridCell(3, 0, 4, 1).GetReducedFromTop(20.f), kStereoMonoFreq, "Split FQ", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cStereoMonoFreq, "Stereo")->SetTooltip("Split frequency for bass treatment");
 
 		// TODO: Set tooltips
 
