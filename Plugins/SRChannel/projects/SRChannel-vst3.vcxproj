@@ -260,6 +260,7 @@
     <ClInclude Include="..\..\..\Classes\DSP\SRFilters.h" />
     <ClInclude Include="..\..\..\Classes\DSP\SRGain.h" />
     <ClInclude Include="..\..\..\Classes\DSP\SRSaturation.h" />
+    <ClInclude Include="..\..\..\Classes\Graphics\SRControls.h" />
     <ClInclude Include="..\..\..\Classes\Graphics\SRCustomGraph.h" />
     <ClInclude Include="..\..\..\Classes\Graphics\SRCustomKnob.h" />
     <ClInclude Include="..\..\..\Classes\Graphics\SRCustomLayout.h" />

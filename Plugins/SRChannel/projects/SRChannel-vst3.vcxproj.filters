@@ -456,6 +456,9 @@
     <ClInclude Include="..\..\..\Classes\Utils\SRParam.h">
       <Filter>SRClasses\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Classes\Graphics\SRControls.h">
+      <Filter>SRClasses\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">
