@@ -82,12 +82,12 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kEqLmfGain)->InitDouble("LMF Gain", 0., -12., 12., 1., "dB", IParam::EFlags::kFlagStepped, "EQ");
 	GetParam(kEqLmfFreq)->InitDouble("LMF Freq", 1000., 20., 2500., 1., "Hz", 0, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(20., 2500., 1000., .5)));
 	GetParam(kEqLmfQ)->InitDouble("LMF Q", .707, 0.1, 10., .1, "", 0, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.1, 10., .707, .5)));
-	GetParam(kEqLmfDs)->InitDouble("LMF DS", 0., -50., 0., .01, "dB", 0, "EQ");
+	GetParam(kEqLmfDs)->InitDouble("LMF DS", 0., -50., 0., .1, "dB", 0, "EQ");
 
 	GetParam(kEqHmfGain)->InitDouble("HMF Gain", 0., -12., 12., 1., "dB", IParam::EFlags::kFlagStepped, "EQ");
 	GetParam(kEqHmfFreq)->InitDouble("HMF Freq", 3000., 600., 15000., 1., "Hz", 0, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(600., 15000., 3000., .5)));
 	GetParam(kEqHmfQ)->InitDouble("HMF Q", .707, 0.1, 10., .1, "", 0, "EQ", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.1, 10., .707, .5)));
-	GetParam(kEqHmfDs)->InitDouble("HMF DS", 0., -50., 0., .01, "dB", 0, "EQ");
+	GetParam(kEqHmfDs)->InitDouble("HMF DS", 0., -50., 0., .1, "dB", 0, "EQ");
 
 	GetParam(kEqLfBoost)->InitDouble("LF Boost", 0., 0., 10., 1., "", IParam::EFlags::kFlagStepped, "EQ");
 	GetParam(kEqLfCut)->InitDouble("LF Cut", 0., 0., 10., 1., "", IParam::EFlags::kFlagStepped, "EQ");
