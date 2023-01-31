@@ -8,9 +8,8 @@
 // Switch using passive or biquad filtering
 // True: Process passive eq as parallel filters (Dry + Lowpass Boost + Lowpass Cut (flipped))
 // False: Use ordinary biquad filters (Shelf, Peak)
-#define PASSIVE true
 // Switch using dummy parameters for modeling or use already modeled values
-#define DUMMY false
+#define DUMMY true
 
 
 #include "IPlug_include_in_plug_hdr.h"
@@ -293,20 +292,7 @@ private:
 	SR::DSP::SRDeesser fEqLmf;
 	SR::DSP::SRDeesser fEqHmf;
 
-#if FLT == 1
-	SR::DSP::SRFilterIIR<sample, 2> fEqLfBoost;
-	SR::DSP::SRFilterIIR<sample, 2> fEqLfCut;
-	SR::DSP::SRFilterIIR<sample, 2> fEqHfBoost;
-	SR::DSP::SRFilterIIR<sample, 2> fEqHfCut;
 
-#elif FLT == 2
-	Dsp::SimpleFilter<Dsp::RBJ::LowShelf, 2> fEqLfBoost;
-	Dsp::SimpleFilter<Dsp::RBJ::LowShelf, 2> fEqLfCut;
-	Dsp::SimpleFilter<Dsp::RBJ::BandShelf, 2> fEqLfBoost;
-	Dsp::SimpleFilter<Dsp::RBJ::HighShelf, 2> fEqLfCut;
-#elif FLT == 3
-
-#if PASSIVE
 	// Statically allocated stereo pairs
 	Iir::RBJ::LowPass fEqLfBoost[2];
 	Iir::RBJ::LowPass fEqLfCut[2];
@@ -316,14 +302,6 @@ private:
 	// Better having SRGain with param smooth, even better these filters had passband gain (with param smooth)
 	SR::DSP::SRParamSmoothRamp fGainLfBoost, fGainLfCut, fGainHfBoost, fGainHfCut;
 	//double mGainLfBoost, mGainLfCut, mGainHfBoost, mGainHfCut;
-
-#else
-	Iir::RBJ::LowShelf fEqLfBoost[2];
-	Iir::RBJ::LowShelf fEqLfCut[2];
-	Iir::RBJ::BandShelf fEqHfBoost[2];
-	Iir::RBJ::HighShelf fEqHfCut[2];
-#endif / !PASSIVE
-#endif // !FLT
 
 	SR::DSP::SRFilterIIR<sample, 2> fEqBandSolo;
 	SR::DSP::SRFilterIIR<sample, 2> fSplitHp;
