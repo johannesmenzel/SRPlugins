@@ -132,7 +132,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kDummy10)->InitDouble("HBQ", .707, 0.01, 10., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(.01, 10., .707, .5)));
 
 	// Set display texts
-	GetParam(kSaturationAmount)->SetDisplayText(GetParam(kStereoPan)->GetMin(), "Off");
+	GetParam(kSaturationAmount)->SetDisplayText(GetParam(kSaturationAmount)->GetMin(), "Off");
 	GetParam(kStereoPan)->SetDisplayText(GetParam(kStereoPan)->GetDefault(), "Center");
 	GetParam(kStereoPan)->SetDisplayText(GetParam(kStereoPan)->GetMin(), "Left");
 	GetParam(kStereoPan)->SetDisplayText(GetParam(kStereoPan)->GetMax(), "Right");
