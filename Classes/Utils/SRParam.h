@@ -9,28 +9,30 @@
 namespace SR {
   namespace DSP {
 
-    /*
-    Class acting as a parameter value ramp smoother.
-    Works with linear parameter changes towards a target value and does not utilize a one pole lowpass.
-    */
+    /** Class acting as a parameter value ramp smoother.
+    * Works with linear parameter changes towards a target value and does not utilize a one pole lowpass.
+    * @param numSmoothSamples Samples until smoother hits target value. Range: > 0
+    * @param value initialize with default value */
     class SRParamSmoothRamp {
     public:
-      // Constructors & Destructors
-      SRParamSmoothRamp(int numSmoothSamples = 0, double value = 0.)
+      SRParamSmoothRamp(int numSmoothSamples = 100, double value = 0.)
         : mTargetValue(value)
         , mCurrentValue(value)
         , mNumSmoothSamples(numSmoothSamples)
         , mNumSmoothSamplesLeft(0)
         , mValueChangePerSample(0.0)
       {
+        // Nothing
       }
 
-      ~SRParamSmoothRamp()
-      {
-      }
+      ~SRParamSmoothRamp() {}
 
-      // Set target value to smooth to
+      /** Set target value to smooth to */
       void Set(double value) {
+        if (mNumSmoothSamples == 0) {
+          SetStrict(value);
+          return;
+        }
         if (mTargetValue != value) {
           mTargetValue = value;
           mNumSmoothSamplesLeft = mNumSmoothSamples;
@@ -38,26 +40,26 @@ namespace SR {
         }
       }
 
-      // Set value ignoring ramp
+      /** Set value directly, ignore ramp */
       void SetStrict(double value) {
         mCurrentValue = mTargetValue = value;
         mNumSmoothSamplesLeft = 0;
         mValueChangePerSample = 0.0;
       }
 
-      // Set number of samples for smoothing
+      /** Set number of samples for smoothing */
       void SetNumSmoothSamples(int numSmoothSamples) {
         mNumSmoothSamples = numSmoothSamples;
       }
 
-      // Get current state
+      /** Get current state */
       double Get() { return mCurrentValue; }
-      // Get ramp size in samples
+      /** Get ramp size in samples */
       int GetNumSmoothSamples() { return mNumSmoothSamples; }
-      // Get number of samples until target is hit
+      /** Get number of samples until target is hit */
       int GetNumSmoothSamplesLeft() { return mNumSmoothSamplesLeft; }
 
-      // Process smoother, call once per cycle
+      // Process smoother, call once per cycle */
       inline void Process() {
         if (mNumSmoothSamplesLeft > 0) {
           mCurrentValue += mValueChangePerSample;
