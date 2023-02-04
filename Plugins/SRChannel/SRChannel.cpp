@@ -48,12 +48,12 @@ private:
 SRChannel::SRChannel(const InstanceInfo& info)
 	: Plugin(info, MakeConfig(kNumParams, kNumPresets))
 	, fGainIn()
-	, fGainOut()
+	, fGainOut(100, SR::DSP::SRGain::kSinusodial, true)
 	, fGainOutLow()
-	, fGainLfBoost()
-	, fGainLfCut()
-	, fGainHfBoost()
-	, fGainHfCut()
+	, fGainLfBoost(100)
+	, fGainLfCut(100)
+	, fGainHfBoost(100)
+	, fGainHfCut(100)
 	, fEqHp()
 	, fEqLp()
 	, fEqLfBoost()
@@ -362,7 +362,7 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames) {
 	if (!GetParam(kBypass)->Bool()) {
 		for (int s = 0; s < nFrames; s++) {
 			outputs[0][s] = fSatInput[0].Process(outputs[0][s]);
-			outputs[1][s] = fSatInput[0].Process(outputs[1][s]);
+			outputs[1][s] = fSatInput[1].Process(outputs[1][s]);
 		}
 	}
 
@@ -377,6 +377,10 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames) {
 	// Process passive EQ
 	if (!GetParam(kBypass)->Bool()) {
 		for (int s = 0; s < nFrames; s++) {
+			fGainLfBoost.Process();
+			fGainLfCut.Process();
+			fGainHfBoost.Process();
+			fGainHfCut.Process();
 			for (int c = 0; c < nChans; c++) {
 				// Parallel (passive) eq processing blends dry with lowpass (boost) and lowpass (cut, flipped phase)
 				outputs[c][s] = outputs[c][s]
@@ -384,10 +388,6 @@ void SRChannel::ProcessBlock(sample** inputs, sample** outputs, int nFrames) {
 					- (fEqLfCut[c].filter(outputs[c][s]) * fGainLfCut.Get()) // Cut Gain may not exceed .9, need to scale that now
 					+ (fEqHfBoost[c].filter(outputs[c][s]) * fGainHfBoost.Get())
 					- (fEqHfCut[c].filter(outputs[c][s]) * fGainHfCut.Get()); // Cut Gain may not exceed .9, need to scale that now
-				fGainLfBoost.Process();
-				fGainLfCut.Process();
-				fGainHfBoost.Process();
-				fGainHfCut.Process();
 			}
 		}
 	}
@@ -465,6 +465,8 @@ void SRChannel::OnReset()
 	fGainIn.Reset();
 	fGainOut.Reset();
 	fGainOutLow.Reset();
+
+
 	fSatInput[0].SetSaturation(SR::DSP::SRSaturation::kSoftSat, GetParam(kSaturationDrive)->Value(), GetParam(kSaturationAmount)->Value(), 1., true, 0., 1., samplerate);
 	fSatInput[1].SetSaturation(SR::DSP::SRSaturation::kSoftSat, GetParam(kSaturationDrive)->Value(), GetParam(kSaturationAmount)->Value(), 1., true, 0., 1., samplerate);
 	fSatTube2.Reset(samplerate);
@@ -473,10 +475,19 @@ void SRChannel::OnReset()
 	fEqLp.SetFilter(SR::DSP::BiquadLowpass, GetParam(kEqLpFreq)->Value() / samplerate, 0.707, 0., samplerate);
 	fEqHmf.Reset(GetParam(kEqHmfDs)->Value(), .25, 3., 50., GetParam(kEqHmfFreq)->Value() / samplerate, GetParam(kEqHmfQ)->Value(), 0., samplerate, (GetParam(kEqHmfIsShelf)->Bool()) ? SR::DSP::BiquadHighshelf : SR::DSP::BiquadPeak);
 	fEqLmf.Reset(GetParam(kEqLmfDs)->Value(), .25, 7., 200., GetParam(kEqLmfFreq)->Value() / samplerate, GetParam(kEqLmfQ)->Value(), 0., samplerate, (GetParam(kEqLmfIsShelf)->Bool()) ? SR::DSP::BiquadLowshelf : SR::DSP::BiquadPeak);
-	AdjustEqPassive();
 	// TODO: Should it really have Q=0?
 	fSplitHp.SetFilter(SR::DSP::BiquadLinkwitzHighpass, GetParam(kStereoMonoFreq)->Value() / samplerate, 0., 0., samplerate);
 	fSplitLp.SetFilter(SR::DSP::BiquadLinkwitzLowpass, GetParam(kStereoMonoFreq)->Value() / samplerate, 0., 0., samplerate);
+
+	fEqLfBoost[0].reset();
+	fEqLfBoost[1].reset();
+	fEqLfCut[0].reset();
+	fEqLfCut[1].reset();
+	fEqHfBoost[0].reset();
+	fEqHfBoost[1].reset();
+	fEqHfCut[0].reset();
+	fEqHfCut[1].reset();
+	AdjustEqPassive();
 
 	AdjustBandSolo();
 
@@ -686,11 +697,11 @@ void SRChannel::OnParamChange(int paramIdx)
 // Adjust all passive filters at once, call from passive eq related OnParamChange()
 void SRChannel::AdjustEqPassive() {
 	const double samplerate = GetSampleRate();
+	fGainLfBoost.Set(pow(.1 * GetParam(kEqLfBoost)->Value(), 2.) * 3.751);
+	fGainLfCut.Set(sqrt(.1 * GetParam(kEqLfCut)->Value()) * .9);
+	fGainHfBoost.Set(pow(.1 * GetParam(kEqHfBoost)->Value(), 2.) * 3.1);
+	fGainHfCut.Set(sqrt(.1 * GetParam(kEqHfCut)->Value()) * .9);
 	for (int c = 0; c < 2; c++) {
-		fGainLfBoost.Set(pow(.1 * GetParam(kEqLfBoost)->Value(), 2.) * 3.751);
-		fGainLfCut.Set(sqrt(.1 * GetParam(kEqLfCut)->Value()) * .9);
-		fGainHfBoost.Set(pow(.1 * GetParam(kEqHfBoost)->Value(), 2.) * 3.1);
-		fGainHfCut.Set(sqrt(.1 * GetParam(kEqHfCut)->Value()) * .9);
 		// @10 Q=.136, xF=9.437 | @5 Q=.206, xF= 18.778 | @1 Q=.374, xF=48.8
 		fEqLfBoost[c].setup(samplerate, GetParam(kEqLfFreq)->Value() * (48.8 - sqrt(.1 * GetParam(kEqLfBoost)->Value()) * 39.4), .374 - sqrt(.1 * GetParam(kEqLfBoost)->Value()) * .238);
 		// @10 Q=.252, xF=57.2 | @5 Q=.253, xF= 80.202 | @1 Q=.341, xF=172
@@ -700,7 +711,6 @@ void SRChannel::AdjustEqPassive() {
 		// @10 Q=.151, xF=29.46 | @5 Q=.183, xF= 23.302
 		fEqHfCut[c].setup(samplerate, GetParam(kEqHfCutFreq)->Value() / 23.302, .183);
 	}
-
 }
 
 // Right now called on all eq related OnParamChange(). The function adjusts the solo filter to the one which is chosen by kEqBandSolo(Int)
