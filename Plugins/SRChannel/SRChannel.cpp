@@ -499,12 +499,13 @@ void SRChannel::OnReset()
 		GetParam(kCompRmsRelease)->Value(),
 		16. / samplerate, // sidechain HP
 		5., // knee dB
-		true, // feedback
+		false, // feedback
 		true, // automake
 		-18., // reference
 		GetParam(kCompRmsMix)->Value() * .01, // mix
 		samplerate);
 	fCompRms.SetWindow(10.);
+	fCompRms.SetMaxGrDb(-12., false);
 
 	fCompPeak.Reset();
 	fCompPeak.ResetCompressor(
@@ -514,7 +515,7 @@ void SRChannel::OnReset()
 		GetParam(kCompPeakRelease)->Value(),
 		16. / samplerate, // sidechain HP
 		2., // knee dB
-		true, // feedback
+		false, // feedback
 		true, // automake
 		-18., // reference
 		GetParam(kCompPeakMix)->Value() * .01, // mix
