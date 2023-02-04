@@ -159,7 +159,6 @@ namespace SR {
 		{
 		public:
 
-			// Constructor
 			SRDynamicsBase(double threshDb = 0.0, double ratio = 1.0, bool autoMakeup = false)
 				: mThreshDb(threshDb)
 				, mThreshLin(Utils::DBToAmp(threshDb))
@@ -180,54 +179,61 @@ namespace SR {
 			{
 			}
 
-			// Destructor
 			virtual ~SRDynamicsBase() {}
 
-			// Sets dynamic processors threshold in dB
+			/** Sets dynamic processors threshold in dB (typically negative values) 
+			* @param threshDb Sets dynamic processors threshold in dB (typically negative values) */
 			virtual void SetThresh(double threshDb) {
 				mThreshDb = threshDb;
 				mThreshLin = SR::Utils::DBToAmp(threshDb);
 				if (mIsAutoMakeup) AdjustAutoMakeup();
 			}
 
-			// Sets dynamic processors ratio
+			/** Set dynamics processors ratio, for ration n:1 enter 1./n 
+			* @param ratio Set dynamics processors ratio, for ration n:1 enter 1./n */
 			virtual void SetRatio(double ratio) {
 				assert(ratio >= 0.0);
 				mRatio = ratio;
 				if (mIsAutoMakeup) AdjustAutoMakeup();
 			}
 
-			// Sets dynamic processors makeup gain in dB
+			/** Sets dynamic processors makeup gain in dB 
+			* @param makeupDb Sets dynamic processors makeup gain in dB */
 			virtual void SetMakeup(double makeupDb) {
 				mMakeup = SR::Utils::DBToAmp(makeupDb);
 				fMakeup.SetGainLin(mMakeup);
 			}
 
-			// Sets if dynamic processor compensates gain reduction automatically
+			/** Sets if dynamic processor compensates gain reduction automatically 
+			* @param autoMakeup Sets if dynamic processor compensates gain reduction automatically*/
 			virtual void SetIsAutoMakeup(bool autoMakeup) {
 				mIsAutoMakeup = autoMakeup;
 				if (mIsAutoMakeup) AdjustAutoMakeup();
 			}
 
-			// Sets target loudness of the track
+			/** Sets target loudness of the track in dB 
+			* @param referenceDb Sets target loudness of the track in dB */
 			virtual void SetReference(double referenceDb) {
 				mReferenceDb = referenceDb;
 				if (mIsAutoMakeup) AdjustAutoMakeup();
 			}
 
-			// Sets soft knee width in dB
+			/** Sets soft knee width in dB 
+			* @param kneeDb Sets soft knee width in dB*/
 			virtual void SetKnee(double kneeDb) {
 				assert(kneeDb >= 0.0);
 				mKneeWidthDb = kneeDb;
 			}
 
+			/** Sets mix behavoir dry/wet, range: 0.-1. 
+			* @param mix Sets mix behavoir dry/wet, range: 0.-1. */
 			virtual void SetMix(double mix) {
 				assert(mix <= 1.);
 				assert(mix >= 0.);
 				mMix = mix;
 			}
 
-			// Call before runtime, typically in OnReset() or similar
+			/** Call before runtime, typically in OnReset() or similar */
 			virtual void Reset(void) {
 				currentOvershootDb = DC_OFFSET;
 				currentOvershootLin = SR::Utils::DBToAmp(DC_OFFSET);
@@ -278,7 +284,7 @@ namespace SR {
 			double mKneeWidthDb;            // Dynamic processors soft knee width in dB
 			double mGrLin;                  // Dynamic processors linear gain reduction (0..1)
 			double mGrDb;                   // Dynamic processors logarithmic gain reduction
-			double mMix;					// Dynamic Processors mix behaviour
+			double mMix;										// Dynamic Processors mix behaviour
 			double currentOvershootDb;      // Logarithmic over-threshold envelope
 			double currentOvershootLin;     // Linear over-threshold envelope
 			double mAverageOfSquares;       // Dynamic processors gain detectors average of squares
@@ -305,8 +311,9 @@ namespace SR {
 				, mSidechainFc(0.0)
 				, mTopologyFeedback(false)
 				, mMaxGr(0.0)
-				, sidechainSignal1(0.0)
-				, sidechainSignal2(0.0)
+				// Needed for feedback topology
+				, mSidechainSignal1(0.0)
+				, mSidechainSignal2(0.0)
 			{
 			}
 			virtual ~SRCompressor() {}
@@ -340,7 +347,9 @@ namespace SR {
 				InitSidechainFilter(sidechainFc);
 				SetTopologyFeedback(isFeedbackCompressor);
 			}
-
+			/** Set maximum gain reduction, awaits negative values 
+			* @param maxGrDb Set maximum gain reduction in dB, set as negative value 
+			* @param sigmoid If true, gain reduction advances to maximum gain reduction in sigmoid shape, else it cuts gain reduction straight at given parameter*/
 			virtual void SetMaxGrDb(double maxGrDb, bool sigmoid = true) {
 				if (!sigmoid)
 					mMaxGr = maxGrDb;
@@ -369,7 +378,7 @@ namespace SR {
 			void process(double& in1, double& in2, double sidechain);	// Compressor runtime process with stereo-linked key
 			SRFilterIIR<double, 2> fSidechainFilter; // Compressors stereo sidechain filter
 			bool mTopologyFeedback; // True if its a feedback compressor, false for modern feedforward
-			double sidechainSignal1, sidechainSignal2;      // Gain reduced signal to get used as new sidechain for feedback topology
+			double mSidechainSignal1, mSidechainSignal2;      // Gain reduced signal to get used as new sidechain for feedback topology
 			double mSidechainFc;  // Compressors stereo sidechain filters center frequency
 			double mMaxGr;  // Maximum gain reduction for gain reduction limiting (no brickwall, just gets damped there)
 		};
@@ -429,8 +438,8 @@ namespace SR {
 
 		// Compressor runtime process for internal sidechain 
 		INLINE void SRCompressor::Process(double& in1, double& in2) {
-			double rectifiedInput1 = (!mTopologyFeedback) ? in1 : sidechainSignal1;
-			double rectifiedInput2 = (!mTopologyFeedback) ? in2 : sidechainSignal2;
+			double rectifiedInput1 = (!mTopologyFeedback) ? in1 : mSidechainSignal1;
+			double rectifiedInput2 = (!mTopologyFeedback) ? in2 : mSidechainSignal2;
 			if (mSidechainFc > 16. / GetSampleRate()) {
 				rectifiedInput1 = fSidechainFilter.Process(rectifiedInput1, 0);
 				rectifiedInput2 = fSidechainFilter.Process(rectifiedInput2, 1);
@@ -467,8 +476,8 @@ namespace SR {
 
 		// RMS Compressor runtime process for internal sidechain 
 		INLINE void SRCompressorRMS::Process(double& in1, double& in2) {
-			double squaredInput1 = (!mTopologyFeedback) ? in1 * in1 : sidechainSignal1 * sidechainSignal1;	// square input
-			double squaredInput2 = (!mTopologyFeedback) ? in2 * in2 : sidechainSignal2 * sidechainSignal2;
+			double squaredInput1 = (!mTopologyFeedback) ? in1 * in1 : mSidechainSignal1 * mSidechainSignal1;	// square input
+			double squaredInput2 = (!mTopologyFeedback) ? in2 * in2 : mSidechainSignal2 * mSidechainSignal2;
 			double summedSquaredInput = squaredInput1 + squaredInput2;			// power summing
 			summedSquaredInput += DC_OFFSET;					// DC offset, to prevent denormal
 			mEnvelopeAverager.process(summedSquaredInput, mAverageOfSquares);		// average of squares
@@ -536,8 +545,8 @@ namespace SR {
 			in2 *= grRaw;
 
 			// for feedback topology set old processed inputs as new sidechain.
-			sidechainSignal1 = in1;
-			sidechainSignal2 = in2;
+			mSidechainSignal1 = in1;
+			mSidechainSignal2 = in2;
 
 			// Apply makeup gain
 			fMakeup.Process(in1, in2);
@@ -968,7 +977,7 @@ namespace SR {
 
 
 
-	}	// end namespace SRDynamics
+	}	// end namespace DSP
 }	// end namespace SR
 
 
