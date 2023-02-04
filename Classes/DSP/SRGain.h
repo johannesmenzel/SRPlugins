@@ -1,29 +1,5 @@
 //  SRGain.h
 
-// Implementation:
-//   Note that you might need a class for each channel
-//   (so 2 for stereo processing.)
-//
-// Header:
-//   private:
-//     Impementation as object:
-//       SRPan name;
-//     Implementation as pointer:
-//       SRPan *name = new SRPan();
-//
-// Class: Constructor, Reset()
-//     Implementation as object:
-//       name.setClass(pType, pVar1, pVar2, pVar3);
-//     Implementation as pointer:
-//       name->setClass(pType, pVar1, pVar2, pVar3);
-//
-// Class: ProcessDoubleReplacing()
-//   Per sample and channel:
-//     Implementation as object:
-//       *out1 = name.process(*in1);
-//     Implementation as pointer:
-//       *out1 = name->process(*in1);
-
 #pragma once
 
 // #include this and that
@@ -31,12 +7,10 @@
 #include "../Utils/SRParam.h" // param smoother
 #include <cassert>
 
-namespace SR
-{
-	namespace DSP
-	{
+namespace SR {
+	namespace DSP {
 
-
+		/** A gain class with panning, stereo width and mix */
 		class SRGain
 		{
 		public:
@@ -50,96 +24,107 @@ namespace SR
 				kNumTypes
 			};
 
-			// Constructors & Destructor
-			SRGain(
-				int pRampNumSamples = 0,
-				PanType pType = kLinear,
-				double pPanNormalized = 0.5,
-				bool pLinearMiddlePosition = true,
-				double pWidthNormalized = 1.0,
-				bool pBypassed = false
+			/** Construct gain class
+			* @param pRampNumSamples Parameter smoothing ramp in number of samples
+			* @param pPanType Panning algorithm
+			* @param pLinearInMiddlePosition Adjust panning algorithm for unity gain in middle position	*/
+			SRGain(int pRampNumSamples = 100,
+				PanType pPanType = kLinear,
+				bool pLinearInMiddlePosition = true
 			)
-				: mGainLin(1.0)
-				, mRampNumSamples(1)
+				: mRampNumSamples(pRampNumSamples)
+				, mPanType(pPanType)
+				, mLinearInMiddlePosition(pLinearInMiddlePosition)
 				, mBypassed(false)
-				, mPanType(kLinear)
-				, mPanNormalized(0.5)
-				, mLinearMiddlePosition(true)
-				, mWidthNormalized(1.0)
-				, mMidCoeff(0.5)
-				, mSideCoeff(0.5)
+				, mWidthNormalized(1.)
+				, mGainLin(1.)
+				, mPanNormalized(.5)
+				, mMidCoeff(.5)
+				, mSideCoeff(.5)
 			{
-				InitGain(pRampNumSamples, pType, pPanNormalized, pLinearMiddlePosition, pWidthNormalized, pBypassed);
+				Reset(mGainLin, mPanNormalized, mWidthNormalized, mBypassed, mRampNumSamples, mPanType, mLinearInMiddlePosition);
 			}
 			~SRGain() {}
 
-			void InitGain(int pRampNumSamples = 0
-				, PanType pType = kLinear
-				, double pPanNormalized = 0.5
-				, bool pLinearMiddlePosition = true
-				, double pWidthNormalized = 1.0
-				, bool pBypassed = false) 
-			{
-				mGainLin = 1.0;
-				mRampNumSamples = (pRampNumSamples < 1) ? 1 : pRampNumSamples;
-				mBypassed = pBypassed;
-				mPanType = pType;
-				mPanNormalized = pPanNormalized;
-				mWidthNormalized = pWidthNormalized;
-				mLinearMiddlePosition = pLinearMiddlePosition;
+			/** Reset Gain class, typically in OnReset() to set strict values to skip parameter smoothing on reset */
+			void Reset() {
 				mGainRamp[0].SetStrict(mGainLin);
 				mGainRamp[1].SetStrict(mGainLin);
+				update();
+			};
+			/** Reset gain class, typically in OnReset() to set strict values to skip parameter smoothing on reset
+			* @param pPanNormalized Panning in normalized value (0.-1.), while .5 is centered 
+			* @param pWidthNormalized Stereo width in normalized value (<= 0.), while 0. = mono; 1. = stereo; >1. wider
+			* @param pBypassed Disable processing
+			* @param pRampNumSamples Parameter smoothing ramp in number of samples
+			* @param pPanType Panning algorithm
+			* @param pLinearInMiddlePosition Adjust panning algorithm for unity gain in middle position */
+			void Reset(double pGainLin
+				, double pPanNormalized
+				, double pWidthNormalized
+				, bool pBypassed
+				, int pRampNumSamples
+				, PanType pPanType
+				, bool pLinearInMiddlePosition)
+			{
+				mGainLin = pGainLin;
+				mPanNormalized = pPanNormalized;
+				mWidthNormalized = pWidthNormalized;
+				SetWidth(mWidthNormalized);
+				mRampNumSamples = (pRampNumSamples < 1) ? 1 : pRampNumSamples;
+				mBypassed = pBypassed;
+				mPanType = pPanType;
+				mLinearInMiddlePosition = pLinearInMiddlePosition;
 				mGainRamp[0].SetNumSmoothSamples(mRampNumSamples);
 				mGainRamp[1].SetNumSmoothSamples(mRampNumSamples);
-				update();
+				Reset(); // Also holds necessary update()
 			}
 
-			// Set normalized gain with linear voltage value (>= 0.0; 1.0 = unity)
+			/** Set normalized gain with linear voltage value (>= 0.0; 1.0 = unity) */
 			void SetGainLin(double pGainLin) { mGainLin = pGainLin; update(); }
-			// Set gain with dB value
-			void SetGainDb(double pGainDb) { SetGainLin(SR::Utils::DBToAmp(pGainDb)); /* don't update because SetGain does */ }
-			// Set algorithm for panning
+			/** Set gain with dB value */
+			void SetGainDb(double pGainDb) { SetGainLin(SR::Utils::DBToAmp(pGainDb)); /* don't update because SetGainLin does */ }
+			/** Set algorithm for panning */
 			void SetPanType(PanType pType) { mPanType = pType; update(); }
-			// If true, gain is at unity in center position and may differ in other positions
-			void SetPanLinearMiddlePosition(bool pLinearMiddlePosition) { mLinearMiddlePosition = pLinearMiddlePosition; update(); }
-			// Set normalized panning position 0 .. 1, while .5 is middle position
+			/** If true, gain is at unity in center position and may differ in other positions */
+			void SetPanLinearMiddlePosition(bool pLinearMiddlePosition) { mLinearInMiddlePosition = pLinearMiddlePosition; update(); }
+			/** Set normalized panning position 0 .. 1, while .5 is middle position */
 			void SetPanPosition(double pPanNormalized) { mPanNormalized = pPanNormalized; update(); }
-			// Set normalized stereo width (0. = mono; 1. = stereo; > 1 = wider than stereo
+			/** Set normalized stereo width (0. = mono; 1. = stereo; > 1 = wider than stereo */
 			void SetWidth(double pWidthNormalized) {
 				mWidthNormalized = pWidthNormalized;
 				const double tmp = 1. / std::max(1. + mWidthNormalized, 2.);
 				mMidCoeff = 1. * tmp;
 				mSideCoeff = mWidthNormalized * tmp;
-				update();
 			}
-			// Set gain computer bypassed
-			void SetBypassed(bool pBypassed) { mBypassed = pBypassed; update(); }
-			// Set number of samples until gain smoothing ramp reaches target value
-			void SetRamp(int pRampNumSamples) { mRampNumSamples = (pRampNumSamples < 1) ? 1 : pRampNumSamples; update(); }
-
-
-			// Get normalized gain with linear voltage value (>= 0.0; 1.0 = unity)
+			/** Set gain computer bypassed */
+			void SetBypassed(bool pBypassed) { mBypassed = pBypassed; }
+			/** Set number of samples until gain smoothing ramp reaches target value */
+			void SetRamp(int pRampNumSamples) {
+				mRampNumSamples = (pRampNumSamples < 1) ? 1 : pRampNumSamples;
+				mGainRamp[0].SetNumSmoothSamples(mRampNumSamples);
+				mGainRamp[1].SetNumSmoothSamples(mRampNumSamples);
+			}
+			/** Get normalized gain with linear voltage value (>= 0.0; 1.0 = unity) */
 			double GetGainLin() { return mGainLin; }
-			// Get gain with dB value
-			double GetGainDb() { return SR::Utils::AmpToDB(mGainLin); } // Get current gain value (decibels)
-			// Get current linear gain voltage at channel [0] or [1]
+			/** Get gain with dB value */
+			double GetGainDb() { return SR::Utils::AmpToDB(mGainLin); }
+			/** Get current linear gain voltage at channel [0] or [1] */
 			double GetCurrentGainLin(int channel) { return mGainRamp[channel].Get(); }
-			// Get algorithm for panning
+			/** Get algorithm for panning */
 			PanType GetPanType() { return mPanType; }
-			// Get normalized panning position 0 .. 1, while .5 is middle position
+			/** Get normalized panning position 0 .. 1, while .5 is middle position */
 			double GetPanPosition() { return mPanNormalized; }
-			// Get normalized stereo width (0. = mono; 1. = stereo; > 1 = wider than stereo
+			/** Get normalized stereo width (0. = mono; 1. = stereo; > 1 = wider than stereo */
 			double GetWidth() { return mWidthNormalized; }
-			// Get if gain computer is bypassed
-			bool GetBypassed() { return mBypassed; } // Get if currently bypassed
-			// Get number of samples until gain smoothing ramp reaches target value
-			int GetRamp() { return mRampNumSamples; } // Get number of samples until smoother reaches target value
-
-			// Runtime method
+			/** Get if gain computer is bypassed */
+			bool GetBypassed() { return mBypassed; }
+			/** Get number of samples until gain smoothing ramp reaches target value */
+			int GetRamp() { return mRampNumSamples; }
+			/** Runtime method, call per sample, overwrites data in sample** directly */
 			void Process(double& in1, double& in2); // for stereo
-
 		protected:
-			// Update gain values after any value changed
+			/** Update gain values after values changed: gain, pan, pan type */
 			void update(void) {
 				double gain1 = mGainLin;
 				double gain2 = mGainLin;
@@ -149,7 +134,7 @@ namespace SR
 
 					switch (mPanType) {
 					case kLinear:
-						if (mLinearMiddlePosition == true) {
+						if (mLinearInMiddlePosition == true) {
 							gain1 = (mPanNormalized > 0.5) ? (1. - mPanNormalized) * 2 : 1.0;
 							gain2 = (mPanNormalized < 0.5) ? mPanNormalized * 2 : 1.0;
 						}
@@ -159,7 +144,7 @@ namespace SR
 						}
 						break;
 					case kSquareroot:
-						if (mLinearMiddlePosition == true) {
+						if (mLinearInMiddlePosition == true) {
 							gain1 = (mPanNormalized > 0.5) ? sqrt(mPanNormalized) * sqrt(2.) : 1.0;
 							gain2 = (mPanNormalized < 0.5) ? sqrt(1 - mPanNormalized) * sqrt(2.) : 1.0;
 						}
@@ -169,7 +154,7 @@ namespace SR
 						}
 						break;
 					case kSinusodial:
-						if (mLinearMiddlePosition == true) {
+						if (mLinearInMiddlePosition == true) {
 							gain1 = (mPanNormalized > 0.5) ? sin(2. * mPanNormalized * M_PI_2) : 1.0;
 							gain2 = (mPanNormalized < 0.5) ? cos((1. - 2. * mPanNormalized) * M_PI_2) : 1.0;
 						}
@@ -190,20 +175,12 @@ namespace SR
 				mGainRamp[0].Set(gain1);
 				mGainRamp[1].Set(gain2);
 			}
-
-			// Gain members
 			double mGainLin;
-
-			// Pan members
 			PanType mPanType;
 			double mPanNormalized; // Enter normalized pan between 0.0 (left) and 1.0 (right)
-			bool mLinearMiddlePosition; // Center volume doens't change if true
-
-			// Width members
+			bool mLinearInMiddlePosition; // Center volume doens't change if true
 			double mWidthNormalized; // Normalized width where 0 = mono, 1 = normal stereo, > 1 = wider
 			double mMidCoeff, mSideCoeff;
-
-			// Global members
 			SRParamSmoothRamp mGainRamp[2]; // Holds gain smoothing functionality
 			int mRampNumSamples; // Enter lenght of gain ramp in samples
 			bool mBypassed; // bool is gain bypassed
@@ -232,5 +209,5 @@ namespace SR
 			}
 		}
 
-	} // namespace SRGain
-} // namespace SR
+	} // namespace !DSP
+} // namespace !SR

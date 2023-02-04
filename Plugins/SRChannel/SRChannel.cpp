@@ -47,13 +47,13 @@ private:
 // Plugin class, init parameters, variables and GUI here
 SRChannel::SRChannel(const InstanceInfo& info)
 	: Plugin(info, MakeConfig(kNumParams, kNumPresets))
-	, fGainIn(100)
-	, fGainOut(100)
-	, fGainOutLow(100)
-	, fGainLfBoost(100)
-	, fGainLfCut(100)
-	, fGainHfBoost(100)
-	, fGainHfCut(100)
+	, fGainIn()
+	, fGainOut()
+	, fGainOutLow()
+	, fGainLfBoost()
+	, fGainLfCut()
+	, fGainHfBoost()
+	, fGainHfCut()
 	, fEqHp()
 	, fEqLp()
 	, fEqLfBoost()
@@ -124,8 +124,8 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kEqBandSolo)->InitEnum("Band Solo", 0, { "Off", "HP", "LP", "Lf", "Lmf" , "Hmf", "Hf" }, 0, "EQ");
 
 	// DUMMY_INIT GetParam(kDummy1)->InitDouble("1", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
-	GetParam(kDummy1)->InitDouble("1", 0.5, 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
-	GetParam(kDummy2)->InitDouble("2", 0.5, 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
+	GetParam(kDummy1)->InitDouble("T2 Inp", 0.5, 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
+	GetParam(kDummy2)->InitDouble("T2 Drv", 0.5, 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
 	GetParam(kDummy3)->InitDouble("3", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
 	GetParam(kDummy4)->InitDouble("4", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
 	GetParam(kDummy5)->InitDouble("5", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
@@ -462,9 +462,9 @@ void SRChannel::OnReset()
 	const double samplerate = GetSampleRate();
 
 	// TODO: Must gain bet in OnReset?
-	fGainIn.InitGain(100);
-	fGainOut.InitGain(100, SR::DSP::SRGain::kSinusodial, (GetParam(kStereoPan)->Value() + 100.) / 200., true, GetParam(kStereoWidth)->Value() * .01);
-	fGainOutLow.InitGain(100);
+	fGainIn.Reset();
+	fGainOut.Reset();
+	fGainOutLow.Reset();
 	fSatInput[0].SetSaturation(SR::DSP::SRSaturation::kSoftSat, GetParam(kSaturationDrive)->Value(), GetParam(kSaturationAmount)->Value(), 1., true, 0., 1., samplerate);
 	fSatInput[1].SetSaturation(SR::DSP::SRSaturation::kSoftSat, GetParam(kSaturationDrive)->Value(), GetParam(kSaturationAmount)->Value(), 1., true, 0., 1., samplerate);
 	fSatTube2.Reset(samplerate);
