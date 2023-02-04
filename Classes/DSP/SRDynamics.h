@@ -116,28 +116,28 @@ namespace SR {
 				, mEnvelopeRelease(releaseMs, sampleRate)	{}
 			virtual ~SRDynamicsDetector() {}
 
-			virtual double GetAttack(void) const { return mEnvelopeAttack.getTc(); }
-			virtual double GetRelease(void) const { return mEnvelopeRelease.getTc(); }
-			virtual double GetSampleRate(void) const { return mEnvelopeAttack.getSampleRate(); }
+			virtual double GetAttack(void) const { return mEnvelopeAttack.GetTc(); }
+			virtual double GetRelease(void) const { return mEnvelopeRelease.GetTc(); }
+			virtual double GetSampleRate(void) const { return mEnvelopeAttack.GetSampleRate(); }
 
 			virtual void ResetDetector(double attackMs, double releaseMs, double sampleRate) {
 				SetAttack(attackMs);
 				SetRelease(releaseMs);
 				SetSampleRate(sampleRate);
 			}
-			virtual void SetAttack(double ms) { mEnvelopeAttack.setTc(ms); }
-			virtual void SetRelease(double ms) { mEnvelopeRelease.setTc(ms); }
+			virtual void SetAttack(double ms) { mEnvelopeAttack.SetTc(ms); }
+			virtual void SetRelease(double ms) { mEnvelopeRelease.SetTc(ms); }
 			virtual void SetSampleRate(double sampleRate) {
-				mEnvelopeAttack.setSampleRate(sampleRate);
-				mEnvelopeRelease.setSampleRate(sampleRate);
+				mEnvelopeAttack.SetSampleRate(sampleRate);
+				mEnvelopeRelease.SetSampleRate(sampleRate);
 			}
 
 			// RUNTIME
 			INLINE void process(double in, double& state) {
 				if (in > state)
-					mEnvelopeAttack.process(in, state);
+					mEnvelopeAttack.Process(in, state);
 				else
-					mEnvelopeRelease.process(in, state);
+					mEnvelopeRelease.Process(in, state);
 			}
 
 		private:
@@ -401,7 +401,7 @@ namespace SR {
 			// sample rate
 			virtual void SetSampleRate(double sampleRate) {
 				SRCompressor::SetSampleRate(sampleRate);
-				mEnvelopeAverager.setSampleRate(sampleRate);
+				mEnvelopeAverager.SetSampleRate(sampleRate);
 			}
 			virtual void InitCompressor(double dB, double ratio, double attackMs, double releaseMs, double sidechainFc, double kneeDb, double rmsWindowMs, bool isFeedbackCompressor, bool autoMakeup, double samplerate) {
 				SetSampleRate(samplerate);
@@ -413,15 +413,15 @@ namespace SR {
 				SRCompressor::InitSidechainFilter(sidechainFc);
 				SRDynamicsBase::SetKnee(kneeDb);
 				SRCompressor::SetTopologyFeedback(isFeedbackCompressor);
-				mEnvelopeAverager.setTc(rmsWindowMs);
+				mEnvelopeAverager.SetTc(rmsWindowMs);
 				SRDynamicsBase::Reset();
 			}
 
 			// RMS window
 			virtual void SetWindow(double ms) {
-				mEnvelopeAverager.setTc(ms);
+				mEnvelopeAverager.SetTc(ms);
 			}
-			virtual double GetWindow(void) const { return mEnvelopeAverager.getTc(); }
+			virtual double GetWindow(void) const { return mEnvelopeAverager.GetTc(); }
 
 			void Process(double& in1, double& in2, double& extSC1, double& extSC2);
 			void Process(double& in1, double& in2);	// compressor runtime process
@@ -480,7 +480,7 @@ namespace SR {
 			double squaredInput2 = (!mTopologyFeedback) ? in2 * in2 : mSidechainSignal2 * mSidechainSignal2;
 			double summedSquaredInput = squaredInput1 + squaredInput2;			// power summing
 			summedSquaredInput += DC_OFFSET;					// DC offset, to prevent denormal
-			mEnvelopeAverager.process(summedSquaredInput, mAverageOfSquares);		// average of squares
+			mEnvelopeAverager.Process(summedSquaredInput, mAverageOfSquares);		// average of squares
 			double sidechainRms = sqrt(mAverageOfSquares);	// sidechainRms (sort of ...), See NOTE 2
 
 			SRCompressor::process(in1, in2, sidechainRms);	// rest of process
@@ -492,7 +492,7 @@ namespace SR {
 			double squaredInput2 = extSC2 * extSC2;
 			double summedSquaredInput = squaredInput1 + squaredInput2;			// power summing
 			summedSquaredInput += DC_OFFSET;					// DC offset, to prevent denormal
-			mEnvelopeAverager.process(summedSquaredInput, mAverageOfSquares);		// average of squares
+			mEnvelopeAverager.Process(summedSquaredInput, mAverageOfSquares);		// average of squares
 			double sidechainRms = sqrt(mAverageOfSquares);	// sidechainRms (sort of ...), see NOTE 2
 			SRCompressor::process(in1, in2, sidechainRms);	// rest of process
 		}
@@ -590,23 +590,23 @@ namespace SR {
 			virtual ~SRLimiter() {}
 
 			virtual void SetAttack(double ms) {
-				unsigned int samp = int(0.001 * ms * mEnvelopeDetectorAttack.getSampleRate());
+				unsigned int samp = int(0.001 * ms * mEnvelopeDetectorAttack.GetSampleRate());
 
 				assert(samp < BUFFER_SIZE);
 
 				mPeakHoldSamples = samp;
-				mEnvelopeDetectorAttack.setTc(ms);
+				mEnvelopeDetectorAttack.SetTc(ms);
 			}
 			virtual void SetRelease(double ms) {
-				mEnvelopeDetectorRelease.setTc(ms);
+				mEnvelopeDetectorRelease.SetTc(ms);
 			}
-			virtual double GetAttack(void)  const { return mEnvelopeDetectorAttack.getTc(); }
-			virtual double GetRelease(void) const { return mEnvelopeDetectorRelease.getTc(); }
+			virtual double GetAttack(void)  const { return mEnvelopeDetectorAttack.GetTc(); }
+			virtual double GetRelease(void) const { return mEnvelopeDetectorRelease.GetTc(); }
 			virtual void   SetSampleRate(double sampleRate) {
-				mEnvelopeDetectorAttack.setSampleRate(sampleRate);
-				mEnvelopeDetectorRelease.setSampleRate(sampleRate);
+				mEnvelopeDetectorAttack.SetSampleRate(sampleRate);
+				mEnvelopeDetectorRelease.SetSampleRate(sampleRate);
 			}
-			virtual double GetSampleRate(void) { return mEnvelopeDetectorAttack.getSampleRate(); }
+			virtual double GetSampleRate(void) { return mEnvelopeDetectorAttack.GetSampleRate(); }
 			virtual const unsigned int GetLatency(void) const { return mPeakHoldSamples; }
 
 			virtual void Reset(void) {
@@ -690,9 +690,9 @@ namespace SR {
 			// See NOTE 5
 				  // attack/release
 			if (mMaxPeak > currentOvershootLin)
-				mEnvelopeDetectorAttack.process(mMaxPeak, currentOvershootLin);		// process attack phase
+				mEnvelopeDetectorAttack.Process(mMaxPeak, currentOvershootLin);		// process attack phase
 			else
-				mEnvelopeDetectorRelease.process(mMaxPeak, currentOvershootLin);		// process release phase
+				mEnvelopeDetectorRelease.Process(mMaxPeak, currentOvershootLin);		// process release phase
 
 			// See NOTE 4
 
@@ -763,14 +763,14 @@ namespace SR {
 			// sample rate
 			virtual void setSampleRate(double sampleRate) {
 				SRGate::SetSampleRate(sampleRate);
-				mEnvelopeAverager.setSampleRate(sampleRate);
+				mEnvelopeAverager.SetSampleRate(sampleRate);
 			}
 
 			// RMS window
 			virtual void setWindow(double ms) {
-				mEnvelopeAverager.setTc(ms);
+				mEnvelopeAverager.SetTc(ms);
 			}
-			virtual double getWindow(void) const { return mEnvelopeAverager.getTc(); }
+			virtual double getWindow(void) const { return mEnvelopeAverager.GetTc(); }
 
 			// runtime process
 			void Process(double& in1, double& in2);	// gate runtime process
@@ -819,7 +819,7 @@ namespace SR {
 
 			double summedSquaredInput = squaredInput1 + squaredInput2;			// power summing
 			summedSquaredInput += DC_OFFSET;					// DC offset, to prevent denormal
-			mEnvelopeAverager.process(summedSquaredInput, mAverageOfSquares);		// average of squares
+			mEnvelopeAverager.Process(summedSquaredInput, mAverageOfSquares);		// average of squares
 			double sidechainRms = sqrt(mAverageOfSquares);	// sidechainRms (sort of ...), See NOTE 2
 
 			SRGate::Process(in1, in2, sidechainRms);	// rest of process
