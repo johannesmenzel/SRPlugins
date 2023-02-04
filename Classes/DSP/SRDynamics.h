@@ -73,23 +73,23 @@ namespace SR {
 
 			virtual ~SRDynamicsEnvelope() {}
 
-			virtual double getTc(void) const { return mTimeConstantMs; }
-			virtual double getSampleRate(void) const { return mSampleRate; }
-
-			virtual void setTc(double ms) {
+			virtual void SetTc(double ms) {
 				assert(ms > 0.0);
 				mTimeConstantMs = ms;
 				setCoef();
 			}
 
-			virtual void setSampleRate(double sampleRate) {
+			virtual void SetSampleRate(double sampleRate) {
 				assert(sampleRate > 0.0);
 				mSampleRate = sampleRate;
 				setCoef();
 			}
 
+			virtual double GetTc(void) const { return mTimeConstantMs; }
+			virtual double GetSampleRate(void) const { return mSampleRate; }
+
 			// Runtime method of Envelope detector
-			INLINE void process(double in, double& state) {
+			INLINE void Process(double in, double& state) {
 				state = in + mRuntimeCoeff * (state - in);
 			}
 
