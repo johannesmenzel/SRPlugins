@@ -72,7 +72,6 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kGainIn)->InitDouble("Input", 0., -120., 12., 0.1, "dB", 0, "Gain", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(-120., 12., 0., .5)));
 	GetParam(kGainOut)->InitDouble("Output", 0., -120., 12., 0.1, "dB", 0, "Gain", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(-120., 12., 0., .5)));
 
-	GetParam(kSaturationAmount)->InitDouble("Sat Amount", 0., 0., 100., 1., "%", 0, "Sat");
 	GetParam(kSaturationDrive)->InitDouble("Sat Drive", 0., 0., 24., 0.1, "dB", 0, "Sat");
 	GetParam(kTube)->InitDouble("Tube", 0., 0., 100., 1., "%", 0, "Sat");
 
@@ -137,7 +136,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kDummy10)->InitDouble("10", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
 
 	// Set display texts
-	GetParam(kSaturationAmount)->SetDisplayText(GetParam(kSaturationAmount)->GetMin(), "Off");
+	GetParam(kTube)->SetDisplayText(GetParam(kTube)->GetMin(), "Off");
 	GetParam(kStereoPan)->SetDisplayText(GetParam(kStereoPan)->GetDefault(), "Center");
 	GetParam(kStereoPan)->SetDisplayText(GetParam(kStereoPan)->GetMin(), "Left");
 	GetParam(kStereoPan)->SetDisplayText(GetParam(kStereoPan)->GetMax(), "Right");
@@ -215,9 +214,8 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsGain.GetGridCell(0, 0, 2, 1).GetReducedFromTop(20.f), kGainIn, "Input", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGainIn, "Gain");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsGain.GetGridCell(1, 0, 2, 1).GetReducedFromTop(20.f), kGainOut, "Output", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGainOut, "Gain");
 		// -- Saturation
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsSat.GetGridCell(0, 0, 4, 1).GetReducedFromTop(20.f), kSaturationAmount, "Amount", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cSaturationAmount, "Sat");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsSat.GetGridCell(0, 0, 4, 1).GetReducedFromTop(20.f), kTube, "Tube", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cTube, "Sat");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsSat.GetGridCell(1, 0, 4, 1).GetReducedFromTop(20.f), kSaturationDrive, "Drive", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cSaturationDrive, "Sat");
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsSat.GetGridCell(2, 0, 4, 1).GetReducedFromTop(20.f), kTube, "Tube", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cTube, "Sat");
 		// -- Filters (HP/LP)
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsFilter.GetGridCell(0, 0, 2, 1).GetReducedFromTop(20.f), kEqLpFreq, "LP", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLpFreq, "Filter");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsFilter.GetGridCell(1, 0, 2, 1).GetReducedFromTop(20.f), kEqHpFreq, "HP", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHpFreq, "Filter");
@@ -469,8 +467,8 @@ void SRChannel::OnReset()
 	fGainOutLow.Reset();
 
 	// Reset saturation classes, mainly for samplerate
-	fSatInput[0].SetSaturation(SR::DSP::SRSaturation::kSoftSat, GetParam(kSaturationDrive)->Value(), GetParam(kSaturationAmount)->Value(), 1., true, 0., 1., samplerate);
-	fSatInput[1].SetSaturation(SR::DSP::SRSaturation::kSoftSat, GetParam(kSaturationDrive)->Value(), GetParam(kSaturationAmount)->Value(), 1., true, 0., 1., samplerate);
+	fSatInput[0].SetSaturation(SR::DSP::SRSaturation::kSoftSat, GetParam(kSaturationDrive)->Value(), 1., 1., true, 0., 1., samplerate);
+	fSatInput[1].SetSaturation(SR::DSP::SRSaturation::kSoftSat, GetParam(kSaturationDrive)->Value(), 1., 1., true, 0., 1., samplerate);
 	
 	fSatTube2.SetParameterNormalized(SR::DSP::Airwindows::Tube2::kParamA, .5 - GetParam(kTube)->Value() * .01 * .2); // @0%: .5; @100%: .3
 	fSatTube2.SetParameterNormalized(SR::DSP::Airwindows::Tube2::kParamB, GetParam(kTube)->Value() * .01); // directly
@@ -563,10 +561,6 @@ void SRChannel::OnParamChange(int paramIdx)
 	case kSaturationDrive:
 		fSatInput[0].SetDrive(GetParam(kSaturationDrive)->Value());
 		fSatInput[1].SetDrive(GetParam(kSaturationDrive)->Value());
-		break;
-	case kSaturationAmount:
-		fSatInput[0].SetAmount(GetParam(kSaturationAmount)->Value() * .01);
-		fSatInput[1].SetAmount(GetParam(kSaturationAmount)->Value() * .01);
 		break;
 	case kTube:
 		fSatTube2.SetParameterNormalized(SR::DSP::Airwindows::Tube2::kParamA, .5 - GetParam(kTube)->Value() * .002); // @0%: .5; @100%: .3
