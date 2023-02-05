@@ -72,7 +72,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kGainIn)->InitDouble("Input", 0., -120., 12., 0.1, "dB", 0, "Gain", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(-120., 12., 0., .5)));
 	GetParam(kGainOut)->InitDouble("Output", 0., -120., 12., 0.1, "dB", 0, "Gain", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(-120., 12., 0., .5)));
 
-	GetParam(kSaturationDrive)->InitDouble("Sat Drive", 0., 0., 24., 0.1, "dB", 0, "Sat");
+	GetParam(kSaturationDrive)->InitDouble("Waveshaper", 0., 0., 24., 0.1, "dB", 0, "Sat");
 	GetParam(kTube)->InitDouble("Tube", 0., 0., 100., 1., "%", 0, "Sat");
 
 	GetParam(kStereoPan)->InitDouble("Pan", 0., -100., 100., 1., "%", 0, "Stereo");
@@ -215,7 +215,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsGain.GetGridCell(1, 0, 2, 1).GetReducedFromTop(20.f), kGainOut, "Output", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cGainOut, "Gain");
 		// -- Saturation
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsSat.GetGridCell(0, 0, 4, 1).GetReducedFromTop(20.f), kTube, "Tube", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cTube, "Sat");
-		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsSat.GetGridCell(1, 0, 4, 1).GetReducedFromTop(20.f), kSaturationDrive, "Drive", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cSaturationDrive, "Sat");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsSat.GetGridCell(1, 0, 4, 1).GetReducedFromTop(20.f), kSaturationDrive, "Waveshaper", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cSaturationDrive, "Sat");
 		// -- Filters (HP/LP)
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsFilter.GetGridCell(0, 0, 2, 1).GetReducedFromTop(20.f), kEqLpFreq, "LP", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLpFreq, "Filter");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsFilter.GetGridCell(1, 0, 2, 1).GetReducedFromTop(20.f), kEqHpFreq, "HP", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHpFreq, "Filter");
