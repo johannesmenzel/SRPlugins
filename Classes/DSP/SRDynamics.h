@@ -233,7 +233,7 @@ namespace SR {
 				mMix = mix;
 			}
 
-			/** Call before runtime, typically in OnReset() or similar */
+			/** Call before runtime, typically in OnReset() or similar. This resets current overshoot and average of squares to DC_OFFSET */
 			virtual void Reset(void) {
 				currentOvershootDb = DC_OFFSET;
 				currentOvershootLin = SR::Utils::DBToAmp(DC_OFFSET);
