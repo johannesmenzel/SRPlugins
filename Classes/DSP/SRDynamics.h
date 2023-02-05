@@ -436,6 +436,21 @@ namespace SR {
 		// COMPRESSOR Inline Functions
 		//-------------------------------------------------------------
 
+		// Compressor runtime process for external sidechain
+		INLINE void SRCompressor::Process(double& in1, double& in2, double& extSC1, double& extSC2) {
+			double rectifiedInput1 = extSC1;
+			double rectifiedInput2 = extSC2;
+			if (mSidechainFc > 16. / GetSampleRate()) {
+				rectifiedInput1 = fSidechainFilter.Process(rectifiedInput1, 0);
+				rectifiedInput2 = fSidechainFilter.Process(rectifiedInput2, 1);
+			}
+			rectifiedInput1 = std::fabs(rectifiedInput1);	// rectify input
+			rectifiedInput2 = std::fabs(rectifiedInput2);
+			// If desired, one could use another EnvelopeDetector to smooth the rectified signal.
+			double rectifiedInputMaxed = std::max(rectifiedInput1, rectifiedInput2);	// link channels with greater of 2
+			process(in1, in2, rectifiedInputMaxed);	// rest of process
+		}
+
 		// Compressor runtime process for internal sidechain 
 		INLINE void SRCompressor::Process(double& in1, double& in2) {
 			double rectifiedInput1 = (!mTopologyFeedback) ? in1 : mSidechainSignal1;
@@ -446,45 +461,13 @@ namespace SR {
 			}
 			rectifiedInput1 = std::fabs(rectifiedInput1);	// rectify input
 			rectifiedInput2 = std::fabs(rectifiedInput2);
-
 			// If desired, one could use another EnvelopeDetector to smooth the rectified signal.
-
-			double rectifiedInputMaxed = std::max(rectifiedInput1, rectifiedInput2);	// link channels with greater of 2
-			process(in1, in2, rectifiedInputMaxed);	// rest of process
-		}
-
-		// Compressor runtime process for external sidechain
-		INLINE void SRCompressor::Process(double& in1, double& in2, double& extSC1, double& extSC2) {
-			double rectifiedInput1 = extSC1;
-			double rectifiedInput2 = extSC2;
-			if (mSidechainFc > 16. / GetSampleRate()) {
-				rectifiedInput1 = fSidechainFilter.Process(rectifiedInput1, 0);
-				rectifiedInput2 = fSidechainFilter.Process(rectifiedInput2, 1);
-			}
-
-			rectifiedInput1 = std::fabs(rectifiedInput1);	// rectify input
-			rectifiedInput2 = std::fabs(rectifiedInput2);
-
-			// If desired, one could use another EnvelopeDetector to smooth the rectified signal.
-
 			double rectifiedInputMaxed = std::max(rectifiedInput1, rectifiedInput2);	// link channels with greater of 2
 			process(in1, in2, rectifiedInputMaxed);	// rest of process
 		}
 
 		// Inline RMS Compressor Sidechain
 		//-------------------------------------------------------------
-
-		// RMS Compressor runtime process for internal sidechain 
-		INLINE void SRCompressorRMS::Process(double& in1, double& in2) {
-			double squaredInput1 = (!mTopologyFeedback) ? in1 * in1 : mSidechainSignal1 * mSidechainSignal1;	// square input
-			double squaredInput2 = (!mTopologyFeedback) ? in2 * in2 : mSidechainSignal2 * mSidechainSignal2;
-			double summedSquaredInput = squaredInput1 + squaredInput2;			// power summing
-			summedSquaredInput += DC_OFFSET;					// DC offset, to prevent denormal
-			mEnvelopeAverager.Process(summedSquaredInput, mAverageOfSquares);		// average of squares
-			double sidechainRms = sqrt(mAverageOfSquares);	// sidechainRms (sort of ...), See NOTE 2
-
-			SRCompressor::process(in1, in2, sidechainRms);	// rest of process
-		}
 
 		// RMS Compressor runtime process for external sidechain 
 		INLINE void SRCompressorRMS::Process(double& in1, double& in2, double& extSC1, double& extSC2) {
@@ -497,6 +480,16 @@ namespace SR {
 			SRCompressor::process(in1, in2, sidechainRms);	// rest of process
 		}
 
+		// RMS Compressor runtime process for internal sidechain 
+		INLINE void SRCompressorRMS::Process(double& in1, double& in2) {
+			double squaredInput1 = (!mTopologyFeedback) ? in1 * in1 : mSidechainSignal1 * mSidechainSignal1;	// square input
+			double squaredInput2 = (!mTopologyFeedback) ? in2 * in2 : mSidechainSignal2 * mSidechainSignal2;
+			double summedSquaredInput = squaredInput1 + squaredInput2;			// power summing
+			summedSquaredInput += DC_OFFSET;					// DC offset, to prevent denormal
+			mEnvelopeAverager.Process(summedSquaredInput, mAverageOfSquares);		// average of squares
+			double sidechainRms = sqrt(mAverageOfSquares);	// sidechainRms (sort of ...), See NOTE 2
+			SRCompressor::process(in1, in2, sidechainRms);	// rest of process
+		}
 		// Inline all compressors process
 		// This is the protected method all compressors input sidechain methods call
 		INLINE void SRCompressor::process(double& in1, double& in2, double sidechain) {
