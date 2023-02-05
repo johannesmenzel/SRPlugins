@@ -22,8 +22,9 @@ namespace SR {
 
 
 				void DrawWidget(IGraphics& g) override {
+					const IColor color = (mMouseIsOver) ? SR::Graphics::Layout::SR_DEFAULT_COLOR_X1 : SR::Graphics::Layout::SR_DEFAULT_COLOR_FG;
 					// Decided for fixed 3.f roundness, maybe align in other places
-					g.DrawRoundRect(SR::Graphics::Layout::SR_DEFAULT_COLOR_FG, mWidgetBounds, 3.f, 0, mTrackSize);
+					g.DrawRoundRect(color, mWidgetBounds, 3.f, 0, mTrackSize);
 				};
 
 				virtual void DrawValue(IGraphics& g, bool mouseOver) override {
