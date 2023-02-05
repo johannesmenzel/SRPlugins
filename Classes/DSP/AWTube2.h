@@ -4,6 +4,11 @@
  *  airwindows Tube2
  *  Copyright (c) airwindows, Airwindows uses the MIT license
  * ======================================== */
+
+ /*
+ * Added wet parameter
+ */
+
 #include <set>
 #include <string>
 #include <math.h>
@@ -17,12 +22,14 @@ namespace SR {
 				enum EParam {
 					kParamA = 0,
 					kParamB = 1,
+					kParamC = 2,
 					kNumParameters
 				};
 				Tube2(double samplerate = 44100.) {
 					Reset(samplerate);
 					A = 0.5;
 					B = 0.5;
+					C = 1.;
 					previousSampleA = 0.0;
 					previousSampleB = 0.0;
 					previousSampleC = 0.0;
@@ -37,13 +44,14 @@ namespace SR {
 				}
 				double getSampleRate() { return mSampleRate; }
 				/**
-				* @param index A: "Input", B: "Tube"
+				* @param index A: "Input", B: "Tube", C: "Wet"
 				* @param value Set double value between 0. and 1.
 				*/
 				void Tube2::SetParameterNormalized(EParam index, double value) {
 					switch (index) {
 					case kParamA: A = value; break;
 					case kParamB: B = value; break;
+					case kParamC: C = value; break;
 					default: throw; // unknown parameter, shouldn't happen!
 					}
 				}
@@ -51,6 +59,7 @@ namespace SR {
 					switch (index) {
 					case kParamA: return A; break;
 					case kParamB: return B; break;
+					case kParamC: return C; break;
 					default: break; // unknown parameter, shouldn't happen!
 					} return 0.0; //we only need to update the relevant name, this is simple to manage
 				}
@@ -70,6 +79,7 @@ namespace SR {
 
 				double A;
 				double B;
+				double C;
 			};
 
 			inline void Tube2::ProcessBlock(double** inputs, double** outputs, int sampleFrames) {
@@ -194,8 +204,8 @@ namespace SR {
 					//inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 1.1e-44l * pow(2,expon+62));
 					//end 64 bit stereo floating point dither
 
-					*out1 = inputSampleL;
-					*out2 = inputSampleR;
+					*out1 = inputSampleL * C + *in1 * (1. - C);
+					*out2 = inputSampleR * C + *in2 * (1. - C);
 
 					in1++;
 					in2++;
