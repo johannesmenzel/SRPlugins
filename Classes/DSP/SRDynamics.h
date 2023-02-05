@@ -521,7 +521,8 @@ namespace SR {
 				}
 				else if (grRaw < mMaxGr + mMaxGrWidth * .5) {
 					// Perform faster fuction representing grRaw on itself: f(grRaw) = ((grRaw - mMaxGr + (mMaxGrWidth / 2.)) ^ 2 / ( 2 * mMaxGrWidth )) + mMaxGr 
-					grRaw = grRaw - mMaxGr + mMaxGrWidth * .5;
+					grRaw -= mMaxGr;
+					grRaw += mMaxGrWidth * .5;
 					grRaw *= grRaw;
 					grRaw /= mMaxGrWidth + mMaxGrWidth;
 					grRaw += mMaxGr;
