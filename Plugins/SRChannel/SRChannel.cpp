@@ -505,7 +505,7 @@ void SRChannel::OnReset()
 		GetParam(kCompRmsMix)->Value() * .01, // mix
 		samplerate);
 	fCompRms.SetWindow(10.);
-	fCompRms.SetMaxGrDb(-12., false);
+	fCompRms.SetMaxGrDb(-9., 2.);
 
 	fCompPeak.Reset();
 	fCompPeak.ResetCompressor(

@@ -51,8 +51,8 @@ namespace SR {
 	namespace DSP {
 		/*
 		DC offset (to prevent denormal); usage:
-		  1. init envelope state to DC_OFFSET before processing
-		  2. add to input before envelope runtime function
+			1. init envelope state to DC_OFFSET before processing
+			2. add to input before envelope runtime function
 		*/
 		static const double DC_OFFSET = 1.0e-25;
 
@@ -113,7 +113,7 @@ namespace SR {
 			//-------------------------------------------------------------
 			SRDynamicsDetector(double attackMs = 10.0, double releaseMs = 100.0, double sampleRate = 44100.0)
 				: mEnvelopeAttack(attackMs, sampleRate)
-				, mEnvelopeRelease(releaseMs, sampleRate)	{}
+				, mEnvelopeRelease(releaseMs, sampleRate) {}
 			virtual ~SRDynamicsDetector() {}
 
 			virtual double GetAttack(void) const { return mEnvelopeAttack.GetTc(); }
@@ -181,7 +181,7 @@ namespace SR {
 
 			virtual ~SRDynamicsBase() {}
 
-			/** Sets dynamic processors threshold in dB (typically negative values) 
+			/** Sets dynamic processors threshold in dB (typically negative values)
 			* @param threshDb Sets dynamic processors threshold in dB (typically negative values) */
 			virtual void SetThresh(double threshDb) {
 				mThreshDb = threshDb;
@@ -189,7 +189,7 @@ namespace SR {
 				if (mIsAutoMakeup) AdjustAutoMakeup();
 			}
 
-			/** Set dynamics processors ratio, for ration n:1 enter 1./n 
+			/** Set dynamics processors ratio, for ration n:1 enter 1./n
 			* @param ratio Set dynamics processors ratio, for ration n:1 enter 1./n */
 			virtual void SetRatio(double ratio) {
 				assert(ratio >= 0.0);
@@ -197,35 +197,35 @@ namespace SR {
 				if (mIsAutoMakeup) AdjustAutoMakeup();
 			}
 
-			/** Sets dynamic processors makeup gain in dB 
+			/** Sets dynamic processors makeup gain in dB
 			* @param makeupDb Sets dynamic processors makeup gain in dB */
 			virtual void SetMakeup(double makeupDb) {
 				mMakeup = SR::Utils::DBToAmp(makeupDb);
 				fMakeup.SetGainLin(mMakeup);
 			}
 
-			/** Sets if dynamic processor compensates gain reduction automatically 
+			/** Sets if dynamic processor compensates gain reduction automatically
 			* @param autoMakeup Sets if dynamic processor compensates gain reduction automatically*/
 			virtual void SetIsAutoMakeup(bool autoMakeup) {
 				mIsAutoMakeup = autoMakeup;
 				if (mIsAutoMakeup) AdjustAutoMakeup();
 			}
 
-			/** Sets target loudness of the track in dB 
+			/** Sets target loudness of the track in dB
 			* @param referenceDb Sets target loudness of the track in dB */
 			virtual void SetReference(double referenceDb) {
 				mReferenceDb = referenceDb;
 				if (mIsAutoMakeup) AdjustAutoMakeup();
 			}
 
-			/** Sets soft knee width in dB 
+			/** Sets soft knee width in dB
 			* @param kneeDb Sets soft knee width in dB*/
 			virtual void SetKnee(double kneeDb) {
 				assert(kneeDb >= 0.0);
 				mKneeWidthDb = kneeDb;
 			}
 
-			/** Sets mix behavoir dry/wet, range: 0.-1. 
+			/** Sets mix behavoir dry/wet, range: 0.-1.
 			* @param mix Sets mix behavoir dry/wet, range: 0.-1. */
 			virtual void SetMix(double mix) {
 				assert(mix <= 1.);
@@ -306,14 +306,15 @@ namespace SR {
 			// SRCompressor methods
 			//-------------------------------------------------------------
 			SRCompressor()
-				: SRDynamicsDetector(10.0, 100.0)
-				, SRDynamicsBase(0.0, 1.0)
-				, mSidechainFc(0.0)
+				: SRDynamicsDetector(10., 100.)
+				, SRDynamicsBase(0., 1.)
+				, mSidechainFc(0.)
 				, mTopologyFeedback(false)
-				, mMaxGr(0.0)
+				, mMaxGr(0.)
+				, mMaxGrWidth(0.)
 				// Needed for feedback topology
-				, mSidechainSignal1(0.0)
-				, mSidechainSignal2(0.0)
+				, mSidechainSignal1(0.)
+				, mSidechainSignal2(0.)
 			{
 			}
 			virtual ~SRCompressor() {}
@@ -347,16 +348,13 @@ namespace SR {
 				InitSidechainFilter(sidechainFc);
 				SetTopologyFeedback(isFeedbackCompressor);
 			}
-			/** Set maximum gain reduction, awaits negative values 
-			* @param maxGrDb Set maximum gain reduction in dB, set as negative value 
-			* @param sigmoid If true, gain reduction advances to maximum gain reduction in sigmoid shape, else it cuts gain reduction straight at given parameter*/
-			virtual void SetMaxGrDb(double maxGrDb, bool sigmoid = true) {
-				if (!sigmoid)
-					mMaxGr = maxGrDb;
-				else {
-					const double tempratio = 1. / mRatio;
-					mMaxGr = (maxGrDb + (maxGrDb * 9.) / (maxGrDb * tempratio - maxGrDb - 9.)); // Simplified P4 sigmoid fitting with d+\frac{da}{dx-d-a} with f(1) = 0.0
-				}
+			/** Set maximum gain reduction, awaits negative values
+			* @param maxGrDb Set maximum gain reduction in dB, set as negative value
+			* @param transitionWidth Set width of transition between direct gain reduction and full limit, like knee. range >= 0.,
+			* should be below maxGrDb / 2. (Is in fact limited internally) */
+			virtual void SetMaxGrDb(double maxGrDb, double transitionWidth) {
+				mMaxGr = maxGrDb;
+				mMaxGrWidth = std::min(transitionWidth, abs(mMaxGr) * .5);
 			}
 
 			virtual void InitSidechainFilter(double sidechainFC) {
@@ -381,6 +379,7 @@ namespace SR {
 			double mSidechainSignal1, mSidechainSignal2;      // Gain reduced signal to get used as new sidechain for feedback topology
 			double mSidechainFc;  // Compressors stereo sidechain filters center frequency
 			double mMaxGr;  // Maximum gain reduction for gain reduction limiting (no brickwall, just gets damped there)
+			double mMaxGrWidth; // Width of transition
 		};
 
 
@@ -516,17 +515,18 @@ namespace SR {
 				grRaw = 0.;
 
 			//// Gain reducion limiter
-			//if (mMaxGr != 0.0) {
-			//  grlimit = grRaw / (mMaxGr * 0.5);
-			//  grlimitsqrt = std::pow(grlimit, 0.8);
-
-			//  grRaw = (1. - grlimitsqrt < 0.)
-			//    ? grRaw + ((1. - grlimitsqrt) * (grRaw - (mMaxGr * 0.5))) / grlimit
-			//    : grRaw;
-			//}
-			if (grRaw < mMaxGr && mMaxGr < 0.0) {
-				//grRaw = mMaxGr + 0.5 * mMaxGr / (grRaw - mMaxGr - 1.);
-				grRaw = mMaxGr - std::tanh(mMaxGr - grRaw);
+			if (mMaxGr < 0.0) {
+				if (grRaw <= mMaxGr - mMaxGrWidth * .5) {
+					grRaw = mMaxGr;
+				}
+				else if (grRaw < mMaxGr + mMaxGrWidth * .5) {
+					// Perform faster fuction representing grRaw on itself: f(grRaw) = ((grRaw - mMaxGr + (mMaxGrWidth / 2.)) ^ 2 / ( 2 * mMaxGrWidth )) + mMaxGr 
+					grRaw = grRaw - mMaxGr + mMaxGrWidth * .5;
+					grRaw *= grRaw;
+					grRaw /= mMaxGrWidth + mMaxGrWidth;
+					grRaw += mMaxGr;
+				}
+				// else	grRaw = grRaw;
 			}
 
 			mGrDb = grRaw; // Store logarithmic gain reduction
@@ -683,7 +683,7 @@ namespace SR {
 			}
 
 			// See NOTE 5
-				  // attack/release
+					// attack/release
 			if (mMaxPeak > currentOvershootLin)
 				mEnvelopeDetectorAttack.Process(mMaxPeak, currentOvershootLin);		// process attack phase
 			else
@@ -977,72 +977,72 @@ namespace SR {
 
 
 /*
-  * -----------------------------------------------------------------------------
-  * NOTE 1:
-  * REGARDING THE DC OFFSET: In this case, since the offset is added before
-  * the attack/release processes, the envelope will never fall below the offset,
-  * thereby avoiding denormals. However, to prevent the offset from causing
-  * constant gain reduction, we must subtract it from the envelope, yielding
-  * a minimum value of 0dB.
-  * -----------------------------------------------------------------------------
-  *
-  * NOTE 2:
-  * REGARDING THE RMS AVERAGER: Ok, so this isn't a REAL RMS
-  * calculation. A true RMS is an FIR moving average. This
-  * approximation is a 1-pole IIR. Nonetheless, in practice,
-  * and in the interest of simplicity, this method will suffice,
-  * giving comparable results.
-  * -----------------------------------------------------------------------------
-  *
-  * NOTE 3:
-  * REGARDING THE GAIN REDUCTION: Due to the logarithmic nature
-  * of the attack phase, the sidechain will never achieve "full"
-  * attack. (Actually, it is only guaranteed to achieve 99% of
-  * the input value over the given time constant.) As such, the
-  * limiter cannot achieve "brick-wall" limiting. There are 2
-  * workarounds:
-  *
-  * 1) Set the threshold slightly lower than the desired threshold.
-  *		i.e. 0.0dB -> -0.1dB or even -0.5dB
-  *
-  * 2) Clip the output at the threshold, as such:
-  *
-  *		if ( in1 > mThreshLin )		in1 = mThreshLin;
-  *		else if ( in1 < -mThreshLin )	in1 = -mThreshLin;
-  *
-  *		if ( in2 > mThreshLin )		in2 = mThreshLin;
-  *		else if ( in2 < -mThreshLin )	in2 = -mThreshLin;
-  *
-  *		(... or replace with your favorite branchless clipper ...)
-  * -----------------------------------------------------------------------------
-  *
-  * NOTE 4:
-  * REGARDING THE ATTACK: This limiter achieves "look-ahead" detection
-  * by allowing the envelope follower to attack the max peak, which is
-  * held for the duration of the attack phase -- unless a new, higher
-  * peak is detected. The output signal is buffered so that the gain
-  * reduction is applied in advance of the "offending" sample.
-  *
-  * NOTE: a DC offset is not necessary for the envelope follower,
-  * as neither the max peak nor envelope should fall below the
-  * threshold (which is assumed to be around 1.0 linear).
-  * -----------------------------------------------------------------------------
-  *
-  * NOTE 5:
-  * REGARDING THE MAX PEAK: This method assumes that the only important
-  * sample in a look-ahead buffer would be the highest peak. As such,
-  * instead of storing all samples in a look-ahead buffer, it only stores
-  * the max peak, and compares all incoming samples to that one.
-  * The max peak has a hold time equal to what the look-ahead buffer
-  * would have been, which is tracked by a timer (counter). When this
-  * timer expires, the sample would have exited from the buffer. Therefore,
-  * a new sample must be assigned to the max peak. We assume that the next
-  * highest sample in our theoretical buffer is the current input sample.
-  * In reality, we know this is probably NOT the case, and that there has
-  * been another sample, slightly lower than the one before it, that has
-  * passed the input. If we do not account for this possibility, our gain
-  * reduction could be insufficient, resulting in an "over" at the output.
-  * To remedy this, we simply apply a suitably long release stage in the
-  * envelope follower.
+	* -----------------------------------------------------------------------------
+	* NOTE 1:
+	* REGARDING THE DC OFFSET: In this case, since the offset is added before
+	* the attack/release processes, the envelope will never fall below the offset,
+	* thereby avoiding denormals. However, to prevent the offset from causing
+	* constant gain reduction, we must subtract it from the envelope, yielding
+	* a minimum value of 0dB.
+	* -----------------------------------------------------------------------------
+	*
+	* NOTE 2:
+	* REGARDING THE RMS AVERAGER: Ok, so this isn't a REAL RMS
+	* calculation. A true RMS is an FIR moving average. This
+	* approximation is a 1-pole IIR. Nonetheless, in practice,
+	* and in the interest of simplicity, this method will suffice,
+	* giving comparable results.
+	* -----------------------------------------------------------------------------
+	*
+	* NOTE 3:
+	* REGARDING THE GAIN REDUCTION: Due to the logarithmic nature
+	* of the attack phase, the sidechain will never achieve "full"
+	* attack. (Actually, it is only guaranteed to achieve 99% of
+	* the input value over the given time constant.) As such, the
+	* limiter cannot achieve "brick-wall" limiting. There are 2
+	* workarounds:
+	*
+	* 1) Set the threshold slightly lower than the desired threshold.
+	*		i.e. 0.0dB -> -0.1dB or even -0.5dB
+	*
+	* 2) Clip the output at the threshold, as such:
+	*
+	*		if ( in1 > mThreshLin )		in1 = mThreshLin;
+	*		else if ( in1 < -mThreshLin )	in1 = -mThreshLin;
+	*
+	*		if ( in2 > mThreshLin )		in2 = mThreshLin;
+	*		else if ( in2 < -mThreshLin )	in2 = -mThreshLin;
+	*
+	*		(... or replace with your favorite branchless clipper ...)
+	* -----------------------------------------------------------------------------
+	*
+	* NOTE 4:
+	* REGARDING THE ATTACK: This limiter achieves "look-ahead" detection
+	* by allowing the envelope follower to attack the max peak, which is
+	* held for the duration of the attack phase -- unless a new, higher
+	* peak is detected. The output signal is buffered so that the gain
+	* reduction is applied in advance of the "offending" sample.
+	*
+	* NOTE: a DC offset is not necessary for the envelope follower,
+	* as neither the max peak nor envelope should fall below the
+	* threshold (which is assumed to be around 1.0 linear).
+	* -----------------------------------------------------------------------------
+	*
+	* NOTE 5:
+	* REGARDING THE MAX PEAK: This method assumes that the only important
+	* sample in a look-ahead buffer would be the highest peak. As such,
+	* instead of storing all samples in a look-ahead buffer, it only stores
+	* the max peak, and compares all incoming samples to that one.
+	* The max peak has a hold time equal to what the look-ahead buffer
+	* would have been, which is tracked by a timer (counter). When this
+	* timer expires, the sample would have exited from the buffer. Therefore,
+	* a new sample must be assigned to the max peak. We assume that the next
+	* highest sample in our theoretical buffer is the current input sample.
+	* In reality, we know this is probably NOT the case, and that there has
+	* been another sample, slightly lower than the one before it, that has
+	* passed the input. If we do not account for this possibility, our gain
+	* reduction could be insufficient, resulting in an "over" at the output.
+	* To remedy this, we simply apply a suitably long release stage in the
+	* envelope follower.
 
 */
