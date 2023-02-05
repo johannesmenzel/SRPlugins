@@ -49,6 +49,7 @@ enum EParams
 	// Sat Stage
 	kSaturationDrive,
 	kSaturationAmount,
+	kTube,
 	kOversamplingRate,
 
 	// EQ Stage
@@ -158,6 +159,7 @@ enum ECtrlTags {
 	// Sat Stage
 	cSaturationDrive,
 	cSaturationAmount,
+	cTube,
 	cOversamplingRate,
 
 	// EQ Stage

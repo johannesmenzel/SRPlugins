@@ -74,6 +74,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 
 	GetParam(kSaturationAmount)->InitDouble("Sat Amount", 0., 0., 100., 1., "%", 0, "Sat");
 	GetParam(kSaturationDrive)->InitDouble("Sat Drive", 0., 0., 24., 0.1, "dB", 0, "Sat");
+	GetParam(kTube)->InitDouble("Tube", 0., 0., 100., 1., "%", 0, "Sat");
 
 	GetParam(kStereoPan)->InitDouble("Pan", 0., -100., 100., 1., "%", 0, "Stereo");
 	GetParam(kStereoWidth)->InitDouble("Width", 100., 0., 1000., 1., "%", 0, "Stereo", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1000., 100., .5)));
@@ -124,8 +125,8 @@ SRChannel::SRChannel(const InstanceInfo& info)
 	GetParam(kEqBandSolo)->InitEnum("Band Solo", 0, { "Off", "HP", "LP", "Lf", "Lmf" , "Hmf", "Hf" }, 0, "EQ");
 
 	// DUMMY_INIT GetParam(kDummy1)->InitDouble("1", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
-	GetParam(kDummy1)->InitDouble("T2 Inp", 0.5, 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
-	GetParam(kDummy2)->InitDouble("T2 Drv", 0.5, 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
+	GetParam(kDummy1)->InitDouble("1", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
+	GetParam(kDummy2)->InitDouble("2", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
 	GetParam(kDummy3)->InitDouble("3", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
 	GetParam(kDummy4)->InitDouble("4", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
 	GetParam(kDummy5)->InitDouble("5", 0., 0., 1., 0.001, "", 0, "Dummy", IParam::ShapePowCurve(SR::Utils::SetShapeCentered(0., 1., .5, .5)));
@@ -216,6 +217,7 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		// -- Saturation
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsSat.GetGridCell(0, 0, 4, 1).GetReducedFromTop(20.f), kSaturationAmount, "Amount", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cSaturationAmount, "Sat");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsSat.GetGridCell(1, 0, 4, 1).GetReducedFromTop(20.f), kSaturationDrive, "Drive", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cSaturationDrive, "Sat");
+		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsSat.GetGridCell(2, 0, 4, 1).GetReducedFromTop(20.f), kTube, "Tube", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cTube, "Sat");
 		// -- Filters (HP/LP)
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsFilter.GetGridCell(0, 0, 2, 1).GetReducedFromTop(20.f), kEqLpFreq, "LP", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqLpFreq, "Filter");
 		pGraphics->AttachControl(new SR::Graphics::Controls::Knob(rectControlsFilter.GetGridCell(1, 0, 2, 1).GetReducedFromTop(20.f), kEqHpFreq, "HP", SR::Graphics::Layout::SR_DEFAULT_STYLE, true, false, -150.f, 150.f, -150.f, EDirection::Vertical, 4., 1.f), cEqHpFreq, "Filter");
@@ -461,24 +463,29 @@ void SRChannel::OnReset()
 	// ToDo: Match all above ToDos in OnParamChange and think of procedure to prevent double code
 	const double samplerate = GetSampleRate();
 
-	// TODO: Must gain bet in OnReset?
+	// Reset Gain to prevent param smoothing on reset (on play)
 	fGainIn.Reset();
 	fGainOut.Reset();
 	fGainOutLow.Reset();
 
-
+	// Reset saturation classes, mainly for samplerate
 	fSatInput[0].SetSaturation(SR::DSP::SRSaturation::kSoftSat, GetParam(kSaturationDrive)->Value(), GetParam(kSaturationAmount)->Value(), 1., true, 0., 1., samplerate);
 	fSatInput[1].SetSaturation(SR::DSP::SRSaturation::kSoftSat, GetParam(kSaturationDrive)->Value(), GetParam(kSaturationAmount)->Value(), 1., true, 0., 1., samplerate);
+	
+	fSatTube2.SetParameterNormalized(SR::DSP::Airwindows::Tube2::kParamA, .5 - GetParam(kTube)->Value() * .01 * .2); // @0%: .5; @100%: .3
+	fSatTube2.SetParameterNormalized(SR::DSP::Airwindows::Tube2::kParamB, GetParam(kTube)->Value() * .01); // directly
+	fSatTube2.SetParameterNormalized(SR::DSP::Airwindows::Tube2::kParamC, std::min(GetParam(kTube)->Value() * .1, 1.)); // @ 0%: 0., @>10%: 1.
 	fSatTube2.Reset(samplerate);
 
 	fEqHp.SetFilter(SR::DSP::BiquadHighpass, GetParam(kEqHpFreq)->Value() / samplerate, 0.707, 0., samplerate);
 	fEqLp.SetFilter(SR::DSP::BiquadLowpass, GetParam(kEqLpFreq)->Value() / samplerate, 0.707, 0., samplerate);
 	fEqHmf.Reset(GetParam(kEqHmfDs)->Value(), .25, 3., 50., GetParam(kEqHmfFreq)->Value() / samplerate, GetParam(kEqHmfQ)->Value(), 0., samplerate, (GetParam(kEqHmfIsShelf)->Bool()) ? SR::DSP::BiquadHighshelf : SR::DSP::BiquadPeak);
 	fEqLmf.Reset(GetParam(kEqLmfDs)->Value(), .25, 7., 200., GetParam(kEqLmfFreq)->Value() / samplerate, GetParam(kEqLmfQ)->Value(), 0., samplerate, (GetParam(kEqLmfIsShelf)->Bool()) ? SR::DSP::BiquadLowshelf : SR::DSP::BiquadPeak);
-	// TODO: Should it really have Q=0?
+	// q = 0 = nonsense, but LR-Filter doesnt mind
 	fSplitHp.SetFilter(SR::DSP::BiquadLinkwitzHighpass, GetParam(kStereoMonoFreq)->Value() / samplerate, 0., 0., samplerate);
 	fSplitLp.SetFilter(SR::DSP::BiquadLinkwitzLowpass, GetParam(kStereoMonoFreq)->Value() / samplerate, 0., 0., samplerate);
 
+	// Reset poles and zeros state
 	fEqLfBoost[0].reset();
 	fEqLfBoost[1].reset();
 	fEqLfCut[0].reset();
@@ -489,8 +496,10 @@ void SRChannel::OnReset()
 	fEqHfCut[1].reset();
 	AdjustEqPassive();
 
+	// Adjust band solo filter if band solo engaged
 	AdjustBandSolo();
 
+	// Reset compressors, set all values and samplerate
 	fCompRms.Reset();
 	fCompRms.ResetCompressor(
 		GetParam(kCompRmsThresh)->Value(),
@@ -521,6 +530,7 @@ void SRChannel::OnReset()
 		GetParam(kCompPeakMix)->Value() * .01, // mix
 		samplerate);
 
+	// Reset meter envelope, mainly for samplerate, but att/rel on init
 	for (int e = 0; e < 4; e++) {
 		fMeterEnvelope[e].ResetDetector(VU_ATTACK, VU_RELEASE, samplerate);
 	}
@@ -557,6 +567,11 @@ void SRChannel::OnParamChange(int paramIdx)
 	case kSaturationAmount:
 		fSatInput[0].SetAmount(GetParam(kSaturationAmount)->Value() * .01);
 		fSatInput[1].SetAmount(GetParam(kSaturationAmount)->Value() * .01);
+		break;
+	case kTube:
+		fSatTube2.SetParameterNormalized(SR::DSP::Airwindows::Tube2::kParamA, .5 - GetParam(kTube)->Value() * .002); // @0%: .5; @100%: .3
+		fSatTube2.SetParameterNormalized(SR::DSP::Airwindows::Tube2::kParamB, GetParam(kTube)->Value() * .01); // directly
+		fSatTube2.SetParameterNormalized(SR::DSP::Airwindows::Tube2::kParamC, std::min(GetParam(kTube)->Value() * .1, 1.)); // @ 0%: 0., @>10%: 1.
 		break;
 	case kStereoPan:
 		fGainOut.SetPanPosition((GetParam(kStereoPan)->Value() + 100.) / 200.);
@@ -678,8 +693,8 @@ void SRChannel::OnParamChange(int paramIdx)
 		fCompPeak.SetMix(GetParam(kCompPeakMix)->Value() * .01);
 		break;
 
-	case kDummy1: fSatTube2.SetParameterNormalized(SR::DSP::Airwindows::Tube2::kParamA, GetParam(kDummy1)->Value()); break;
-	case kDummy2: fSatTube2.SetParameterNormalized(SR::DSP::Airwindows::Tube2::kParamB, GetParam(kDummy2)->Value()); break;
+	case kDummy1: break;
+	case kDummy2: break;
 	case kDummy3: break;
 	case kDummy4: break;
 	case kDummy5: break;
