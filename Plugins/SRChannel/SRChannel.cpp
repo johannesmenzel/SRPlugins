@@ -187,8 +187,8 @@ SRChannel::SRChannel(const InstanceInfo& info)
 		// Attach Controls
 		// -- Meters
 		pGraphics->AttachControl(new IVMeterControl<4>(rectMeterVu, "In Out", SR::Graphics::Layout::SR_DEFAULT_STYLE_METER, EDirection::Vertical, { "", "", "", "" }, 0, iplug::igraphics::IVMeterControl<4>::EResponse::Log, -60.f, 12.f, { 0, -6, -12, -24, -48 }), cMeterVu, "VU");
-		pGraphics->AttachControl(new IVMeterControl<1>(rectControlsCompLevel.GetCentredInside(25.f, rectControlsCompLevel.H()).GetReducedFromTop(20.f), "", SR::Graphics::Layout::SR_DEFAULT_STYLE_METER, EDirection::Vertical, { "" }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -12.f, 0.f, { 0, -3, -6, -9, -12 }), cMeterGrLevel, "GR");
-		pGraphics->AttachControl(new IVMeterControl<1>(rectControlsCompPeak.GetCentredInside(25.f, rectControlsCompPeak.H()).GetReducedFromTop(20.f), "", SR::Graphics::Layout::SR_DEFAULT_STYLE_METER, EDirection::Vertical, { "" }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -4.f, 0.f, { 0, -1, -2, -3, -4 }), cMeterGrPeak, "GR");
+		pGraphics->AttachControl(new IVMeterControl<1>(rectControlsCompLevel.GetCentredInside(25.f, rectControlsCompLevel.H()).GetReducedFromTop(20.f), "", SR::Graphics::Layout::SR_DEFAULT_STYLE_METER, EDirection::Vertical, { "" }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -13.f, 0.f, { 0, -3, -6, -9, -12 }), cMeterGrLevel, "GR");
+		pGraphics->AttachControl(new IVMeterControl<1>(rectControlsCompPeak.GetCentredInside(25.f, rectControlsCompPeak.H()).GetReducedFromTop(20.f), "", SR::Graphics::Layout::SR_DEFAULT_STYLE_METER, EDirection::Vertical, { "" }, 0, iplug::igraphics::IVMeterControl<1>::EResponse::Log, -4.25f, 0.f, { 0, -1, -2, -3, -4 }), cMeterGrPeak, "GR");
 		// -- Set GR meter displaying the other way round
 		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrLevel))->SetBaseValue(1.);
 		dynamic_cast<IVMeterControl<1>*>(pGraphics->GetControlWithTag(cMeterGrPeak))->SetBaseValue(1.);
@@ -505,7 +505,7 @@ void SRChannel::OnReset()
 		GetParam(kCompRmsMix)->Value() * .01, // mix
 		samplerate);
 	fCompRms.SetWindow(10.);
-	fCompRms.SetMaxGrDb(-12., 2.);
+	fCompRms.SetMaxGrDb(-12., 3.);
 
 	fCompPeak.Reset();
 	fCompPeak.ResetCompressor(
