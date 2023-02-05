@@ -494,9 +494,9 @@ namespace SR {
 		// Inline all compressors process
 		// This is the protected method all compressors input sidechain methods call
 		INLINE void SRCompressor::process(double& in1, double& in2, double sidechain) {
-			sidechain = fabs(sidechain);                          // rect (just in case)
-			sidechain += DC_OFFSET;                               // add DC offset to avoid log( 0 )
-			double sidechainDb = SR::Utils::AmpToDB(sidechain);   // linear -> dB conversion
+			double sidechainDb = fabs(sidechain);                 // rect (just in case)
+			sidechainDb += DC_OFFSET;                             // add DC offset to avoid log( 0 )
+			sidechainDb = SR::Utils::AmpToDB(sidechainDb);				// linear -> dB conversion
 			double sampleOvershootDb = sidechainDb - mThreshDb;   // delta over threshold
 			sampleOvershootDb += DC_OFFSET;                       // add DC offset to avoid denormal (why twice?); See NOTE 1
 			SRDynamicsDetector::process(sampleOvershootDb, currentOvershootDb);	// process attack/release envelope
@@ -520,14 +520,15 @@ namespace SR {
 					grRaw = mMaxGr;
 				}
 				else if (grRaw < mMaxGr + mMaxGrWidth * .5) {
-					// Perform faster fuction representing grRaw on itself: f(grRaw) = ((grRaw - mMaxGr + (mMaxGrWidth / 2.)) ^ 2 / ( 2 * mMaxGrWidth )) + mMaxGr 
-					grRaw -= mMaxGr;
+					// The function f(grRaw) = ((grRaw - mMaxGr + (mMaxGrWidth / 2.)) ^ 2 / ( 2 * mMaxGrWidth )) + mMaxGr
+					// is performed in single steps for faster calculation
+					grRaw -= mMaxGr; // upper calculation
 					grRaw += mMaxGrWidth * .5;
-					grRaw *= grRaw;
-					grRaw /= mMaxGrWidth + mMaxGrWidth;
-					grRaw += mMaxGr;
+					grRaw *= grRaw; // instead pow (^2)
+					grRaw /= mMaxGrWidth + mMaxGrWidth; // lower calculation
+					grRaw += mMaxGr; // add mMaxGr
 				}
-				// else	grRaw = grRaw;
+				// else	grRaw just stays the same
 			}
 
 			mGrDb = grRaw; // Store logarithmic gain reduction
