@@ -438,32 +438,34 @@ namespace SR {
 
 		// Compressor runtime process for external sidechain
 		INLINE void SRCompressor::Process(double& in1, double& in2, double& extSC1, double& extSC2) {
-			double rectifiedInput1 = extSC1;
-			double rectifiedInput2 = extSC2;
+			double sidechainL = extSC1;
+			double sidechainR = extSC2;
 			if (mSidechainFc > 16. / GetSampleRate()) {
-				rectifiedInput1 = fSidechainFilter.Process(rectifiedInput1, 0);
-				rectifiedInput2 = fSidechainFilter.Process(rectifiedInput2, 1);
+				sidechainL = fSidechainFilter.Process(sidechainL, 0);
+				sidechainR = fSidechainFilter.Process(sidechainR, 1);
 			}
-			rectifiedInput1 = std::fabs(rectifiedInput1);	// rectify input
-			rectifiedInput2 = std::fabs(rectifiedInput2);
-			// If desired, one could use another EnvelopeDetector to smooth the rectified signal.
-			double rectifiedInputMaxed = std::max(rectifiedInput1, rectifiedInput2);	// link channels with greater of 2
-			process(in1, in2, rectifiedInputMaxed);	// rest of process
+			// Rectify sidechain
+			sidechainL = std::fabs(sidechainL);
+			sidechainR = std::fabs(sidechainR);
+			// Choose bigger of L and R
+			double sidechainMaxOfLR = std::max(sidechainL, sidechainR);	// link channels with greater of 2
+			process(in1, in2, sidechainMaxOfLR);	// rest of process
 		}
 
 		// Compressor runtime process for internal sidechain 
 		INLINE void SRCompressor::Process(double& in1, double& in2) {
-			double rectifiedInput1 = (!mTopologyFeedback) ? in1 : mSidechainSignal1;
-			double rectifiedInput2 = (!mTopologyFeedback) ? in2 : mSidechainSignal2;
+			double sidechainL = (!mTopologyFeedback) ? in1 : mSidechainSignal1;
+			double sidechainR = (!mTopologyFeedback) ? in2 : mSidechainSignal2;
 			if (mSidechainFc > 16. / GetSampleRate()) {
-				rectifiedInput1 = fSidechainFilter.Process(rectifiedInput1, 0);
-				rectifiedInput2 = fSidechainFilter.Process(rectifiedInput2, 1);
+				sidechainL = fSidechainFilter.Process(sidechainL, 0);
+				sidechainR = fSidechainFilter.Process(sidechainR, 1);
 			}
-			rectifiedInput1 = std::fabs(rectifiedInput1);	// rectify input
-			rectifiedInput2 = std::fabs(rectifiedInput2);
-			// If desired, one could use another EnvelopeDetector to smooth the rectified signal.
-			double rectifiedInputMaxed = std::max(rectifiedInput1, rectifiedInput2);	// link channels with greater of 2
-			process(in1, in2, rectifiedInputMaxed);	// rest of process
+			// Rectify sidechain
+			sidechainL = std::fabs(sidechainL);
+			sidechainR = std::fabs(sidechainR);
+			// Choose bigger of L and R
+			double sidechainMaxOfLR = std::max(sidechainL, sidechainR);	// link channels with greater of 2
+			process(in1, in2, sidechainMaxOfLR);	// rest of process
 		}
 
 		// Inline RMS Compressor Sidechain
