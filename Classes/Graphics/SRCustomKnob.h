@@ -32,11 +32,25 @@ namespace SR {
 					const float widgetRadius = mWidgetBounds.GetLengthOfShortestSide() * .5f - (mTrackSize * .5f); // The radius out to the indicator track arc
 					const float widgetRadius92 = widgetRadius * .92f;
 					const float widgetRadius75 = widgetRadius * .75f;
+					const float pointerThickness = widgetRadius * .15f;
 					const float cx = mWidgetBounds.MW(), cy = mWidgetBounds.MH();
 					const float angle = mAngle1 + (static_cast<float>(GetValue()) * (mAngle2 - mAngle1));
 					const IColor color = (mMouseIsOver) ? SR::Graphics::Layout::SR_DEFAULT_COLOR_X1 : SR::Graphics::Layout::SR_DEFAULT_COLOR_FG;
 					if (mTrackSize > 0.f) {
+						// Frame
 						g.DrawArc(color, cx, cy, widgetRadius92, angle - 15.f, angle + 15.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius, angle + 15.f, angle + 45.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius92, angle + 45.f, angle + 75.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius, angle + 75.f, angle + 105.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius92, angle + 105.f, angle + 135.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius, angle + 135.f, angle + 165.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius92, angle + 165.f, angle - 165.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius, angle - 165.f, angle - 135.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius92, angle - 135.f, angle - 105.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius, angle - 105.f, angle - 75.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius92, angle - 75.f, angle - 45.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius, angle - 45.f, angle - 15.f, &mBlend, mTrackSize);
+						// Frame connectors
 						g.DrawRadialLine(color, cx, cy, angle + 15.f, widgetRadius92, widgetRadius, &mBlend, mTrackSize);
 						g.DrawRadialLine(color, cx, cy, angle + 45.f, widgetRadius92, widgetRadius, &mBlend, mTrackSize);
 						g.DrawRadialLine(color, cx, cy, angle + 75.f, widgetRadius92, widgetRadius, &mBlend, mTrackSize);
@@ -49,20 +63,11 @@ namespace SR {
 						g.DrawRadialLine(color, cx, cy, angle - 75.f, widgetRadius92, widgetRadius, &mBlend, mTrackSize);
 						g.DrawRadialLine(color, cx, cy, angle - 45.f, widgetRadius92, widgetRadius, &mBlend, mTrackSize);
 						g.DrawRadialLine(color, cx, cy, angle - 15.f, widgetRadius92, widgetRadius, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius, angle + 15.f, angle + 45.f, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius92, angle + 45.f, angle + 75.f, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius, angle + 75.f, angle + 105.f, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius92, angle + 105.f, angle + 135.f, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius, angle + 135.f, angle + 165.f, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius92, angle + 165.f, angle - 165.f, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius, angle - 165.f, angle - 135.f, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius92, angle - 135.f, angle - 105.f, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius, angle - 105.f, angle - 75.f, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius92, angle - 75.f, angle - 45.f, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius, angle - 45.f, angle - 15.f, &mBlend, mTrackSize);
+						// Inner circle
 						g.DrawCircle(color, cx, cy, widgetRadius75, &mBlend, mTrackSize);
-						g.DrawRadialLine(color, cx, cy, angle, 0.f, widgetRadius75, &mBlend, mPointerThickness + 2.f * mTrackSize);
-						g.DrawRadialLine(SR::Graphics::Layout::SR_DEFAULT_COLOR_CUSTOM_PANEL_BG, cx, cy, angle, 0. + mTrackSize, widgetRadius75 + mTrackSize, &mBlend, mPointerThickness);
+						// Pointer
+						g.DrawRadialLine(color, cx, cy, angle, 0.f, widgetRadius75, &mBlend, pointerThickness + 2.f * mTrackSize);
+						g.DrawRadialLine(SR::Graphics::Layout::SR_DEFAULT_COLOR_CUSTOM_PANEL_BG, cx, cy, angle, 0. + mTrackSize, widgetRadius75 + mTrackSize, &mBlend, pointerThickness);
 					}
 				};
 			};
@@ -89,19 +94,12 @@ namespace SR {
 					const float widgetRadius50 = widgetRadius * .5f;
 					const float widgetRadius55 = widgetRadius * .55f;
 					const float widgetRadius75 = widgetRadius * .75f;
+					const float pointerThickness = widgetRadius * .15f;
 					const float cx = mWidgetBounds.MW(), cy = mWidgetBounds.MH();
 					const float angle = mAngle1 + (static_cast<float>(GetValue()) * (mAngle2 - mAngle1));
 					const IColor color = (mMouseIsOver) ? SR::Graphics::Layout::SR_DEFAULT_COLOR_X1 : SR::Graphics::Layout::SR_DEFAULT_COLOR_FG;
 					if (mTrackSize > 0.f) {
-						g.DrawRadialLine(color, cx, cy, angle + 75.f, widgetRadius50, widgetRadius55, &mBlend, mTrackSize);
-						g.DrawRadialLine(color, cx, cy, angle + 105.f, widgetRadius50, widgetRadius55, &mBlend, mTrackSize);
-						g.DrawRadialLine(color, cx, cy, angle + 135.f, widgetRadius50, widgetRadius55, &mBlend, mTrackSize);
-						g.DrawRadialLine(color, cx, cy, angle + 150.f, widgetRadius50, widgetRadius, &mBlend, mTrackSize);
-						g.DrawRadialLine(color, cx, cy, angle - 150.f, widgetRadius50, widgetRadius, &mBlend, mTrackSize);
-						g.DrawRadialLine(color, cx, cy, angle - 135.f, widgetRadius50, widgetRadius55, &mBlend, mTrackSize);
-						g.DrawRadialLine(color, cx, cy, angle - 105.f, widgetRadius50, widgetRadius55, &mBlend, mTrackSize);
-						g.DrawRadialLine(color, cx, cy, angle - 75.f, widgetRadius50, widgetRadius55, &mBlend, mTrackSize);
-						g.DrawRadialLine(color, cx, cy, angle - 45.f, widgetRadius50, widgetRadius55, &mBlend, mTrackSize);
+						// Frame
 						g.DrawArc(color, cx, cy, widgetRadius55, angle + 30.f, angle + 45.f, &mBlend, mTrackSize);
 						g.DrawArc(color, cx, cy, widgetRadius50, angle + 45.f, angle + 75.f, &mBlend, mTrackSize);
 						g.DrawArc(color, cx, cy, widgetRadius55, angle + 75.f, angle + 105.f, &mBlend, mTrackSize);
@@ -114,7 +112,19 @@ namespace SR {
 						g.DrawArc(color, cx, cy, widgetRadius55, angle - 45.f, angle - 30.f, &mBlend, mTrackSize);
 						g.DrawArc(color, cx, cy, widgetRadius75, angle + 10.f, angle + 150.f, &mBlend, mTrackSize);
 						g.DrawArc(color, cx, cy, widgetRadius75, angle - 150.f, angle - 10.f, &mBlend, mTrackSize);
+						// Frame connectors
+						g.DrawRadialLine(color, cx, cy, angle + 75.f, widgetRadius50, widgetRadius55, &mBlend, mTrackSize);
+						g.DrawRadialLine(color, cx, cy, angle + 105.f, widgetRadius50, widgetRadius55, &mBlend, mTrackSize);
+						g.DrawRadialLine(color, cx, cy, angle + 135.f, widgetRadius50, widgetRadius55, &mBlend, mTrackSize);
+						g.DrawRadialLine(color, cx, cy, angle - 135.f, widgetRadius50, widgetRadius55, &mBlend, mTrackSize);
+						g.DrawRadialLine(color, cx, cy, angle - 105.f, widgetRadius50, widgetRadius55, &mBlend, mTrackSize);
+						g.DrawRadialLine(color, cx, cy, angle - 75.f, widgetRadius50, widgetRadius55, &mBlend, mTrackSize);
+						g.DrawRadialLine(color, cx, cy, angle - 45.f, widgetRadius50, widgetRadius55, &mBlend, mTrackSize);
+						// Back part
+						g.DrawRadialLine(color, cx, cy, angle + 150.f, widgetRadius55, widgetRadius, &mBlend, mTrackSize);
+						g.DrawRadialLine(color, cx, cy, angle - 150.f, widgetRadius55, widgetRadius, &mBlend, mTrackSize);
 						g.DrawArc(color, cx, cy, widgetRadius, angle + 150.f, angle - 150.f, &mBlend, mTrackSize);
+						// Front part
 						g.DrawLine(color,
 							cx + widgetRadius50 * std::cos(DegToRad(angle - 90.f - 30.f)),
 							cy + widgetRadius50 * std::sin(DegToRad(angle - 90.f - 30.f)),
@@ -127,9 +137,10 @@ namespace SR {
 							cx + widgetRadius * std::cos(DegToRad(angle - 90.f + 5.f)),
 							cy + widgetRadius * std::sin(DegToRad(angle - 90.f + 5.f)),
 							&mBlend, mTrackSize);
-						g.DrawRadialLine(color, cx, cy, angle, 0.f, widgetRadius, &mBlend, mPointerThickness + 2.f * mTrackSize);
-						g.DrawRadialLine(SR::Graphics::Layout::SR_DEFAULT_COLOR_CUSTOM_PANEL_BG, cx, cy, angle, 0.f + mTrackSize, widgetRadius - mTrackSize, &mBlend, mPointerThickness);
 						g.DrawArc(color, cx, cy, widgetRadius, angle - 5.f, angle + 5.f, &mBlend, mTrackSize);
+						//Pointer
+						g.DrawRadialLine(color, cx, cy, angle, 0.f, widgetRadius, &mBlend, pointerThickness + 2.f * mTrackSize);
+						g.DrawRadialLine(SR::Graphics::Layout::SR_DEFAULT_COLOR_CUSTOM_PANEL_BG, cx, cy, angle, 0.f + mTrackSize, widgetRadius, &mBlend, pointerThickness);
 					}
 				};
 			};
@@ -152,15 +163,29 @@ namespace SR {
 
 				void DrawWidget(IGraphics& g) override {
 					const float widgetRadius = mWidgetBounds.GetLengthOfShortestSide() * .5f - (mTrackSize * .5f); // The radius out to the indicator track arc
-					const float widgetRadius1 = widgetRadius * .75f;
-					const float widgetRadius2 = widgetRadius * .67f;
-					const float widgetRadius3 = widgetRadius * .50f;
-					const float widgetRadius4 = widgetRadius * .40f;
+					const float widgetRadius1 = widgetRadius * .74f;
+					const float widgetRadius2 = widgetRadius * .66f;
+					const float widgetRadius3 = widgetRadius * .48f;
+					const float widgetRadius4 = widgetRadius * .38f;
+					const float pointerThickness = widgetRadius * .1f;
 					const float cx = mWidgetBounds.MW(), cy = mWidgetBounds.MH();
 					const float angle = mAngle1 + (static_cast<float>(GetValue()) * (mAngle2 - mAngle1));
 					const IColor color = (mMouseIsOver) ? SR::Graphics::Layout::SR_DEFAULT_COLOR_X1 : SR::Graphics::Layout::SR_DEFAULT_COLOR_FG;
 					if (mTrackSize > 0.f) {
+						// Frame
 						g.DrawArc(color, cx, cy, widgetRadius2, angle - 15.f, angle + 15.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius1, angle + 15.f, angle + 45.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius2, angle + 45.f, angle + 75.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius1, angle + 75.f, angle + 105.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius2, angle + 105.f, angle + 135.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius1, angle + 135.f, angle + 165.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius2, angle + 165.f, angle - 165.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius1, angle - 165.f, angle - 135.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius2, angle - 135.f, angle - 105.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius1, angle - 105.f, angle - 75.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius2, angle - 75.f, angle - 45.f, &mBlend, mTrackSize);
+						g.DrawArc(color, cx, cy, widgetRadius1, angle - 45.f, angle - 15.f, &mBlend, mTrackSize);
+						// Frame connectors
 						g.DrawRadialLine(color, cx, cy, angle + 15.f, widgetRadius2, widgetRadius1, &mBlend, mTrackSize);
 						g.DrawRadialLine(color, cx, cy, angle + 45.f, widgetRadius2, widgetRadius1, &mBlend, mTrackSize);
 						g.DrawRadialLine(color, cx, cy, angle + 75.f, widgetRadius2, widgetRadius1, &mBlend, mTrackSize);
@@ -173,22 +198,13 @@ namespace SR {
 						g.DrawRadialLine(color, cx, cy, angle - 75.f, widgetRadius2, widgetRadius1, &mBlend, mTrackSize);
 						g.DrawRadialLine(color, cx, cy, angle - 45.f, widgetRadius2, widgetRadius1, &mBlend, mTrackSize);
 						g.DrawRadialLine(color, cx, cy, angle - 15.f, widgetRadius2, widgetRadius1, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius1, angle + 15.f, angle + 45.f, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius2, angle + 45.f, angle + 75.f, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius1, angle + 75.f, angle + 105.f, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius2, angle + 105.f, angle + 135.f, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius1, angle + 135.f, angle + 165.f, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius2, angle + 165.f, angle - 165.f, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius1, angle - 165.f, angle - 135.f, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius2, angle - 135.f, angle - 105.f, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius1, angle - 105.f, angle - 75.f, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius2, angle - 75.f, angle - 45.f, &mBlend, mTrackSize);
-						g.DrawArc(color, cx, cy, widgetRadius1, angle - 45.f, angle - 15.f, &mBlend, mTrackSize);
-						g.DrawRadialLine(color, cx, cy, angle, widgetRadius2, widgetRadius, &mBlend, mPointerThickness + 2.f * mTrackSize);
-						g.DrawRadialLine(SR::Graphics::Layout::SR_DEFAULT_COLOR_CUSTOM_PANEL_BG, cx, cy, angle, widgetRadius2 + mTrackSize, widgetRadius + mTrackSize, &mBlend, mPointerThickness);
+						// Inner and outer circles
 						g.DrawCircle(color, cx, cy, widgetRadius3, &mBlend, mTrackSize);
 						g.DrawCircle(color, cx, cy, widgetRadius4, &mBlend, mTrackSize);
 						g.DrawCircle(color, cx, cy, widgetRadius, &mBlend, mTrackSize);
+						// Pointer
+						g.DrawRadialLine(color, cx, cy, angle, widgetRadius2, widgetRadius, &mBlend, pointerThickness + 2.f * mTrackSize);
+						g.DrawRadialLine(SR::Graphics::Layout::SR_DEFAULT_COLOR_CUSTOM_PANEL_BG, cx, cy, angle, widgetRadius2 + mTrackSize, widgetRadius + mTrackSize, &mBlend, pointerThickness);
 					}
 				};
 			};
