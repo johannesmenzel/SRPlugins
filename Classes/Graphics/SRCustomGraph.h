@@ -33,7 +33,7 @@ namespace SR {
 					, mY(numValues, .0)
 					, mPatternFill(EPatternType::Linear)
 				{
-					mPatternFill = IPattern::CreateLinearGradient(bounds, EDirection::Vertical, {IColorStop(GetColor(kX3), 0.f), IColorStop(GetColor(kHL), 1.f)});
+					mPatternFill = IPattern::CreateLinearGradient(bounds, EDirection::Vertical, {IColorStop(GetColor(kX1), 0.f), IColorStop(GetColor(kHL), 1.f)});
 					AttachIControl(this, ""); // TODO: Should hand label
 				}
 
