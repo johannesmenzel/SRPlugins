@@ -31,7 +31,9 @@ namespace SR {
 					, mValues(numValues, .0)
 					, mX(numValues, .0)
 					, mY(numValues, .0)
+					, mPatternFill(EPatternType::Linear)
 				{
+					mPatternFill = IPattern::CreateLinearGradient(bounds, EDirection::Vertical, {IColorStop(GetColor(kX3), 0.f), IColorStop(GetColor(kHL), 1.f)});
 					AttachIControl(this, ""); // TODO: Should hand label
 				}
 
@@ -50,7 +52,9 @@ namespace SR {
 					}
 					g.PathLineTo(mRECT.R, (mRECT.B - mRECT.H() * mBaseline));
 					g.PathClose();
-					g.PathFill(GetColor(kHL));
+					// Added gradient, still unsure if I like it. Otherwise delete all lines containing mPatternFill and revert to just PathFill(kHL) like below
+					//g.PathFill(GetColor(kHL));
+					g.PathFill(mPatternFill);
 
 					// Draw Graph
 					g.PathClear();
@@ -87,6 +91,7 @@ namespace SR {
 				//WDL_String mDisp;
 				int mNumValues;
 				float mBaseline;
+				IPattern mPatternFill;
 				std::vector<float> mValues;
 				std::vector<float> mX;
 				std::vector<float> mY;
