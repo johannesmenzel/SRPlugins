@@ -7,3 +7,6 @@
 [submodule "iPlug2"]
 	path = iPlug2
 	url = http://github.com/iPlug2/iPlug2.git
+[submodule "DPF"]
+	path = DPF
+	url = https://github.com/DISTRHO/DPF.git
