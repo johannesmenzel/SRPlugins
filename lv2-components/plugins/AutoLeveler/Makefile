@@ -14,7 +14,8 @@ include ../../DPF/Makefile.plugins.mk
 
 # Target to build LV2 plugin and generate ttl
 lv2_with_ttl: lv2_dsp
-	cd ../../bin/lv2/$(NAME).lv2 && ../../DPF/utils/lv2_ttl_generator ./$(NAME)_dsp.so
+	cd ../../bin/$(NAME).lv2
+	../../DPF/utils/lv2_ttl_generator ./$(NAME)_dsp.so
 
 # Enable required plugin types
 #TARGETS += jack
