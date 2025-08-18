@@ -1,50 +1,60 @@
 #!/usr/bin/make -f
-# Makefile for DPF #
-# ---------------- #
-# Created by falkTX
-#
+# Makefile for riban plugins #
+# Created by riban - derived from falkTX
 
+# DPF magic
 include DPF/Makefile.base.mk
 
-all: dgl examples gen
+# Default LV2 install folder
+LV2_INSTALL_PREFIX  ?= /usr/lib/lv2
 
-# --------------------------------------------------------------
+# Default target builds all riban lv2 plugins
+all: plugins
 
-ifneq ($(CROSS_COMPILING),true)
-CAN_GENERATE_TTL = true
-else ifneq ($(EXE_WRAPPER),)
-CAN_GENERATE_TTL = true
-endif
-
+# Target to build DGL
 dgl:
-ifeq ($(HAVE_DGL),true)
-	$(MAKE) -C dgl
-endif
+	$(MAKE) -C DPF/dgl
 
-examples: dgl
-	$(MAKE) all -C plugins/AutoLeveler
-
-ifeq ($(CAN_GENERATE_TTL),true)
-gen: examples utils/lv2_ttl_generator
-	@$(CURDIR)/utils/generate-ttl.sh
-
+# Target to build TTL generator command
 utils/lv2_ttl_generator:
-	$(MAKE) -C utils/lv2-ttl-generator
-else
-gen:
-endif
+	$(MAKE) -C DPF/utils/lv2-ttl-generator
 
-tests: dgl
-	$(MAKE) -C tests
+# Target to build riban lv2 plugins
+plugins: dgl utils/lv2_ttl_generator
+	$(MAKE) all -C AutoLeveler
 
-# --------------------------------------------------------------
+# Target to build deb package containing all riban lv2 plugins
+deb: plugins
+	mkdir -p Hannes-lv2$(LV2_INSTALL_PREFIX)
+	cp -r bin/lv2/* Hannes-lv2$(LV2_INSTALL_PREFIX)/
+	dpkg-deb --build Hannes-lv2 bin
 
-clean:
-	$(MAKE) clean -C dgl
-	$(MAKE) clean -C plugins/AutoLeveler
-	$(MAKE) clean -C utils/lv2-ttl-generator
+# Target to clean plugins
+clean_plugin:
+	$(MAKE) clean -C AutoLeveler
 	rm -rf bin build
 
-# --------------------------------------------------------------
+# Target to clean DPF
+clean_dpf:
+	$(MAKE) clean -C DPF/dgl
+	$(MAKE) clean -C DPF/utils/lv2-ttl-generator
 
-.PHONY: dgl examples tests
+# Target to clean deb package
+clean_deb:
+	rm -rf Hannes-lv2$(LV2_INSTALL_PREFIX)
+	rm -f bin/Hannes-lv2*.deb
+
+# Target to clean everything
+clean: clean_plugin clean_dpf clean_deb
+
+# Target to install plugins
+install: plugins
+	mkdir -p $(LV2_INSTALL_PREFIX)
+	cp -r bin/lv2/* $(LV2_INSTALL_PREFIX)/
+
+# Target to uninstall plugins
+uninstall:
+	rm -rf $(LV2_INSTALL_PREFIX)/riban*.lv2
+
+# List of targets that do not build files from their title
+.PHONY: dgl plugins all deb clean clean_plugin clean_dpf clean_deb install uninstall

@@ -51,11 +51,14 @@ protected:
   }
 
   void run(const float **inputs, float **outputs, uint32_t frames) override {
-    const float *const in = inputs[0];
-    float *const out = outputs[0];
-
+    const float *const in1 = inputs[0];
+    const float *const in2 = inputs[1];
+    float *const out1 = outputs[0];
+    float *const out2 = outputs[1];
+    
     for (uint32_t i = 0; i < frames; i++) {
-      out[i] = in[i] * gain;
+      out1[i] = in1[i] * gain;
+      out2[i] = in2[i] * gain;
     }
   }
 

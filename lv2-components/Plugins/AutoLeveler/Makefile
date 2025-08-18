@@ -1,46 +1,27 @@
 #!/usr/bin/make -f
-# Makefile for DISTRHO Plugins #
-# ---------------------------- #
-# Created by falkTX
-#
+# Makefile for riban Chordulator plugin
+# Created by riban - derived from falkTX
 
-# --------------------------------------------------------------
 # Project name, used for binaries
-
 NAME = AutoLeveler
 
-# --------------------------------------------------------------
 # Files to build
-
 FILES_DSP = \
 	AutoLeveler.cpp
 
-# FILES_UI  = \
-# 	ExampleUIParameters.cpp
+# DPF magic
+include ../../Makefile.plugins.mk
 
-# --------------------------------------------------------------
-# Do some magic
+# Target to build LV2 plugin and generate ttl
+lv2_with_ttl: lv2_dsp
+	cd ../../bin/lv2/$(NAME).lv2 && ../../../DPF/utils/lv2_ttl_generator ./$(NAME)_dsp.so
 
-include ../../DPF/Makefile.plugins.mk
-
-# --------------------------------------------------------------
-# Enable all possible plugin types
-
-# TARGETS += jack
-# TARGETS += ladspa
-
-# ifeq ($(HAVE_LIBLO),true)
-# ifeq ($(HAVE_OPENGL),true)
-# TARGETS += dssi
-# endif # HAVE_OPENGL
-# endif # HAVE_LIBLO
-
-TARGETS += lv2_sep
-# TARGETS += vst
-# TARGETS += vst3
-# TARGETS += clap
-# TARGETS += au
+# Enable required plugin types
+#TARGETS += jack
+TARGETS += lv2_with_ttl
+#TARGETS += vst2
+#TARGETS += vst3
+#TARGETS += clap
+#TARGETS += au
 
 all: $(TARGETS)
-
-# --------------------------------------------------------------
