@@ -13,6 +13,7 @@
 #define DISTRHO_PLUGIN_WANT_PROGRAMS    0
 
 enum Parameters {
+    kThreshPeak,
     kGain,
     kParametersCount
 };

@@ -1,13 +1,18 @@
 #include "DistrhoPlugin.hpp"
 #include "DistrhoPluginInfo.h"
 #include <cstdint>
+#include "../../../Classes/DSP/SRGain.h"
 
 START_NAMESPACE_DISTRHO
 
 
 class AutoLeveler : public Plugin {
 public:
-  AutoLeveler() : Plugin(kParametersCount, 0, 0), gain(1.0) {}
+  AutoLeveler() : Plugin(kParametersCount, 0, 0)
+  , mThreshPeak(0.0)
+  , fGainProcessor(100, SR::DSP::SRGain::kSinusodial, true) {
+    fGainProcessor.Reset(1.0, 0.5, 1.0, false, 100, SR::DSP::SRGain::kSinusodial, true);
+  }
 
 protected:
   const char *getLabel() const override { return "AutoLeveler"; }
@@ -19,12 +24,19 @@ protected:
 
   void initParameter(uint32_t index, Parameter &parameter) override {
     switch (index) {
+    case kThreshPeak:
+      parameter.name = "Threshold";
+      parameter.symbol = "threshold";
+      parameter.ranges.def = 0.f;
+      parameter.ranges.min = -60.f;
+      parameter.ranges.max = 0.f;
+      break;
     case kGain:
       parameter.name = "Gain";
       parameter.symbol = "gain";
-      parameter.ranges.def = 1.0f;
-      parameter.ranges.min = 0.0f;
-      parameter.ranges.max = 2.0f;
+      parameter.ranges.def = 1.f;
+      parameter.ranges.min = 0.f;
+      parameter.ranges.max = 2.f;
       break;
     default:
       break;
@@ -33,8 +45,10 @@ protected:
 
   float getParameterValue(uint32_t index) const override {
     switch (index) {
+    case kThreshPeak:
+      return mThreshPeak;
     case kGain:
-      return gain;
+      return fGainProcessor.GetGainLin();
     default:
       return 0.0;
     }
@@ -42,8 +56,11 @@ protected:
 
   void setParameterValue(uint32_t index, float value) override {
     switch (index) {
+    case kThreshPeak:
+      mThreshPeak = value;
+      break;
     case kGain:
-      gain = value;
+      fGainProcessor.SetGainLin(value);
       break;
     default:
       break;
@@ -57,13 +74,14 @@ protected:
     float *const out2 = outputs[1];
     
     for (uint32_t i = 0; i < frames; i++) {
-      out1[i] = in1[i] * gain;
-      out2[i] = in2[i] * gain;
+      out1[i] = in1[i] * fGainProcessor.GetGainLin();
+      out2[i] = in2[i] * fGainProcessor.GetGainLin();
     }
   }
 
 private:
-  float gain;
+  float mThreshPeak;
+  SR::DSP::SRGain fGainProcessor;
 
   DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AutoLeveler);
 };

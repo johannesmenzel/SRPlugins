@@ -104,7 +104,41 @@
  /usr/include/c++/12/bits/uniform_int_dist.h \
  ../../DPF/distrho/extra/LeakDetector.hpp \
  ../../DPF/distrho/src/DistrhoPluginChecks.h DistrhoPluginInfo.h \
- DistrhoPluginInfo.h
+ DistrhoPluginInfo.h ../../../Classes/DSP/SRGain.h \
+ ../../../Classes/DSP/../Utils/SRHelpers.h /usr/include/c++/12/math.h \
+ /usr/include/c++/12/string /usr/include/c++/12/bits/stringfwd.h \
+ /usr/include/c++/12/bits/memoryfwd.h \
+ /usr/include/c++/12/bits/char_traits.h \
+ /usr/include/c++/12/bits/postypes.h /usr/include/c++/12/cwchar \
+ /usr/include/wchar.h /usr/include/aarch64-linux-gnu/bits/types/wint_t.h \
+ /usr/include/aarch64-linux-gnu/bits/types/mbstate_t.h \
+ /usr/include/c++/12/bits/allocator.h \
+ /usr/include/aarch64-linux-gnu/c++/12/bits/c++allocator.h \
+ /usr/include/c++/12/bits/new_allocator.h \
+ /usr/include/c++/12/bits/localefwd.h \
+ /usr/include/aarch64-linux-gnu/c++/12/bits/c++locale.h \
+ /usr/include/c++/12/iosfwd /usr/include/c++/12/cctype \
+ /usr/include/ctype.h /usr/include/c++/12/bits/ostream_insert.h \
+ /usr/include/c++/12/bits/cxxabi_forced.h \
+ /usr/include/c++/12/bits/stl_function.h \
+ /usr/include/c++/12/backward/binders.h \
+ /usr/include/c++/12/bits/refwrap.h /usr/include/c++/12/bits/invoke.h \
+ /usr/include/c++/12/bits/range_access.h \
+ /usr/include/c++/12/bits/basic_string.h \
+ /usr/include/c++/12/ext/alloc_traits.h \
+ /usr/include/c++/12/bits/alloc_traits.h \
+ /usr/include/c++/12/ext/string_conversions.h /usr/include/c++/12/cerrno \
+ /usr/include/errno.h /usr/include/aarch64-linux-gnu/bits/errno.h \
+ /usr/include/linux/errno.h /usr/lib/linux/uapi/arm64/asm/errno.h \
+ /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
+ /usr/include/aarch64-linux-gnu/bits/types/error_t.h \
+ /usr/include/c++/12/bits/charconv.h \
+ /usr/include/c++/12/bits/functional_hash.h \
+ /usr/include/c++/12/bits/hash_bytes.h \
+ /usr/include/c++/12/bits/basic_string.tcc \
+ ../../../Classes/DSP/../Utils/SRParam.h /usr/include/c++/12/variant \
+ ../../../Classes/DSP/../Utils/../DSP/SRFilters.h \
+ /usr/include/c++/12/cassert /usr/include/assert.h
 /usr/include/stdc-predef.h:
 ../../DPF/distrho/DistrhoPlugin.hpp:
 ../../DPF/distrho/DistrhoDetails.hpp:
@@ -232,3 +266,51 @@
 ../../DPF/distrho/src/DistrhoPluginChecks.h:
 DistrhoPluginInfo.h:
 DistrhoPluginInfo.h:
+../../../Classes/DSP/SRGain.h:
+../../../Classes/DSP/../Utils/SRHelpers.h:
+/usr/include/c++/12/math.h:
+/usr/include/c++/12/string:
+/usr/include/c++/12/bits/stringfwd.h:
+/usr/include/c++/12/bits/memoryfwd.h:
+/usr/include/c++/12/bits/char_traits.h:
+/usr/include/c++/12/bits/postypes.h:
+/usr/include/c++/12/cwchar:
+/usr/include/wchar.h:
+/usr/include/aarch64-linux-gnu/bits/types/wint_t.h:
+/usr/include/aarch64-linux-gnu/bits/types/mbstate_t.h:
+/usr/include/c++/12/bits/allocator.h:
+/usr/include/aarch64-linux-gnu/c++/12/bits/c++allocator.h:
+/usr/include/c++/12/bits/new_allocator.h:
+/usr/include/c++/12/bits/localefwd.h:
+/usr/include/aarch64-linux-gnu/c++/12/bits/c++locale.h:
+/usr/include/c++/12/iosfwd:
+/usr/include/c++/12/cctype:
+/usr/include/ctype.h:
+/usr/include/c++/12/bits/ostream_insert.h:
+/usr/include/c++/12/bits/cxxabi_forced.h:
+/usr/include/c++/12/bits/stl_function.h:
+/usr/include/c++/12/backward/binders.h:
+/usr/include/c++/12/bits/refwrap.h:
+/usr/include/c++/12/bits/invoke.h:
+/usr/include/c++/12/bits/range_access.h:
+/usr/include/c++/12/bits/basic_string.h:
+/usr/include/c++/12/ext/alloc_traits.h:
+/usr/include/c++/12/bits/alloc_traits.h:
+/usr/include/c++/12/ext/string_conversions.h:
+/usr/include/c++/12/cerrno:
+/usr/include/errno.h:
+/usr/include/aarch64-linux-gnu/bits/errno.h:
+/usr/include/linux/errno.h:
+/usr/lib/linux/uapi/arm64/asm/errno.h:
+/usr/include/asm-generic/errno.h:
+/usr/include/asm-generic/errno-base.h:
+/usr/include/aarch64-linux-gnu/bits/types/error_t.h:
+/usr/include/c++/12/bits/charconv.h:
+/usr/include/c++/12/bits/functional_hash.h:
+/usr/include/c++/12/bits/hash_bytes.h:
+/usr/include/c++/12/bits/basic_string.tcc:
+../../../Classes/DSP/../Utils/SRParam.h:
+/usr/include/c++/12/variant:
+../../../Classes/DSP/../Utils/../DSP/SRFilters.h:
+/usr/include/c++/12/cassert:
+/usr/include/assert.h:

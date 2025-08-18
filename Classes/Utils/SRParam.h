@@ -1,9 +1,11 @@
 #pragma once
 //#include "IPlug/IPlug_include_in_plug_hdr.h"
-#include "IPlugLogger.h"
+// Commented because of third party usage, may have to be added later.
+// #include "IPlugLogger.h"
 #include <variant>
 #include "../DSP/SRFilters.h"
-#include "ptrlist.h"
+// Commented because of third party usage, may have to be added later.
+// #include "ptrlist.h"
 
 
 namespace SR {
