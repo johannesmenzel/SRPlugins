@@ -1,12 +1,12 @@
 #define PLUG_NAME "SRChannel"
 #define PLUG_MFR "SRPlugins"
-#define PLUG_VERSION_HEX 0x00000200
-#define PLUG_VERSION_STR "0.2.0"
+#define PLUG_VERSION_HEX 0x00000300
+#define PLUG_VERSION_STR "0.3.0"
 #define PLUG_UNIQUE_ID 'SrCh'
 #define PLUG_MFR_ID 'SrPl'
 #define PLUG_URL_STR "https://github.com/johannesmenzel/SRPlugins"
 #define PLUG_EMAIL_STR "johannes.menzel@posteo.de"
-#define PLUG_COPYRIGHT_STR "Copyright 2023 Johannes Menzel"
+#define PLUG_COPYRIGHT_STR "Copyright 2025 Johannes Menzel"
 #define PLUG_CLASS_NAME SRChannel
 
 #define BUNDLE_NAME "SRChannel"

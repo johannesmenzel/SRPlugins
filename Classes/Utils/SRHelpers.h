@@ -56,7 +56,8 @@ namespace SR {
         (2.44506634652299 + (2.44506634652299 + x2) *
           fabs(x + 0.814642734961073 * x * ax)));
     }
-
+    template <typename T>
+    T Clip(T x, T lo, T hi) { return std::min(std::max(x, lo), hi); }
   }
 }
 // end namespaces

@@ -58,9 +58,9 @@ namespace SR {
 				Update();
 			}
 
-			void SetFreqCPS(double freqCPS) { mNewState.freq = Clip(freqCPS, 10, 20000.); }
-			void SetQ(double q) { mNewState.q = Clip(Q, 0.1, 100.); }
-			void SetGain(double gainDB) { mNewState.gain = Clip(gainDB, -36, 36.); }
+			void SetFreqCPS(double freqCPS) { mNewState.freq = SR::Utils::Clip(freqCPS, 10, 20000.); }
+			void SetQ(double q) { mNewState.q = SR::Utils::Clip(Q, 0.1, 100.); }
+			void SetGain(double gainDB) { mNewState.gain = SR::Utils::Clip(gainDB, -36, 36.); }
 			void SetMode(EFilterType mode) { mNewState.mode = mode; }
 			void SetSampleRate(double sampleRate) { mNewState.sampleRate = sampleRate; }
 			// SVF process block
