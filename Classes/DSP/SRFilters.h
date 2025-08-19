@@ -66,7 +66,8 @@ namespace SR {
 			// SVF process block
 			void ProcessBlock(T** inputs, T** outputs, int nChans, int nFrames)
 			{
-				assert(nChans <= MAXNUMCHANNELS);
+				// removed for 3rd party usage
+				// assert(nChans <= MAXNUMCHANNELS);
 
 				if (mState != mNewState)
 					Update();
@@ -325,7 +326,8 @@ namespace SR {
 			// Process methods
 			// IIR processing
 			T Process(T in, int channel) {
-				assert(channel < MAXNUMCHANNELS);
+				// removed for 3rd party usage
+				//assert(channel < MAXNUMCHANNELS);
 				switch (mType)
 				{
 				case OnepoleHighpass:
@@ -363,7 +365,8 @@ namespace SR {
 			} // Get frequency response or phase at specified points
 
 			double GetFrequencyResponse(double atNormalizedFrequency, double rangeDb, bool returnPhase) {
-				assert(atNormalizedFrequency <= 0.5);
+				// removed for 3rd party usage
+				// assert(atNormalizedFrequency <= 0.5);
 				double w = 2. * M_PI * atNormalizedFrequency;
 
 				double cos1 = cos(-1. * w);
