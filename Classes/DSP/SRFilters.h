@@ -105,7 +105,7 @@ namespace SR {
 			{
 				mState = mNewState;
 
-				const double w = std::tan(SR::Utils::M_PI * mState.freq / mState.sampleRate);
+				const double w = std::tan(M_PI * mState.freq / mState.sampleRate);
 
 				switch (mState.mode)
 				{
