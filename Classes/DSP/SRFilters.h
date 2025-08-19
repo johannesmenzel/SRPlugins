@@ -587,7 +587,7 @@ namespace SR {
 				z1 = 0.0;
 			}
 
-			SRFilterOnePole(double frequency, double samplerate) {
+			SRFilterOnePole(int type, double frequency, double samplerate) {
 				SetFilter(type, frequency, samplerate);
 				z1 = 0.0;
 				SetType(type);

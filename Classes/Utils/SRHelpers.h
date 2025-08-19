@@ -36,7 +36,7 @@ namespace SR {
     // DSP
     // ---
 
-    static const double PI = 3.1415926535897932384626433832795
+    static const double PI = 3.1415926535897932384626433832795;
 
     // Fast tanh algorithm for real time audio (source unknown)
     inline double fast_tanh(double x) {
