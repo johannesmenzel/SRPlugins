@@ -126,8 +126,8 @@ namespace SR {
 		protected:
 			/** Update gain values after values changed: gain, pan, pan type */
 			void update(void) {
-				double gain1 = mGainLin;
-				double gain2 = mGainLin;
+				double gain1;
+				double gain2;
 
 				// Pan position calculation
 				if (mPanNormalized != 0.5) {
@@ -171,6 +171,14 @@ namespace SR {
 						break;
 					}
 				}
+				else {
+					// Center position, no panning
+					gain1 = 1.0;
+					gain2 = 1.0;
+				}
+
+				gain1 *= mGainLin;
+				gain2 *= mGainLin;
 
 				mGainRamp[0].Set(gain1);
 				mGainRamp[1].Set(gain2);
