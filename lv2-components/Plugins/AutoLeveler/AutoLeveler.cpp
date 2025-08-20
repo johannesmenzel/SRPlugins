@@ -66,7 +66,7 @@ protected:
       break;
     }
   }
-
+  
   void run(const float **inputs, float **outputs, uint32_t frames) override {
     const float *const in1 = inputs[0];
     const float *const in2 = inputs[1];
@@ -74,8 +74,11 @@ protected:
     float *const out2 = outputs[1];
     
     for (uint32_t i = 0; i < frames; i++) {
-      out1[i] = in1[i] * fGainProcessor.GetGainLin();
-      out2[i] = in2[i] * fGainProcessor.GetGainLin();
+      double left = in1[i];
+      double right = in2[i];
+      fGainProcessor.Process(left, right);
+      out1[i] = left;
+      out2[i] = right;
     }
   }
 
