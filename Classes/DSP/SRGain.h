@@ -106,9 +106,9 @@ namespace SR {
 				mGainRamp[1].SetNumSmoothSamples(mRampNumSamples);
 			}
 			/** Get normalized gain with linear voltage value (>= 0.0; 1.0 = unity) */
-			double GetGainLin() { return mGainLin; }
+			double GetGainLin() const { return mGainLin; }
 			/** Get gain with dB value */
-			double GetGainDb() { return SR::Utils::AmpToDB(mGainLin); }
+			double GetGainDb() const { return SR::Utils::AmpToDB(mGainLin); }
 			/** Get current linear gain voltage at channel [0] or [1] */
 			double GetCurrentGainLin(int channel) { return mGainRamp[channel].Get(); }
 			/** Get algorithm for panning */
