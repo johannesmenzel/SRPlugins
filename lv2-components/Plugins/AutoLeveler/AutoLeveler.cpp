@@ -86,8 +86,11 @@ protected:
     float *const out2 = outputs[1];
     
     for (uint32_t i = 0; i < frames; i++) {
+      // Create temp double values for processing
       double left = in1[i];
       double right = in2[i];
+
+      // process 
       fGainProcessor.Process(left, right);
       out1[i] = left;
       out2[i] = right;
