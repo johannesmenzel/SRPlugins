@@ -38,6 +38,13 @@ protected:
       parameter.ranges.min = 0.f;
       parameter.ranges.max = 2.f;
       break;
+    case kPan:
+      parameter.name = "Pan";
+      parameter.symbol = "pan";
+      parameter.ranges.def = 0.5f;
+      parameter.ranges.min = 0.f;
+      parameter.ranges.max = 1.f;
+      break;
     default:
       break;
     }
@@ -49,6 +56,8 @@ protected:
       return mThreshPeak;
     case kGain:
       return fGainProcessor.GetGainLin();
+    case kPan:
+      return fGainProcessor.GetPanPosition();
     default:
       return 0.0;
     }
@@ -61,6 +70,9 @@ protected:
       break;
     case kGain:
       fGainProcessor.SetGainLin(value);
+      break;
+    case kPan:
+      fGainProcessor.SetPanPosition(value);
       break;
     default:
       break;

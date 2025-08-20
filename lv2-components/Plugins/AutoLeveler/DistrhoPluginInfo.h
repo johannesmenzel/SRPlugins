@@ -15,6 +15,7 @@
 enum Parameters {
     kThreshPeak,
     kGain,
+    kPan,
     kParametersCount
 };
 
