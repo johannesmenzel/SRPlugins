@@ -34,9 +34,9 @@ protected:
     case kGain:
       parameter.name = "Gain";
       parameter.symbol = "gain";
-      parameter.ranges.def = 1.f;
-      parameter.ranges.min = 0.f;
-      parameter.ranges.max = 2.f;
+      parameter.ranges.def = 0.f;
+      parameter.ranges.min = -60.f;
+      parameter.ranges.max = 12.f;
       break;
     case kPan:
       parameter.name = "Pan";
@@ -55,7 +55,7 @@ protected:
     case kThreshPeak:
       return mThreshPeak;
     case kGain:
-      return fGainProcessor.GetGainLin();
+      return fGainProcessor.GetGainDb();
     case kPan:
       return fGainProcessor.GetPanPosition();
     default:
@@ -69,7 +69,7 @@ protected:
       mThreshPeak = value;
       break;
     case kGain:
-      fGainProcessor.SetGainLin(value);
+      fGainProcessor.SetGainDb(value);
       break;
     case kPan:
       fGainProcessor.SetPanPosition(value);
