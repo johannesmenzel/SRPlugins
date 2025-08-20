@@ -112,15 +112,15 @@ namespace SR {
 			/** Get current linear gain voltage at channel [0] or [1] */
 			double GetCurrentGainLin(int channel) { return mGainRamp[channel].Get(); }
 			/** Get algorithm for panning */
-			PanType GetPanType() { return mPanType; }
+			PanType GetPanType() const { return mPanType; }
 			/** Get normalized panning position 0 .. 1, while .5 is middle position */
-			double GetPanPosition() { return mPanNormalized; }
+			double GetPanPosition() const { return mPanNormalized; }
 			/** Get normalized stereo width (0. = mono; 1. = stereo; > 1 = wider than stereo */
-			double GetWidth() { return mWidthNormalized; }
+			double GetWidth() const { return mWidthNormalized; }
 			/** Get if gain computer is bypassed */
-			bool GetBypassed() { return mBypassed; }
+			bool GetBypassed() const { return mBypassed; }
 			/** Get number of samples until gain smoothing ramp reaches target value */
-			int GetRamp() { return mRampNumSamples; }
+			int GetRamp() const { return mRampNumSamples; }
 			/** Runtime method, call per sample, overwrites data in sample** directly */
 			void Process(double& in1, double& in2); // for stereo
 		protected:
