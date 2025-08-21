@@ -9,9 +9,13 @@ START_NAMESPACE_DISTRHO
 class AutoLeveler : public Plugin {
 public:
   AutoLeveler() : Plugin(kParametersCount, 0, 0)
-  , mThreshPeak(0.0)
-  , fGainProcessor(100, SR::DSP::SRGain::kSinusodial, true) {
+  , mThreshPeak(1.0)
+  , mCurrentGainReduction(1.0)
+  , fGainProcessor(100, SR::DSP::SRGain::kSinusodial, true)
+  , fPreGainProcessor(100, SR::DSP::SRGain::kSinusodial, true)
+  {
     fGainProcessor.Reset(1.0, 0.5, 1.0, false, 100, SR::DSP::SRGain::kSinusodial, true);
+    fPreGainProcessor.Reset(1.0, 0.5, 1.0, false, 100, SR::DSP::SRGain::kSinusodial, true);
   }
 
 protected:
@@ -31,9 +35,9 @@ protected:
       parameter.ranges.min = -60.f;
       parameter.ranges.max = 0.f;
       break;
-    case kGain:
-      parameter.name = "Gain";
-      parameter.symbol = "gain";
+    case kPreGain:
+      parameter.name = "PreGain";
+      parameter.symbol = "pregain";
       parameter.ranges.def = 0.f;
       parameter.ranges.min = -60.f;
       parameter.ranges.max = 12.f;
@@ -53,11 +57,11 @@ protected:
   float getParameterValue(uint32_t index) const override {
     switch (index) {
     case kThreshPeak:
-      return mThreshPeak;
-    case kGain:
-      return fGainProcessor.GetGainDb();
+      return SR::Utils::AmpToDB(mThreshPeak);
+    case kPreGain:
+      return SR::Utils::AmpToDB(mPreGain);
     case kPan:
-      return fGainProcessor.GetPanPosition();
+      return fPreGainProcessor.GetPanPosition();
     default:
       return 0.0;
     }
@@ -66,13 +70,15 @@ protected:
   void setParameterValue(uint32_t index, float value) override {
     switch (index) {
     case kThreshPeak:
-      mThreshPeak = value;
+      mThreshPeak = SR::Utils::DBToAmp(value);
+      calcGain();
       break;
-    case kGain:
-      fGainProcessor.SetGainDb(value);
+    case kPreGain:
+      mPreGain = SR::Utils::DBToAmp(value);
       break;
     case kPan:
-      fGainProcessor.SetPanPosition(value);
+      fPreGainProcessor.SetPanPosition(value);
+      calcGain();
       break;
     default:
       break;
@@ -84,22 +90,42 @@ protected:
     const float *const in2 = inputs[1];
     float *const out1 = outputs[0];
     float *const out2 = outputs[1];
+
+    float currentpeak = mThreshPeak;
     
     for (uint32_t i = 0; i < frames; i++) {
       // Create temp double values for processing
       double left = in1[i];
       double right = in2[i];
 
-      // process 
+      // process gain processor
+      fPreGainProcessor.Process(left, right);
       fGainProcessor.Process(left, right);
+
+      // get processed values back to floating output pointer
+      if (abs(left) > currentpeak) {
+        currentpeak = abs(left);
+      }
+      if (abs(right) > currentpeak) {
+        currentpeak = abs(right);
+      }
       out1[i] = left;
       out2[i] = right;
+    }
+    if (currentpeak > mThreshPeak) {
+      mCurrentGainReduction =- currentpeak - mThreshPeak;
+      calcGain();
     }
   }
 
 private:
-  float mThreshPeak;
+  float mThreshPeak, mCurrentGainReduction, mPreGain;
   SR::DSP::SRGain fGainProcessor;
+  SR::DSP::SRGain fPreGainProcessor;
+
+  void calcGain() {
+    fGainProcessor.SetGainLin(mCurrentGainReduction);
+  }
 
   DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AutoLeveler);
 };
