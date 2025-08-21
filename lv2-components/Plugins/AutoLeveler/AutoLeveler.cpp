@@ -70,7 +70,7 @@ protected:
   void setParameterValue(uint32_t index, float value) override {
     switch (index) {
     case kThreshPeak:
-      mCurrentGainReduction=1.f;
+      // mCurrentGainReduction=1.f;
       mThreshPeak = SR::Utils::DBToAmp(value);
       calcGain();
       break;
@@ -99,22 +99,26 @@ protected:
       double left = in1[i];
       double right = in2[i];
 
-      // process gain processor
+      // process pregain processor
       fPreGainProcessor.Process(left, right);
-      fGainProcessor.Process(left, right);
 
-      // get processed values back to floating output pointer
+      // Get current peak overshoot
       if (abs(left) > currentpeak) {
         currentpeak = abs(left);
       }
       if (abs(right) > currentpeak) {
         currentpeak = abs(right);
       }
+
+      // process gain processor
+      fGainProcessor.Process(left, right);
+      
+      // get processed values back to floating output pointer
       out1[i] = left;
       out2[i] = right;
     }
     if (currentpeak > mThreshPeak) {
-      mCurrentGainReduction -= (currentpeak - mThreshPeak);
+      mCurrentGainReduction = 1.f - (currentpeak - mThreshPeak);
       calcGain();
     }
   }
