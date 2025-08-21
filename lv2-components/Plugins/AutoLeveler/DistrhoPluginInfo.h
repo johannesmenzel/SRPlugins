@@ -3,6 +3,7 @@
 
 #define DISTRHO_PLUGIN_NAME  "AutoLeveler"
 #define DISTRHO_PLUGIN_URI   "https://github.com/johannesmenzel/SRPlugins/lv2-components/AutoLeveler"
+#define DISTRHO_PLUGIN_LV2_CATEGORY "lv2:ReverbPlugin"
 
 #define DISTRHO_PLUGIN_NUM_INPUTS       2
 #define DISTRHO_PLUGIN_NUM_OUTPUTS      2
