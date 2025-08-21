@@ -9,13 +9,13 @@ START_NAMESPACE_DISTRHO
 class AutoLeveler : public Plugin {
 public:
   AutoLeveler() : Plugin(kParametersCount, 0, 0)
-  , mThreshPeak(1.0)
-  , mCurrentGainReduction(1.0)
+  , mThreshPeak(1.f)
+  , mCurrentGainReduction(1.f)
   , fGainProcessor(100, SR::DSP::SRGain::kSinusodial, true)
   , fPreGainProcessor(100, SR::DSP::SRGain::kSinusodial, true)
   {
     fGainProcessor.Reset(1.0, 0.5, 1.0, false, 100, SR::DSP::SRGain::kSinusodial, true);
-    fPreGainProcessor.Reset(1.0, 0.5, 1.0, false, 100, SR::DSP::SRGain::kSinusodial, true);
+    fPreGainProcessor.Reset(1.0, 0.5, 1.0, false, 1000, SR::DSP::SRGain::kSinusodial, true);
   }
 
 protected:
@@ -59,7 +59,7 @@ protected:
     case kThreshPeak:
       return SR::Utils::AmpToDB(mThreshPeak);
     case kPreGain:
-      return SR::Utils::AmpToDB(mPreGain);
+      return fPreGainProcessor.GetGainDb();
     case kPan:
       return fPreGainProcessor.GetPanPosition();
     default:
@@ -70,11 +70,12 @@ protected:
   void setParameterValue(uint32_t index, float value) override {
     switch (index) {
     case kThreshPeak:
+      mCurrentGainReduction=1.f;
       mThreshPeak = SR::Utils::DBToAmp(value);
       calcGain();
       break;
     case kPreGain:
-      mPreGain = SR::Utils::DBToAmp(value);
+      fPreGainProcessor.SetGainDb(value);
       break;
     case kPan:
       fPreGainProcessor.SetPanPosition(value);
@@ -113,13 +114,13 @@ protected:
       out2[i] = right;
     }
     if (currentpeak > mThreshPeak) {
-      mCurrentGainReduction =- currentpeak - mThreshPeak;
+      mCurrentGainReduction =- (currentpeak - mThreshPeak);
       calcGain();
     }
   }
 
 private:
-  float mThreshPeak, mCurrentGainReduction, mPreGain;
+  float mThreshPeak, mCurrentGainReduction;
   SR::DSP::SRGain fGainProcessor;
   SR::DSP::SRGain fPreGainProcessor;
 
