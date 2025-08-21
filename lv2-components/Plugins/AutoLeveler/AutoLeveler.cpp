@@ -125,6 +125,9 @@ private:
   SR::DSP::SRGain fPreGainProcessor;
 
   void calcGain() {
+    if (mCurrentGainReduction > 1.f) {
+      mCurrentGainReduction = 1.f;
+    }
     fGainProcessor.SetGainLin(mCurrentGainReduction);
   }
 
