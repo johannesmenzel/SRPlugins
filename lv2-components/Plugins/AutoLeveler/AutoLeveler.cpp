@@ -11,11 +11,11 @@ public:
   AutoLeveler() : Plugin(kParametersCount, 0, 0)
   , mThreshPeak(1.f)
   , mCurrentGainReduction(1.f)
-  , fGainProcessor(100, SR::DSP::SRGain::kSinusodial, true)
+  , fGainProcessor(1000, SR::DSP::SRGain::kSinusodial, true)
   , fPreGainProcessor(100, SR::DSP::SRGain::kSinusodial, true)
   {
-    fGainProcessor.Reset(1.0, 0.5, 1.0, false, 100, SR::DSP::SRGain::kSinusodial, true);
-    fPreGainProcessor.Reset(1.0, 0.5, 1.0, false, 1000, SR::DSP::SRGain::kSinusodial, true);
+    fGainProcessor.Reset(1.0, 0.5, 1.0, false, 1000, SR::DSP::SRGain::kSinusodial, true);
+    fPreGainProcessor.Reset(1.0, 0.5, 1.0, false, 100, SR::DSP::SRGain::kSinusodial, true);
   }
 
 protected:
@@ -114,7 +114,7 @@ protected:
       out2[i] = right;
     }
     if (currentpeak > mThreshPeak) {
-      mCurrentGainReduction =- (currentpeak - mThreshPeak);
+      mCurrentGainReduction -= (currentpeak - mThreshPeak);
       calcGain();
     }
   }
