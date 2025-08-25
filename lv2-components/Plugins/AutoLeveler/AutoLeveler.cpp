@@ -2,6 +2,7 @@
 #include "DistrhoPluginInfo.h"
 #include <cstdint>
 #include "../../../Classes/DSP/SRGain.h"
+#include "../../../Classes/DSP/SRDynamics.h"
 
 START_NAMESPACE_DISTRHO
 
@@ -10,12 +11,17 @@ class AutoLeveler : public Plugin {
 public:
   AutoLeveler() : Plugin(kParametersCount, 0, 0)
   , mThreshPeakDb(0.f)
+  , mThreshRMSDb(-12.f)
   , mCurrentGainReductionDb(0.f)
+  , mEnvelopeRMS(0.f)
   , fGainProcessor(1000, SR::DSP::SRGain::kSinusodial, true)
   , fPreGainProcessor(100, SR::DSP::SRGain::kSinusodial, true)
+  , fEnvelopeRMS(300., getSampleRate())
   {
     fGainProcessor.Reset(1.0, 0.5, 1.0, false, 1000, SR::DSP::SRGain::kSinusodial, true);
     fPreGainProcessor.Reset(1.0, 0.5, 1.0, false, 100, SR::DSP::SRGain::kSinusodial, true);
+    fEnvelopeRMS.SetSampleRate(getSampleRate());
+    fEnvelopeRMS.SetTc(300.);
   }
 
 protected:
@@ -29,9 +35,16 @@ protected:
   void initParameter(uint32_t index, Parameter &parameter) override {
     switch (index) {
     case kThreshPeak:
-      parameter.name = "Threshold";
-      parameter.symbol = "threshold";
+      parameter.name = "Threshold Peak";
+      parameter.symbol = "threshold_peak";
       parameter.ranges.def = 0.f;
+      parameter.ranges.min = -60.f;
+      parameter.ranges.max = 0.f;
+      break;
+    case kThreshRMS:
+      parameter.name = "Threshold RMS";
+      parameter.symbol = "threshold_rms";
+      parameter.ranges.def = -12.f;
       parameter.ranges.min = -60.f;
       parameter.ranges.max = 0.f;
       break;
@@ -58,6 +71,8 @@ protected:
     switch (index) {
     case kThreshPeak:
       return mThreshPeakDb;
+    case kThreshRMS:
+      return mThreshRMSDb;
     case kPreGain:
       return fPreGainProcessor.GetGainDb();
     case kPan:
@@ -73,6 +88,12 @@ protected:
       // Reset gain reduction when threshold changes
       mCurrentGainReductionDb=0.f;
       mThreshPeakDb = value;
+      // calcGain();
+      break;
+    case kThreshRMS:
+      // Reset gain reduction when threshold changes
+      mCurrentGainReductionDb=0.f;
+      mThreshRMSDb = value;
       // calcGain();
       break;
     case kPreGain:
@@ -94,8 +115,9 @@ protected:
     float *const out2 = outputs[1];
 
     // Reset current peak for this buffer
-    float currentpeak = 0.f;
-    
+    double currentMaxPeak = 0.0;
+    double currentMaxRMS = 0.0;
+
     for (uint32_t i = 0; i < frames; i++) {
       // Create temp double values for processing
       double left = in1[i];
@@ -105,11 +127,18 @@ protected:
       fPreGainProcessor.Process(left, right);
 
       // Get current linear max peak per buffer
-      if (abs(left) > currentpeak) {
-        currentpeak = abs(left);
+      if (abs(left) > currentMaxPeak) {
+        currentMaxPeak = abs(left);
       }
-      if (abs(right) > currentpeak) {
-        currentpeak = abs(right);
+      if (abs(right) > currentMaxPeak) {
+        currentMaxPeak = abs(right);
+      }
+
+      fEnvelopeRMS.Process(0.5 * (abs(left) + abs(right)), mEnvelopeRMS);
+
+      // Get current RMS value
+      if (mEnvelopeRMS > currentMaxRMS) {
+        currentMaxRMS = mEnvelopeRMS;
       }
 
       // process gain processor
@@ -120,18 +149,21 @@ protected:
       out2[i] = right;
     }
     // Convert peak value to log scale
-    float currentpeakDb = SR::Utils::AmpToDB(currentpeak);
+    double currentMaxPeakDb = SR::Utils::AmpToDB(currentMaxPeak);
+    double currentMaxRMSDb = SR::Utils::AmpToDB(currentMaxRMS);
 
     // Get current peak overshoot in log scale and adjust gain reduction
-    if (currentpeakDb > mThreshPeakDb) {
+    if (currentMaxPeakDb > mThreshPeakDb || currentMaxRMSDb > mThreshRMSDb) {
       // calculate gain reduction in dB, but don't raise it
-      mCurrentGainReductionDb = std::min(0.f - (currentpeakDb - mThreshPeakDb), mCurrentGainReductionDb);
+      mCurrentGainReductionDb = std::min(std::min((0.f - (currentMaxPeakDb - mThreshPeakDb)), (0.f - (currentMaxRMSDb - mThreshRMSDb))), mCurrentGainReductionDb);
       calcGain();
     }
   }
 
 private:
-  float mThreshPeakDb, mCurrentGainReductionDb;
+  float mThreshPeakDb, mThreshRMSDb;
+  double mEnvelopeRMS,mCurrentGainReductionDb;
+  SR::DSP::SRDynamicsEnvelope fEnvelopeRMS;
   SR::DSP::SRGain fGainProcessor;
   SR::DSP::SRGain fPreGainProcessor;
 
