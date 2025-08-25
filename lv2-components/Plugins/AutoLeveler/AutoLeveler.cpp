@@ -29,14 +29,22 @@ protected:
   const char *getDescription() const override { return "Auto Leveler for Zynthian Chains"; }
   const char *getMaker() const override { return "SRPlugins"; }
   const char *getLicense() const override { return "GPL"; }
-  uint32_t getVersion() const override { return d_version(0, 0, 1); }
+  uint32_t getVersion() const override { return d_version(0, 0, 2); }
   int64_t getUniqueId() const override { return d_cconst('S', 'R', 'A', 'L'); }
+
+  // Control groups
+  enum {
+    kPortGroupLeveler = 0,
+    kPortGroupPre
+  };
 
   void initParameter(uint32_t index, Parameter &parameter) override {
     switch (index) {
     case kThreshPeak:
       parameter.name = "Threshold Peak";
       parameter.symbol = "threshold_peak";
+      parameter.unit = "dB";
+      parameter.groupId = kPortGroupLeveler;
       parameter.ranges.def = 0.f;
       parameter.ranges.min = -60.f;
       parameter.ranges.max = 0.f;
@@ -44,6 +52,8 @@ protected:
     case kThreshRMS:
       parameter.name = "Threshold RMS";
       parameter.symbol = "threshold_rms";
+      parameter.unit = "dB";
+      parameter.groupId = kPortGroupLeveler;
       parameter.ranges.def = -12.f;
       parameter.ranges.min = -60.f;
       parameter.ranges.max = 0.f;
@@ -51,6 +61,8 @@ protected:
     case kPreGain:
       parameter.name = "PreGain";
       parameter.symbol = "pregain";
+      parameter.unit = "dB";
+      parameter.groupId = kPortGroupPre;
       parameter.ranges.def = 0.f;
       parameter.ranges.min = -60.f;
       parameter.ranges.max = 12.f;
@@ -58,14 +70,31 @@ protected:
     case kPan:
       parameter.name = "Pan";
       parameter.symbol = "pan";
-      parameter.ranges.def = 0.5f;
-      parameter.ranges.min = 0.f;
-      parameter.ranges.max = 1.f;
+      parameter.unit = "%";
+      parameter.groupId = kPortGroupPre;
+      parameter.ranges.def = 0.f;
+      parameter.ranges.min = -100.f;
+      parameter.ranges.max = 100.f;
       break;
     default:
       break;
     }
   }
+
+    void initPortGroup(uint32_t groupId, PortGroup& portGroup) override
+    {
+        switch (groupId) {
+        case kPortGroupLeveler:
+            portGroup.name = "Leveller";
+            portGroup.symbol = "leveller";
+            break;
+        case kPortGroupPre:
+            portGroup.name = "Pre";
+            portGroup.symbol = "pre";
+            break;
+        }
+    }
+
 
   float getParameterValue(uint32_t index) const override {
     switch (index) {
@@ -76,7 +105,7 @@ protected:
     case kPreGain:
       return fPreGainProcessor.GetGainDb();
     case kPan:
-      return fPreGainProcessor.GetPanPosition();
+      return fPreGainProcessor.GetPanPosition() * 200.f - 100.f;
     default:
       return 0.0;
     }
@@ -100,7 +129,7 @@ protected:
       fPreGainProcessor.SetGainDb(value);
       break;
     case kPan:
-      fPreGainProcessor.SetPanPosition(value);
+      fPreGainProcessor.SetPanPosition((value + 100.f) / 200.f);
       // calcGain();
       break;
     default:
