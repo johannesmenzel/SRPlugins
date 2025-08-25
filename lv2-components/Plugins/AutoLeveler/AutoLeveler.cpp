@@ -15,12 +15,12 @@ public:
   , mThreshRMSDb(-12.f)
   , mCurrentGainReductionDb(0.f)
   , mEnvelopeRMS(0.f)
-  , fGainProcessor(1000, SR::DSP::SRGain::kSinusodial, true)
-  , fPreGainProcessor(100, SR::DSP::SRGain::kSinusodial, true)
+  , fGainProcessor(10000, SR::DSP::SRGain::kSinusodial, true)
+  , fPreGainProcessor(1000, SR::DSP::SRGain::kSinusodial, true)
   , fEnvelopeRMS(300., 44100)
   {
-    fGainProcessor.Reset(1.0, 0.5, 1.0, false, 1000, SR::DSP::SRGain::kSinusodial, true);
-    fPreGainProcessor.Reset(1.0, 0.5, 1.0, false, 100, SR::DSP::SRGain::kSinusodial, true);
+    fGainProcessor.Reset(1.0, 0.5, 1.0, false, 10000, SR::DSP::SRGain::kSinusodial, true);
+    fPreGainProcessor.Reset(1.0, 0.5, 1.0, false, 1000, SR::DSP::SRGain::kSinusodial, true);
     fEnvelopeRMS.SetSampleRate(getSampleRate());
     fEnvelopeRMS.SetTc(300.);
   }
