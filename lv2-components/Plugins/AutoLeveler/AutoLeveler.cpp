@@ -177,13 +177,13 @@ protected:
       out1[i] = left;
       out2[i] = right;
     }
-    // Convert peak value to log scale
+    // Convert max values to log scale
     double currentMaxPeakDb = SR::Utils::AmpToDB(currentMaxPeak);
     double currentMaxRMSDb = SR::Utils::AmpToDB(currentMaxRMS);
 
-    // Get current peak overshoot in log scale and adjust gain reduction
+    // Get current peak and rms overshoot in log scale and adjust gain reduction
     if (currentMaxPeakDb > mThreshPeakDb || currentMaxRMSDb > mThreshRMSDb) {
-      // calculate gain reduction in dB, but don't raise it
+      // calculate gain reduction in dB, chose if peak or rms detector is lower, and never raise current gain reduction
       mCurrentGainReductionDb = std::min(std::min((0.f - (currentMaxPeakDb - mThreshPeakDb)), (0.f - (currentMaxRMSDb - mThreshRMSDb))), mCurrentGainReductionDb);
       calcGain();
     }
