@@ -16,7 +16,7 @@ public:
   , mEnvelopeRMS(0.f)
   , fGainProcessor(1000, SR::DSP::SRGain::kSinusodial, true)
   , fPreGainProcessor(100, SR::DSP::SRGain::kSinusodial, true)
-  , fEnvelopeRMS(300., getSampleRate())
+  , fEnvelopeRMS(300., 44100)
   {
     fGainProcessor.Reset(1.0, 0.5, 1.0, false, 1000, SR::DSP::SRGain::kSinusodial, true);
     fPreGainProcessor.Reset(1.0, 0.5, 1.0, false, 100, SR::DSP::SRGain::kSinusodial, true);
