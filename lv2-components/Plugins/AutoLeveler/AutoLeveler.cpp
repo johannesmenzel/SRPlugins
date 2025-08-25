@@ -26,7 +26,7 @@ public:
 
 protected:
   const char *getLabel() const override { return "AutoLeveler"; }
-  const char *getDescription() const override { return "Auto Leveler for Zynthian Chains"; }
+  const char *getDescription() const override { return "Automatically level down audio signals according to peak and rms threshold. Use on chains or master chain."; }
   const char *getMaker() const override { return "SRPlugins"; }
   const char *getLicense() const override { return "GPL"; }
   uint32_t getVersion() const override { return d_version(0, 0, 2); }
