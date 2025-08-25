@@ -30,7 +30,7 @@ protected:
   const char *getDescription() const override { return "Automatically level down audio signals according to peak and rms threshold. Use on chains or master chain."; }
   const char *getMaker() const override { return "SRPlugins"; }
   const char *getLicense() const override { return "GPL"; }
-  uint32_t getVersion() const override { return d_version(0, 0, 2); }
+  uint32_t getVersion() const override { return d_version(0, 1, 0); }
   int64_t getUniqueId() const override { return d_cconst('S', 'R', 'A', 'L'); }
 
   // Control groups
