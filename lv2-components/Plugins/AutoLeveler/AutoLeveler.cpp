@@ -10,6 +10,7 @@ START_NAMESPACE_DISTRHO
 class AutoLeveler : public Plugin {
 public:
   AutoLeveler() : Plugin(kParametersCount, 0, 0)
+  , mListen(true)
   , mThreshPeakDb(0.f)
   , mThreshRMSDb(-12.f)
   , mCurrentGainReductionDb(0.f)
@@ -58,6 +59,16 @@ protected:
       parameter.ranges.min = -60.f;
       parameter.ranges.max = 0.f;
       break;
+    case kListen:
+      parameter.name = "Listen";
+      parameter.symbol = "listen";
+      parameter.unit = "";
+      parameter.groupId = kPortGroupLeveler;
+      parameter.ranges.def = 1.f;
+      parameter.ranges.min = 0.f;
+      parameter.ranges.max = 1.f;
+      parameter.hints = kParameterIsBoolean;
+      break;
     case kPreGain:
       parameter.name = "PreGain";
       parameter.symbol = "pregain";
@@ -102,6 +113,8 @@ protected:
       return mThreshPeakDb;
     case kThreshRMS:
       return mThreshRMSDb;
+    case kListen:
+      return mListen ? 1.f : 0.f;
     case kPreGain:
       return fPreGainProcessor.GetGainDb();
     case kPan:
@@ -124,6 +137,14 @@ protected:
       mCurrentGainReductionDb=0.f;
       mThreshRMSDb = value;
       // calcGain();
+      break;
+    case kListen:
+      if (value > 0.5f) {
+        mCurrentGainReductionDb=0.f;
+        mListen = true;
+      } else {
+        mListen = false;
+      }
       break;
     case kPreGain:
       fPreGainProcessor.SetGainDb(value);
@@ -156,18 +177,20 @@ protected:
       fPreGainProcessor.Process(left, right);
 
       // Get current linear max peak per buffer
-      if (abs(left) > currentMaxPeak) {
-        currentMaxPeak = abs(left);
-      }
-      if (abs(right) > currentMaxPeak) {
-        currentMaxPeak = abs(right);
-      }
+      if (mListen) {
+        if (abs(left) > currentMaxPeak) {
+          currentMaxPeak = abs(left);
+        }
+        if (abs(right) > currentMaxPeak) {
+          currentMaxPeak = abs(right);
+        }
+      
+        fEnvelopeRMS.Process(0.5 * (abs(left) + abs(right)), mEnvelopeRMS);
 
-      fEnvelopeRMS.Process(0.5 * (abs(left) + abs(right)), mEnvelopeRMS);
-
-      // Get current RMS value
-      if (mEnvelopeRMS > currentMaxRMS) {
-        currentMaxRMS = mEnvelopeRMS;
+        // Get current RMS value
+        if (mEnvelopeRMS > currentMaxRMS) {
+          currentMaxRMS = mEnvelopeRMS;
+        }
       }
 
       // process gain processor
@@ -181,28 +204,26 @@ protected:
     double currentMaxPeakDb = SR::Utils::AmpToDB(currentMaxPeak);
     double currentMaxRMSDb = SR::Utils::AmpToDB(currentMaxRMS);
 
-    // Get current peak and rms overshoot in log scale and adjust gain reduction
-    if (currentMaxPeakDb > mThreshPeakDb || currentMaxRMSDb > mThreshRMSDb) {
-      // calculate gain reduction in dB, chose if peak or rms detector is lower, and never raise current gain reduction
-      mCurrentGainReductionDb = std::min(std::min((0.f - (currentMaxPeakDb - mThreshPeakDb)), (0.f - (currentMaxRMSDb - mThreshRMSDb))), mCurrentGainReductionDb);
-      calcGain();
+    if (mListen) {
+      // Get current peak and rms overshoot in log scale and adjust gain reduction
+      if (currentMaxPeakDb > mThreshPeakDb || currentMaxRMSDb > mThreshRMSDb) {
+        // calculate gain reduction in dB, chose if peak or rms detector is lower, and never raise current gain reduction
+        mCurrentGainReductionDb = std::min(std::min((0.f - (currentMaxPeakDb - mThreshPeakDb)), (0.f - (currentMaxRMSDb - mThreshRMSDb))), mCurrentGainReductionDb);
+        // It's a down leveler, we don't want to boost the gain
+        if (mCurrentGainReductionDb > 0.f) {
+          mCurrentGainReductionDb = 0.f;
+        }
+        fGainProcessor.SetGainDb(mCurrentGainReductionDb);      }
     }
   }
 
 private:
+  bool mListen;
   float mThreshPeakDb, mThreshRMSDb;
   double mEnvelopeRMS,mCurrentGainReductionDb;
   SR::DSP::SRDynamicsEnvelope fEnvelopeRMS;
   SR::DSP::SRGain fGainProcessor;
   SR::DSP::SRGain fPreGainProcessor;
-
-  void calcGain() {
-    // It's a down leveler, we don't want to boost the gain
-    if (mCurrentGainReductionDb > 0.f) {
-      mCurrentGainReductionDb = 0.f;
-    }
-    fGainProcessor.SetGainDb(mCurrentGainReductionDb);
-  }
 
   DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AutoLeveler);
 };
