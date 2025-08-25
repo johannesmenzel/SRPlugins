@@ -9,8 +9,8 @@ START_NAMESPACE_DISTRHO
 class AutoLeveler : public Plugin {
 public:
   AutoLeveler() : Plugin(kParametersCount, 0, 0)
-  , mThreshPeak(1.f)
-  , mCurrentGainReduction(1.f)
+  , mThreshPeakDb(0.f)
+  , mCurrentGainReductionDb(0.f)
   , fGainProcessor(1000, SR::DSP::SRGain::kSinusodial, true)
   , fPreGainProcessor(100, SR::DSP::SRGain::kSinusodial, true)
   {
@@ -57,7 +57,7 @@ protected:
   float getParameterValue(uint32_t index) const override {
     switch (index) {
     case kThreshPeak:
-      return SR::Utils::AmpToDB(mThreshPeak);
+      return mThreshPeakDb;
     case kPreGain:
       return fPreGainProcessor.GetGainDb();
     case kPan:
@@ -70,16 +70,17 @@ protected:
   void setParameterValue(uint32_t index, float value) override {
     switch (index) {
     case kThreshPeak:
-      // mCurrentGainReduction=1.f;
-      mThreshPeak = SR::Utils::DBToAmp(value);
-      calcGain();
+      // Reset gain reduction when threshold changes
+      mCurrentGainReductionDb=0.f;
+      mThreshPeakDb = value;
+      // calcGain();
       break;
     case kPreGain:
       fPreGainProcessor.SetGainDb(value);
       break;
     case kPan:
       fPreGainProcessor.SetPanPosition(value);
-      calcGain();
+      // calcGain();
       break;
     default:
       break;
@@ -92,7 +93,8 @@ protected:
     float *const out1 = outputs[0];
     float *const out2 = outputs[1];
 
-    float currentpeak = mThreshPeak;
+    // Reset current peak for this buffer
+    float currentpeak = 0.f;
     
     for (uint32_t i = 0; i < frames; i++) {
       // Create temp double values for processing
@@ -102,7 +104,7 @@ protected:
       // process pregain processor
       fPreGainProcessor.Process(left, right);
 
-      // Get current peak overshoot
+      // Get current linear max peak per buffer
       if (abs(left) > currentpeak) {
         currentpeak = abs(left);
       }
@@ -113,26 +115,32 @@ protected:
       // process gain processor
       fGainProcessor.Process(left, right);
       
-      // get processed values back to floating output pointer
+      // get processed values back to floating output buffer
       out1[i] = left;
       out2[i] = right;
     }
-    if (currentpeak > mThreshPeak) {
-      mCurrentGainReduction = 1.f - (currentpeak - mThreshPeak);
+    // Convert peak value to log scale
+    float currentpeakDb = SR::Utils::AmpToDB(currentpeak);
+
+    // Get current peak overshoot in log scale and adjust gain reduction
+    if (currentpeakDb > mThreshPeakDb) {
+      // calculate gain reduction in dB, but don't raise it
+      mCurrentGainReductionDb = std::min(0.f - (currentpeakDb - mThreshPeakDb), mCurrentGainReductionDb);
       calcGain();
     }
   }
 
 private:
-  float mThreshPeak, mCurrentGainReduction;
+  float mThreshPeakDb, mCurrentGainReductionDb;
   SR::DSP::SRGain fGainProcessor;
   SR::DSP::SRGain fPreGainProcessor;
 
   void calcGain() {
-    if (mCurrentGainReduction > 1.f) {
-      mCurrentGainReduction = 1.f;
+    // It's a down leveler, we don't want to boost the gain
+    if (mCurrentGainReductionDb > 0.f) {
+      mCurrentGainReductionDb = 0.f;
     }
-    fGainProcessor.SetGainLin(mCurrentGainReduction);
+    fGainProcessor.SetGainDb(mCurrentGainReductionDb);
   }
 
   DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AutoLeveler);
